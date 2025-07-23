@@ -56,7 +56,11 @@ export default defineConfig({
     lazyCompilation: true,
   },
   // 构建产物相关配置
-  output: {},
+  output: {
+    sourceMap: {
+      js: isDev ? 'eval' : false, // 开发环境开启js的sourceMap
+    }
+  },
   source: {
     // 配置装饰器语法用于支持@injectable()和@inject装饰器
     decorators: {
