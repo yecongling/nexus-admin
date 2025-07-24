@@ -1,7 +1,7 @@
 import i18n from 'i18next';
-import { LanguagesSupported } from './language';
 import { initReactI18next } from 'react-i18next';
 import { usePreferencesStore } from '@/stores/store';
+import { LanguagesSupported } from './language';
 
 /**
  * 加载语言资源
@@ -15,6 +15,7 @@ const loadLangResources = (lang: string) => ({
     login: require(`./${lang}/login`).default,
     app: require(`./${lang}/app`).default,
     workflow: require(`./${lang}/workflow`).default,
+    preferences: require(`./${lang}/preferences`).default,
   },
 });
 

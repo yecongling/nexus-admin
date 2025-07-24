@@ -1,4 +1,5 @@
 import { Tooltip } from 'antd';
+import { t } from 'i18next';
 import FullContent from '../icons/FullContent';
 import HeaderMixedNav from '../icons/HeaderMixedNav';
 import HeaderNav from '../icons/HeaderNav';
@@ -9,49 +10,62 @@ import SidebarNav from '../icons/SidebarNav';
 import '../Theme/theme.scss';
 import './layout.scss';
 import { QuestionCircleOutlined } from '@ant-design/icons';
+import { usePreferencesStore } from '@/stores/store';
+
+// 定义组件映射
+const components: Record<string, React.FC> = {
+  'full-content': FullContent,
+  'header-nav': HeaderNav,
+  'mixed-nav': MixedNav,
+  'sidebar-mixed-nav': SidebarMixedNav,
+  'sidebar-nav': SidebarNav,
+  'header-mixed-nav': HeaderMixedNav,
+  'header-sidebar-nav': HeaderSidebarNav,
+};
 
 // 预设的布局
 const PRESET = [
   {
-    name: 'vertical',
-    tip: 'verticalTip',
-    type: SidebarNav,
+    name: t('preferences.vertical'),
+    tip: t('preferences.verticalTip'),
+    type: 'sidebar-nav',
   },
   {
-    name: 'twoColumn',
-    tip: 'twoColumnTip',
-    type: SidebarMixedNav,
+    name: t('preferences.twoColumn'),
+    tip: t('preferences.twoColumnTip'),
+    type: 'sidebar-mixed-nav',
   },
   {
-    name: 'horizontal',
-    tip: 'horizontalTip',
-    type: HeaderNav,
+    name: t('preferences.horizontal'),
+    tip: t('preferences.horizontalTip'),
+    type: 'header-nav',
   },
   {
-    name: 'headerSidebarNav',
-    tip: 'headerSidebarNavTip',
-    type: HeaderSidebarNav,
+    name: t('preferences.headerSidebarNav'),
+    tip: t('preferences.headerSidebarNavTip'),
+    type: 'header-sidebar-nav',
   },
   {
-    name: 'mixedMenu',
-    tip: 'mixedMenuTip',
-    type: MixedNav,
+    name: t('preferences.mixedMenu'),
+    tip: t('preferences.mixedMenuTip'),
+    type: 'mixed-nav',
   },
   {
-    name: 'headerTwoColumn',
-    tip: 'headerTwoColumnTip',
-    type: HeaderMixedNav,
+    name: t('preferences.headerTwoColumn'),
+    tip: t('preferences.headerTwoColumnTip'),
+    type: 'header-mixed-nav',
   },
   {
-    name: 'fullContent',
-    tip: 'fullContentTip',
-    type: FullContent,
+    name: t('preferences.fullContent'),
+    tip: t('preferences.fullContentTip'),
+    type: 'full-content',
   },
 ];
 /**
  * 布局
  */
 const MyLayout: React.FC = () => {
+  const { updatePreferences } = usePreferencesStore();
   return (
     <div
       style={{
@@ -71,7 +85,7 @@ const MyLayout: React.FC = () => {
             width: '100px',
           }}
           onClick={() => {
-            console.log(item.name);
+            updatePreferences('app', 'layout', item.name);
           }}
         >
           <div
@@ -83,7 +97,7 @@ const MyLayout: React.FC = () => {
             }}
           >
             {(() => {
-              const Comp = item.type;
+              const Comp = components[item.type];
               return <Comp />;
             })()}
           </div>

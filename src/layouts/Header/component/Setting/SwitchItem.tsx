@@ -1,12 +1,8 @@
 import { Switch } from 'antd';
 import type { ReactNode } from 'react';
-import './switchItem.scss';
+import { type Category, type SettingKey, usePreferencesStore } from '@/stores/store';
 import type { Preferences } from '@/stores/storeState';
-import {
-  type Category,
-  type SettingKey,
-  usePreferencesStore,
-} from '@/stores/store';
+import './switchItem.scss';
 
 /**
  * 获取 preferences 中的值
@@ -34,11 +30,7 @@ const SwitchItem: React.FC<SwitchItemProps> = (props) => {
   const { preferences, updatePreferences } = usePreferencesStore();
 
   // 状态值
-  const value = getPreferenceValue(
-    preferences,
-    category,
-    pKey as unknown as SettingKey<Category>,
-  );
+  const value = getPreferenceValue(preferences, category, pKey as unknown as SettingKey<Category>);
 
   /**
    * 切换时更新状态
@@ -74,11 +66,7 @@ const SwitchItem: React.FC<SwitchItemProps> = (props) => {
         </span>
       )}
       {/* 切换 */}
-      <Switch
-        disabled={disabled}
-        onChange={changePreferences}
-        checked={value}
-      />
+      <Switch disabled={disabled} onChange={changePreferences} checked={value} />
     </div>
   );
 };

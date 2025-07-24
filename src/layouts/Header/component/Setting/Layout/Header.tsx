@@ -29,7 +29,7 @@ const Header = () => {
   return (
     <>
       {/* 显示顶栏 */}
-      <SwitchItem title="显示顶栏" category="header" pKey="enable" />
+      <SwitchItem disabled={false} title="显示顶栏" category="header" pKey="enable" />
       {/* 模式 */}
       <SelectItem title="模式" items={modeItems} />
       {/* 菜单位置 */}

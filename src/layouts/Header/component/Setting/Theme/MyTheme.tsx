@@ -1,8 +1,8 @@
-import { THEME_PRESET } from '@/enums/constants';
 import clsx from 'clsx';
+import { THEME_PRESET } from '@/enums/constants';
+import { usePreferencesStore } from '@/stores/store';
 import './theme.scss';
 import SwitchItem from '../SwitchItem';
-import { usePreferencesStore } from '@/stores/store';
 
 /**
  * 主题
@@ -73,7 +73,7 @@ const MyTheme: React.FC = () => {
         pKey="semiDarkSidebar"
       />
       {/* 深色顶栏 */}
-      <SwitchItem title="深色顶栏" category="theme" pKey="semiDarkHeader" />
+      <SwitchItem disabled={false} title="深色顶栏" category="theme" pKey="semiDarkHeader" />
     </div>
   );
 };
