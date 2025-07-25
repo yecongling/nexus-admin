@@ -38,7 +38,7 @@ type MenuItem = Required<MenuProps>['items'][number];
 const LeftMenu: React.FC = memo(() => {
   const { preferences, updatePreferences } = usePreferencesStore();
   // 从状态库中获取状态
-  const { sidebar, theme, navigation } = preferences;
+  const { sidebar, theme, navigation, app } = preferences;
   const { menus } = useMenuStore();
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -51,9 +51,7 @@ const LeftMenu: React.FC = memo(() => {
   const { collapsed, width } = sidebar;
   let { mode, semiDarkSidebar, colorPrimary } = theme;
   if (mode === 'auto') {
-    mode = window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'dark'
-      : 'light';
+    mode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
   // 如果深色侧边栏目前也搞成dark
   if (semiDarkSidebar) {
@@ -85,28 +83,15 @@ const LeftMenu: React.FC = memo(() => {
     (menuList: RouteItem[], newArr: MenuItem[] = []) => {
       for (const item of menuList) {
         // 处理子路由和权限按钮不显示
-        if (
-          item?.meta?.menuType === 2 ||
-          item?.meta?.menuType === 3 ||
-          item?.hidden
-        ) {
+        if (item?.meta?.menuType === 2 || item?.meta?.menuType === 3 || item?.hidden) {
           continue;
         }
         // 下面判断代码解释 *** !item?.children?.length   ==>   (!item.children || item.children.length === 0)
         if (!item?.children?.length) {
-          newArr.push(
-            getItem(item.meta?.title, item.path, getIcon(item.meta?.icon)),
-          );
+          newArr.push(getItem(item.meta?.title, item.path, getIcon(item.meta?.icon)));
           continue;
         }
-        newArr.push(
-          getItem(
-            item.meta?.title,
-            item.path,
-            getIcon(item.meta?.icon),
-            deepLoopFloat(item.children),
-          ),
-        );
+        newArr.push(getItem(item.meta?.title, item.path, getIcon(item.meta?.icon), deepLoopFloat(item.children)));
       }
       return newArr;
     },
@@ -128,8 +113,10 @@ const LeftMenu: React.FC = memo(() => {
     // 判断如果是二级路由，不在左边菜单那种的就不去更新
     const route = searchRoute(pathname, menus);
     if (route && Object.keys(route).length) {
-      // const title = route.meta?.title;
-      // if (title) document.title = `${title} - flex & nexus`;
+      if (app.dynamicTitle) {
+        const title = route.meta?.title;
+        if (title) document.title = `Nexus - ${t(title)}`;
+      }
       if (!collapsed) setOpenKeys(openKey);
     }
   }, [pathname, collapsed, menus]);
@@ -207,11 +194,7 @@ const LeftMenu: React.FC = memo(() => {
           height: collapsed ? '140px' : '40px',
         }}
       >
-        <Space
-          direction={collapsed ? 'vertical' : 'horizontal'}
-          align="center"
-          className="justify-center"
-        >
+        <Space direction={collapsed ? 'vertical' : 'horizontal'} align="center" className="justify-center">
           <ConfigProvider
             theme={{
               components: {
@@ -249,11 +232,7 @@ const LeftMenu: React.FC = memo(() => {
               color="default"
               variant="filled"
               shape="circle"
-              icon={
-                <QuestionCircleOutlined
-                  style={{ color: isDark ? 'white' : 'black' }}
-                />
-              }
+              icon={<QuestionCircleOutlined style={{ color: isDark ? 'white' : 'black' }} />}
             />
           </Tooltip>
           <Button
@@ -267,18 +246,12 @@ const LeftMenu: React.FC = memo(() => {
             }}
             icon={
               collapsed ? (
-                <MenuUnfoldOutlined
-                  style={{ color: isDark ? 'white' : 'black' }}
-                />
+                <MenuUnfoldOutlined style={{ color: isDark ? 'white' : 'black' }} />
               ) : (
-                <MenuFoldOutlined
-                  style={{ color: isDark ? 'white' : 'black' }}
-                />
+                <MenuFoldOutlined style={{ color: isDark ? 'white' : 'black' }} />
               )
             }
-            onClick={() =>
-              updatePreferences('sidebar', 'collapsed', !collapsed)
-            }
+            onClick={() => updatePreferences('sidebar', 'collapsed', !collapsed)}
           />
         </Space>
       </div>

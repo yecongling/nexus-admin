@@ -1,4 +1,4 @@
-import { Badge, Dropdown, FloatButton, Input, Layout, type MenuProps, Skeleton, Space, Tooltip } from 'antd';
+import { Badge, Dropdown, FloatButton, Layout, type MenuProps, Skeleton, Space, Tooltip } from 'antd';
 import React, { memo, useState, Suspense, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -6,7 +6,6 @@ import {
   GithubOutlined,
   LockOutlined,
   MailOutlined,
-  SearchOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
 
@@ -19,6 +18,7 @@ import FullScreen from './component/FullScreen';
 import MessageBox from './component/MessageBox';
 import UserDropdown from './component/UserDropdown';
 import LayoutMenu from '../menu';
+import SearchMenuModal from './component/SearchMenuModal';
 
 const Setting = React.lazy(() => import('./component/Setting'));
 
@@ -59,14 +59,6 @@ const Header: React.FC = memo(() => {
   }));
 
   /**
-   * 检索菜单
-   * @param name 菜单名
-   */
-  const searchMenu = (name: string) => {
-    console.log(name);
-  };
-
-  /**
    * 切换语言
    * @param locale 语言
    */
@@ -91,12 +83,7 @@ const Header: React.FC = memo(() => {
             {showHeaderNav && <LayoutMenu className="w-full" mode="horizontal" theme={themeHeader} />}
           </div>
           <Space size="large" className="flex justify-end items-center toolbox">
-            <Input
-              variant="filled"
-              placeholder={t('common.operation.search')}
-              suffix={<SearchOutlined style={{ cursor: 'pointer', fontSize: '18px' }} />}
-              onChange={(e) => searchMenu(e.target.value)}
-            />
+            <SearchMenuModal />
             <Tooltip placement="bottom" title="github">
               <GithubOutlined style={{ cursor: 'pointer', fontSize: '18px' }} onClick={routeGitHub} />
             </Tooltip>

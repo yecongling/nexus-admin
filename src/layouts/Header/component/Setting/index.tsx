@@ -134,14 +134,14 @@ const Setting: React.FC<SettingProps> = memo(({ open, setOpen }) => {
       open={open}
       closeIcon={false}
       footer={
-        <Space size={16}>
+        <div className="w-full flex justify-evenly items-center">
           <Button type="primary" icon={<CopyOutlined />} disabled>
             复制偏好设置
           </Button>
           <Button icon={<ClearOutlined />} type="primary" danger onClick={resetPreference}>
             重置偏好设置
           </Button>
-        </Space>
+        </div>
       }
       onClose={() => setOpen(false)}
     >

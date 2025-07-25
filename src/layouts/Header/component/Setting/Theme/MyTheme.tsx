@@ -73,7 +73,7 @@ const MyTheme: React.FC = () => {
         pKey="semiDarkSidebar"
       />
       {/* 深色顶栏 */}
-      <SwitchItem disabled={false} title="深色顶栏" category="theme" pKey="semiDarkHeader" />
+      <SwitchItem disabled title="深色顶栏" category="theme" pKey="semiDarkHeader" />
     </div>
   );
 };
