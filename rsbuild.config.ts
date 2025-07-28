@@ -59,7 +59,7 @@ export default defineConfig({
   output: {
     sourceMap: {
       js: isDev ? 'eval' : false, // 开发环境开启js的sourceMap
-    }
+    },
   },
   source: {
     // 配置装饰器语法用于支持@injectable()和@inject装饰器
@@ -74,14 +74,12 @@ export default defineConfig({
       strategy: 'split-by-experience',
       // 下面的部分单独分包(这里暂时不分包-原因是：后续的测试中发现不配置下面的选项页面加载反而更快)
       forceSplitting: {
-        //   axios: /node_modules[\\/]axios/,
-        //   react: /node_modules[\\/]react/,
+        axios: /node_modules[\\/]axios/,
         antd: /node_modules[\\/]antd/,
-        //   'lodash-es': /node_modules[\\/]lodash-es/,
         //   echarts: /node_modules[\\/]echarts/,
         //   zrender: /node_modules[\\/]zrender/,
         antdIcons: /node_modules[\\/]@ant-design\/icons/,
-        //   'rc-cp': /node_modules[\\/]rc-/,
+        'rc-cp': /node_modules[\\/]rc-/,
       },
     },
     // 启用构建缓存
