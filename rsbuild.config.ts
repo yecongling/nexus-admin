@@ -34,7 +34,13 @@ export default defineConfig({
     // 启动图片压缩
     pluginImageCompress(),
     // 启动html压缩
-    pluginHtmlMinifierTerser(),
+    pluginHtmlMinifierTerser({
+      collapseBooleanAttributes: true,
+      collapseInlineTagWhitespace: true,
+      collapseWhitespace: true,
+      minifyCSS: true,
+      minifyJS: true,
+    }),
   ],
   // 配置html模板
   html: {
@@ -46,6 +52,8 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
       // 将三方依赖中对lodash的依赖重定向到lodash-es
       lodash: 'lodash-es',
+      'lodash-es': path.resolve(__dirname, 'node_modules/lodash-es'),
+      react: path.resolve(__dirname, 'node_modules/react'),
     },
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
     // 通过rsdcotor分析出来的打包时重复包
@@ -54,12 +62,20 @@ export default defineConfig({
   dev: {
     // 按需编译
     lazyCompilation: true,
+    // 启用热更新
+    hmr: true,
+    // 显示编译进度条
+    // progressBar: true,
   },
   // 构建产物相关配置
   output: {
     sourceMap: {
-      js: isDev ? 'eval' : false, // 开发环境开启js的sourceMap
+      js: isDev ? 'cheap-module-source-map' : false, // 开发环境开启js的sourceMap
+      css: isDev,
     },
+    cleanDistPath: true, // 每次构建前清理dist目录
+    polyfill: 'usage', // 按需引入polyfill
+    charset: 'utf8', // 设置输出文件的编码
   },
   source: {
     // 配置装饰器语法用于支持@injectable()和@inject装饰器
@@ -78,8 +94,8 @@ export default defineConfig({
         antd: /node_modules[\\/]antd/,
         //   echarts: /node_modules[\\/]echarts/,
         //   zrender: /node_modules[\\/]zrender/,
-        antdIcons: /node_modules[\\/]@ant-design\/icons/,
-        'rc-cp': /node_modules[\\/]rc-/,
+        // antdIcons: /node_modules[\\/]@ant-design\/icons/,
+        // 'rc-cp': /node_modules[\\/]rc-/,
       },
     },
     // 启用构建缓存
@@ -87,7 +103,11 @@ export default defineConfig({
     // 移除console.[method]语句
     removeConsole: true,
     // 开启包文件分析
-    // bundleAnalyze: {},
+    // bundleAnalyze: {
+    //   openAnalyzer: isDev, // 是否开启包文件分析，现在仅在开发环境下开启
+    //   analyzerMode: 'static',
+    //   reportFilename: 'bundle-report.html',
+    // },
   },
   // 服务相关
   server: {
