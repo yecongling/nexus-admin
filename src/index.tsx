@@ -5,6 +5,7 @@ import GlobalConfigProvider from './GlobalConfigProvider';
 import './index.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import './locales/i18next-config';
+import '@ant-design/v5-patch-for-react-19';
 
 const container = document.getElementById('root');
 if (container) {

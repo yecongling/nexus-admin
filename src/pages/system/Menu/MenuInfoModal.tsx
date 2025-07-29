@@ -2,13 +2,12 @@ import { QuestionCircleFilled, SettingOutlined } from '@ant-design/icons';
 import { Dropdown, Form, Input, InputNumber, type InputRef, Radio, Space, Switch, Tooltip, TreeSelect } from 'antd';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import React from 'react';
+import type React from 'react';
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import DragModal from '@/components/modal/DragModal';
 import { menuService } from '@/services/system/menu/menuApi';
 import { addIcon } from '@/utils/utils';
-
-const IconPanel = React.lazy(() => import('@/components/IconPanel'));
+import IconPanel from '@/components/IconPanel';
 
 // 菜单类型枚举
 enum MenuType {
@@ -58,10 +57,25 @@ export interface MenuData {
  * 菜单信息编辑弹窗
  */
 const MenuInfoModal: React.FC<MenuInfoModalProps> = ({ visible, currentRow, onOk, onCancel }) => {
-  const [form] = Form.useForm<MenuData>();
+  const [form] = Form.useForm();
   const nameRef = useRef<InputRef>(null);
   const [menuType, setMenuType] = useState<MenuType>(MenuType.TOP_LEVEL);
   const { t } = useTranslation();
+
+  // 初始化表单数据
+  useEffect(() => {
+    if (!visible) {
+      return;
+    }
+    const newMenuType = currentRow?.menuType ?? MenuType.TOP_LEVEL;
+    setMenuType(newMenuType);
+
+    if (currentRow) {
+      form.setFieldsValue(currentRow);
+    } else {
+      form.resetFields();
+    }
+  }, [currentRow, form, visible]);
 
   // 递归处理目录数据，对 title 进行国际化
   const translateDirectory = useCallback((data: any[]) => {
@@ -111,7 +125,7 @@ const MenuInfoModal: React.FC<MenuInfoModalProps> = ({ visible, currentRow, onOk
         form.focusField(firstErrorField);
       }
     }
-  }, [form, onOk]);
+  }, []);
 
   // 处理菜单类型变更
   const handleMenuTypeChange = useCallback((value: MenuType) => {
@@ -123,14 +137,11 @@ const MenuInfoModal: React.FC<MenuInfoModalProps> = ({ visible, currentRow, onOk
   }, []);
 
   // 选择图标
-  const handleIconSelect = useCallback(
-    (icon: string) => {
-      if (icon) {
-        form.setFieldsValue({ icon });
-      }
-    },
-    [form],
-  );
+  const handleIconSelect = useCallback((icon: string) => {
+    if (icon) {
+      form.setFieldsValue({ icon });
+    }
+  }, []);
 
   // 弹窗打开后的处理
   const handleAfterOpenChange = useCallback((open: boolean) => {
@@ -138,20 +149,6 @@ const MenuInfoModal: React.FC<MenuInfoModalProps> = ({ visible, currentRow, onOk
       nameRef.current?.focus();
     }
   }, []);
-
-  // 初始化表单数据
-  useEffect(() => {
-    if (!visible) return;
-
-    const newMenuType = currentRow?.menuType ?? MenuType.TOP_LEVEL;
-    setMenuType(newMenuType);
-
-    if (currentRow) {
-      form.setFieldsValue(currentRow);
-    } else {
-      form.resetFields();
-    }
-  }, [visible, currentRow]);
 
   // 根据菜单类型判断是否显示路由相关字段
   const showRouteFields = useMemo(() => menuType !== MenuType.PERMISSION_BUTTON, [menuType]);
@@ -162,7 +159,6 @@ const MenuInfoModal: React.FC<MenuInfoModalProps> = ({ visible, currentRow, onOk
       styles={{
         body: {
           padding: '20px 40px',
-          height: menuType === MenuType.SUB_ROUTE ? '500px' : '600px',
           overflowY: 'auto',
         },
       }}
