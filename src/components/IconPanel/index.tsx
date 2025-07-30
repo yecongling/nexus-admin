@@ -1,6 +1,6 @@
 import * as AntdIcon from '@ant-design/icons';
 import { Pagination } from 'antd';
-import { randomUUID } from 'crypto';
+import { random } from 'lodash-es';
 import React from 'react';
 import { useEffect, useState } from 'react';
 import { isValidElementType } from 'react-is';
@@ -36,7 +36,7 @@ const IconPanel: React.FC<IconPanelProps> = (props) => {
     <>
       <div className="icon-panel flex flex-wrap gap-2 p-4">
         {paginatedIcons.map((icon) => {
-          const id = randomUUID();
+          const id = random();
           return (
             <div
               key={`${icon.displayName}-${id}`}

@@ -187,7 +187,7 @@ const LeftMenu: React.FC = memo(() => {
           <Empty description={<>暂无菜单，请检查用户角色是否具有菜单！</>} />
         )}
       </Spin>
-      <Divider style={{ margin: '8px 0' }} />
+      <Divider style={{ margin: '0 0 8px 0' }} />
       <div
         className="flex justify-center content-center"
         style={{

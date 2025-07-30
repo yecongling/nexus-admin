@@ -48,11 +48,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ onFinish }) => {
         </Col>
         <Col span={6} style={{ textAlign: 'right' }}>
           <Space>
-            <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-              {t('common.operation.search')}
-            </Button>
             <Button type="default" icon={<RedoOutlined />}>
               {t('common.operation.reset')}
+            </Button>
+            <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
+              {t('common.operation.search')}
             </Button>
           </Space>
         </Col>

@@ -46,7 +46,7 @@ export const THEME_PRESET: Array<{
 // 内置的theme
 export const BUILTIN_THEME_PRESETS: BuiltinThemePreset[] = [
   {
-    color: 'rgb(0, 107, 230)',
+    color: '#1890ff',
     type: 'default',
   },
   {

@@ -3,7 +3,7 @@ import { isEqual } from 'lodash-es';
 import type React from 'react';
 import { useReducer, useState } from 'react';
 import { ExclamationCircleFilled } from '@ant-design/icons';
-import { App, Button, Card, ConfigProvider, Space, type TableProps, Tag } from 'antd';
+import { App, Button, Card, ConfigProvider, Space, Switch, type TableProps } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import { menuService } from '@/services/system/menu/menuApi';
@@ -76,28 +76,53 @@ const Menu: React.FC = () => {
     },
   });
 
+  // 切换菜单状态mutation
+  const toggleMenuStatusMutation = useMutation({
+    mutationFn: ({ menuId, status }: { menuId: string; status: boolean }) =>
+      menuService.toggleMenuStatus(menuId, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sys_menu', searchParams] });
+    },
+  });
+
   // 定义表格列
   const columns: TableProps['columns'] = [
     {
       title: '名称',
-      width: 160,
+      width: 120,
       dataIndex: 'name',
+      align: 'left',
       key: 'name',
+      sorter: (a: any, b: any) => {
+        return a.name.localeCompare(b.name);
+      },
       render(value) {
         return t(value);
       },
     },
     {
-      title: '组件',
-      width: 140,
-      dataIndex: 'component',
-      key: 'component',
-    },
-    {
       title: '路径',
       width: 140,
+      align: 'left',
       dataIndex: 'url',
       key: 'url',
+    },
+    {
+      title: '图标',
+      width: 80,
+      dataIndex: 'icon',
+      key: 'icon',
+      align: 'center',
+      render(value) {
+        return addIcon(value);
+      },
+    },
+    {
+      title: '组件',
+      width: 140,
+      align: 'left',
+      dataIndex: 'component',
+      key: 'component',
     },
     {
       title: '类型',
@@ -121,20 +146,13 @@ const Menu: React.FC = () => {
       },
     },
     {
-      title: '图标',
-      width: 80,
-      dataIndex: 'icon',
-      key: 'icon',
-      align: 'center',
-      render(value) {
-        return addIcon(value);
-      },
-    },
-    {
       title: '序号',
       width: 80,
       dataIndex: 'sortNo',
       key: 'sortNo',
+      sorter: (a: any, b: any) => {
+        return a.sortNo - b.sortNo;
+      },
       align: 'center',
     },
     {
@@ -143,11 +161,16 @@ const Menu: React.FC = () => {
       dataIndex: 'status',
       key: 'status',
       align: 'center',
-      render(value: boolean) {
-        if (value) {
-          return <Tag color="green">启用</Tag>;
-        }
-        return <Tag color="gray">停用</Tag>;
+      render(value: boolean, record: any) {
+        return (
+          <Switch
+            size="small"
+            value={value}
+            onChange={(checked) => {
+              toggleMenuStatusMutation.mutate({ menuId: record.id, status: checked });
+            }}
+          />
+        );
       },
     },
     {
@@ -310,7 +333,7 @@ const Menu: React.FC = () => {
           isLoading={isLoading}
           rowKey="id"
           scroll={{ y: height - 128, x: 'max-content' }}
-          rowSelection={{ ...rowSelection }}
+          rowSelection={{ ...rowSelection, checkStrictly: false }}
         />
       </Card>
 

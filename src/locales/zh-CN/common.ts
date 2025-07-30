@@ -8,7 +8,7 @@ const translation = {
     cancel: '取消',
     delete: '删除',
     edit: '编辑',
-    add: '添加',
+    add: '新增',
     save: '保存',
     reset: '重置',
     submit: '提交',

@@ -19,6 +19,8 @@ enum MenuApi {
   deleteMenu = '/system/menu/deleteMenu',
   // 批量删除菜单
   deleteMenuBatch = '/system/menu/deleteMenuBatch',
+  // 切换菜单状态
+  toggleMenuStatus = '/system/menu/toggleMenuStatus',
   // 导出（Excel）
   exportMenus = '/system/menu/export',
   // 批量导入
@@ -88,6 +90,14 @@ interface IMenuService {
    * @returns 删除结果
    */
   deleteMenuBatch(menuIds: string[]): Promise<boolean>;
+
+  /**
+   * 切换菜单状态
+   * @param menuId 菜单ID
+   * @param status 状态
+   * @returns 切换结果
+   */
+  toggleMenuStatus(menuId: string, status: boolean): Promise<boolean>;
 
   /**
    * 导出菜单
@@ -203,6 +213,20 @@ export const menuService: IMenuService = {
       data: { menuIds },
     });
   },
+
+  /**
+   * 切换菜单状态
+   * @param menuId 菜单ID
+   * @param status 状态
+   * @returns 切换结果
+   */
+  toggleMenuStatus(menuId: string, status: boolean): Promise<boolean> {
+    return HttpRequest.post({
+      url: MenuApi.toggleMenuStatus,
+      data: { menuId, status },
+    });
+  },
+
   /**
    * 导出菜单
    * @param params 查询参数

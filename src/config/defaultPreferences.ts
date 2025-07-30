@@ -90,7 +90,7 @@ export const defaultPreferences: Preferences = {
   theme: {
     builtinType: "default",
     colorError: "#ff4d4f",
-    colorPrimary: "#1677ff",
+    colorPrimary: "#1890ff",
     colorSuccess: "#52c41a",
     colorWarning: "#faad14",
     mode: "light",
