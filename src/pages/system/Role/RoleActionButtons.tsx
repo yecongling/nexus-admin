@@ -1,4 +1,4 @@
-import { PlusOutlined, DeleteOutlined, ExclamationCircleFilled } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, ExclamationCircleFilled, ImportOutlined } from '@ant-design/icons';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { App, Button, Space } from 'antd';
 import type React from 'react';
@@ -37,7 +37,7 @@ const RoleActionButtons: React.FC<RoleActionButtonsProps> = ({ onAddRoleClick, s
       <Button type="primary" icon={<PlusOutlined />} onClick={onAddRoleClick}>
         {t('common.operation.add')}
       </Button>
-      <Button type="default" icon={<PlusOutlined />}>
+      <Button type="default" icon={<ImportOutlined />}>
         {t('common.operation.import')}
       </Button>
       <Button type="default" danger icon={<DeleteOutlined />} disabled={selRows.length === 0} onClick={onBatchDelete}>
