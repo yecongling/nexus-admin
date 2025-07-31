@@ -1,6 +1,8 @@
 import { ManOutlined, WomanOutlined, MoreOutlined } from '@ant-design/icons';
-import { Button, Space, Tag, Image, Dropdown, type TableProps, type MenuProps } from 'antd';
+import { Button, Space, Tag, Image, Dropdown, type TableProps, type MenuProps, Tooltip } from 'antd';
 import type { UserModel } from '@/services/system/user/type';
+import type { ThemePreferences } from '@/stores/storeState';
+import { Icon } from '@iconify-icon/react';
 
 /**
  * 获取表格列
@@ -13,6 +15,7 @@ export const getColumns = (
   handleEdit: (record: UserModel) => void,
   handleDetail: (record: UserModel) => void,
   t: (key: string) => string,
+  theme: ThemePreferences,
   handleMore: (record: UserModel) => MenuProps['items'],
 ): TableProps<UserModel>['columns'] => [
   {
@@ -93,12 +96,20 @@ export const getColumns = (
     align: 'center',
     render: (_: any, record: UserModel) => (
       <Space size={0}>
-        <Button type="link" size="small" onClick={() => handleDetail(record)}>
-          {t('common.operation.detail')}
-        </Button>
-        <Button type="link" size="small" onClick={() => handleEdit(record)}>
-          {t('common.operation.edit')}
-        </Button>
+        <Tooltip title={t('common.operation.detail')}>
+          <Button
+            type="text"
+            icon={<Icon icon="ix:plant-details" style={{ color: theme.colorPrimary }} className="text-xl block" />}
+            onClick={() => handleDetail(record)}
+          />
+        </Tooltip>
+        <Tooltip title={t('common.operation.edit')}>
+          <Button
+            type="text"
+            icon={<Icon icon="fluent-color:calendar-edit-16" className="text-xl block" />}
+            onClick={() => handleEdit(record)}
+          />
+        </Tooltip>
         <Dropdown menu={{ items: handleMore(record) }} placement="bottom" trigger={['click']}>
           <Button type="link" size="small" icon={<MoreOutlined />} />
         </Dropdown>

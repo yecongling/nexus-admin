@@ -106,7 +106,13 @@ const AppCard: React.FC<AppCardProps> = ({ app, onRefresh }) => {
                 </div>
               </div>
               <div className="mx-1 !hidden h-[14px] w-[1px] shrink-0 group-hover:!flex" />
-              <div className="!hidden shrink-0 group-hover:!flex">
+              <div
+                className="!hidden shrink-0 group-hover:!flex"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                }}
+              >
                 {/* 这里是下拉选择编辑 */}
                 <CustomPopover
                   htmlContent={

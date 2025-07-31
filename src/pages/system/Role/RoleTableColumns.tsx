@@ -1,5 +1,5 @@
 import type { TableProps } from 'antd';
-import { DeleteOutlined, EditOutlined, ExclamationCircleFilled, MoreOutlined } from '@ant-design/icons';
+import { ExclamationCircleFilled, MoreOutlined } from '@ant-design/icons';
 import { Space, Button, Dropdown, App, Tooltip, Switch } from 'antd';
 import { useCallback } from 'react';
 import type { RoleState } from '@/services/system/role/type';
@@ -32,7 +32,7 @@ const getRoleTableColumns = ({
       {
         key: 'edit',
         label: '编辑',
-        icon: <EditOutlined className="text-orange-400! text-xl!" />,
+        icon: <Icon icon="fluent-color:calendar-edit-16" className="text-xl! block" />,
         onClick: () => {
           dispatch({
             openEditModal: true,
@@ -44,7 +44,7 @@ const getRoleTableColumns = ({
       {
         key: 'delete',
         label: '删除',
-        icon: <DeleteOutlined className="text-xl!" style={{ color: theme.colorError }} />,
+        icon: <Icon icon="fluent:delete-dismiss-24-filled" className="text-xl! block text-[#ff4d4f]" />,
         onClick: () => {
           modal.confirm({
             title: '删除角色',

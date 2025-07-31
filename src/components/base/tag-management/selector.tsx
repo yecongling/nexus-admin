@@ -198,7 +198,7 @@ const Panel: React.FC<PanelProps> = (props) => {
   });
 
   return (
-    <div className="relative w-full rounded-lg border-[0.5px] border-blue-100 bg-white">
+    <div className="relative w-[300px] rounded-lg border-[0.5px] border-blue-100 bg-white">
       <div className="p-2">
         <Input
           prefix={<SearchOutlined />}
@@ -377,7 +377,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
             )
           }
           popupClassName="!w-full !ring-0"
-          className="!z-20 h-fit !w-full"
+          className="!z-20 h-fit !w-[324px]"
         />
       )}
     </>

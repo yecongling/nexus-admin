@@ -2,7 +2,7 @@
   "languages": [
     {
       "value": "en-US",
-      "name": "English (United States)",
+      "name": "English",
       "prompt_name": "English",
       "example": "Hello",
       "supported": true

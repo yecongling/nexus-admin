@@ -18,7 +18,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onFinish }) => {
       <Row gutter={24}>
         <Col span={6}>
           <Form.Item name="name" label="菜单名称" colon={false}>
-            <Input autoFocus allowClear autoComplete="off" />
+            <Input autoFocus allowClear autoComplete="off" placeholder="请输入菜单名称" />
           </Form.Item>
         </Col>
         <Col span={6}>

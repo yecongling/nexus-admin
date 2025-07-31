@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash-es';
-import { DeleteOutlined, EditOutlined, ExclamationCircleFilled, LockOutlined } from '@ant-design/icons';
+import { EditOutlined, ExclamationCircleFilled, LockOutlined } from '@ant-design/icons';
 import { Card, Table, App } from 'antd';
 import type React from 'react';
 import { useMemo, useReducer, useState } from 'react';
@@ -14,12 +14,16 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import TableActionButtons from './TableActionButtons';
 import UserPasswordModal from './UserPasswordModal';
 import { useTranslation } from 'react-i18next';
+import { usePreferencesStore } from '@/stores/store';
+import { Icon } from '@iconify-icon/react';
 
 /**
  * 用户管理
  */
 const User: React.FC = () => {
   const { modal } = App.useApp();
+  const { preferences } = usePreferencesStore();
+  const { theme } = preferences;
   const { t } = useTranslation();
   // 合并状态
   const [state, dispatch] = useReducer(
@@ -177,11 +181,11 @@ const User: React.FC = () => {
   // 表格操作列中的更多操作
   const columns = useMemo(
     () =>
-      getColumns(handleEdit, handleDetail, t, (record) => [
+      getColumns(handleEdit, handleDetail, t, theme, (record) => [
         {
           key: 'updatePwd',
           label: '修改密码',
-          icon: <EditOutlined className="text-orange-400!" />,
+          icon: <Icon icon="fluent:password-reset-48-regular" className="text-xl! block text-orange-300" />,
           onClick: () => {
             /* 打开密码编辑弹窗 */
             dispatch({
@@ -193,13 +197,13 @@ const User: React.FC = () => {
         {
           key: 'freeze',
           label: record.status === 1 ? '冻结' : '解冻',
-          icon: <LockOutlined className="text-orange-400!" />,
+          icon: <Icon icon="fluent-color:lock-shield-32" className="text-xl! block" />,
           onClick: () => handleUpdateStatusMutation.mutate(record),
         },
         {
           key: 'delete',
           label: t('common.operation.delete'),
-          icon: <DeleteOutlined className="text-red-400!" />,
+          icon: <Icon icon="fluent:delete-dismiss-24-filled" className="text-xl! block text-[#ff4d4f]!" />,
           onClick: () => {
             modal.confirm({
               title: '删除用户',

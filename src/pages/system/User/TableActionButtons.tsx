@@ -2,6 +2,7 @@ import { Button, Space, Upload, message } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { usePermission } from '@/hooks/usePermission';
 import { useTranslation } from 'react-i18next';
+import { Icon } from '@iconify-icon/react';
 
 interface TableActionButtonsProps {
   handleAdd: () => void;
@@ -24,6 +25,8 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
   const canBatchDelete = usePermission(['sys:user:delete']);
   // 是否有批量导入权限
   const canBatchImport = usePermission(['sys:user:import']);
+  // 是否有批量导出权限
+  const canBatchExport = usePermission(['sys:user:export']);
   return (
     <Space>
       {canAdd && (
@@ -46,12 +49,28 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
             }
           }}
         >
-          <Button icon={<PlusOutlined />}>{t('common.operation.import')}</Button>
+          <Button icon={<Icon icon="material-icon-theme:folder-import" className="text-xl! block" />}>
+            {t('common.operation.import')}
+          </Button>
         </Upload>
       )}
 
+      {canBatchExport && (
+        <Button
+          icon={<Icon icon="material-icon-theme:folder-export" className="text-xl! block" />}
+          disabled={selectedRows.length === 0}
+        >
+          {t('common.operation.export')}
+        </Button>
+      )}
+
       {canBatchDelete && (
-        <Button danger icon={<DeleteOutlined />} disabled={selectedRows.length === 0} onClick={handleBatchDelete}>
+        <Button
+          danger
+          icon={<Icon icon="fluent:delete-dismiss-24-filled" className="text-xl block text-[#ff4d4f]" />}
+          disabled={selectedRows.length === 0}
+          onClick={handleBatchDelete}
+        >
           {t('common.operation.delete')}
         </Button>
       )}
