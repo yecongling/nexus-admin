@@ -1,3 +1,5 @@
+import { usePlatformHotkey } from '@/hooks/usePlatformHotkey';
+import { getShortcutLabel } from '@/utils/utils';
 import { SearchOutlined } from '@ant-design/icons';
 import { Input, Modal } from 'antd';
 import { useState } from 'react';
@@ -19,13 +21,25 @@ const SearchMenuModal: React.FC = () => {
     console.log(name);
   };
 
+  // 绑定快捷键
+  const shortcut = usePlatformHotkey({
+    mac: 'meta+k',
+    windows: 'ctrl+k',
+    handler: (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      setOpenModal(true);
+    },
+  });
+
   return (
     <>
       <Input
         variant="filled"
-        className='w-32!'
+        className="w-34!"
         placeholder={t('common.operation.search')}
-        suffix={<SearchOutlined style={{ cursor: 'pointer', fontSize: '18px' }} />}
+        suffix={<div className="bg-white rounded-sm px-2">{getShortcutLabel(shortcut)}</div>}
+        prefix={<SearchOutlined style={{ cursor: 'pointer', fontSize: '18px' }} />}
         onClick={() => setOpenModal(true)}
       />
       <Modal

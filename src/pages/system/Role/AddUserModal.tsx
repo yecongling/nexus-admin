@@ -99,7 +99,11 @@ const AddUser: React.FC<AddUserProps> = ({ open, onOk, onCancel, roleId }) => {
       width: 60,
       align: 'center',
       render: (text) => {
-        return text === 1 ? <ManOutlined className="text-blue-400" /> : <WomanOutlined className="text-pink-400" />;
+        return text === 1 ? (
+          <ManOutlined className="text-blue-400! text-xl" />
+        ) : (
+          <WomanOutlined className="text-pink-400! text-xl" />
+        );
       },
     },
   ];
@@ -195,7 +199,6 @@ const AddUser: React.FC<AddUserProps> = ({ open, onOk, onCancel, roleId }) => {
       <Card className="mt-2">
         <Table
           size="small"
-          title={() => '用户列表'}
           bordered
           rowKey="id"
           loading={isLoading}

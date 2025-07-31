@@ -188,6 +188,7 @@ const MenuInfoModal: React.FC<MenuInfoModalProps> = ({ visible, currentRow, onOk
         body: {
           padding: '20px 40px',
           overflowY: 'auto',
+          height: 600
         },
       }}
       title={`${currentRow ? '编辑' : '新增'}菜单数据`}
@@ -277,10 +278,10 @@ const MenuInfoModal: React.FC<MenuInfoModalProps> = ({ visible, currentRow, onOk
                 autoComplete="off"
                 addonAfter={
                   <Dropdown
-                    trigger={['hover']}
+                    trigger={['click']}
                     placement="bottom"
                     popupRender={() => <IconPanel onSelect={handleIconSelect} />}
-                    overlayClassName="w-[360px] h-[300px] bg-white overflow-y-auto p-2 shadow-xl transition-all duration-200"
+                    overlayClassName="w-[360px] h-[300px] bg-white overflow-y-auto p-2 shadow-xl"
                   >
                     <SettingOutlined className="cursor-pointer" />
                   </Dropdown>

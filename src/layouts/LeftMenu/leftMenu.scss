@@ -5,39 +5,8 @@
   }
 }
 
-.sider ul.ant-menu::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-  background-color: transparent;
-  display: none;
-}
-
 .side-menu {
   flex: 1;
-  overflow: auto;
-}
-
-.scroll:hover .side-menu {
   overflow-y: auto;
 }
 
-.side-menu .ant-menu-root {
-  border-right: none !important;
-}
-
-.side-menu::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.side-menu::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.12);
-  border-radius: 3px;
-  box-shadow: inset 0 0 5px rgba(0, 21, 41, 0.05);
-}
-
-.side-menu::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.06);
-  border-radius: 3px;
-  box-shadow: inset 0 0 5px rgba(0, 21, 41, 0.05);
-}

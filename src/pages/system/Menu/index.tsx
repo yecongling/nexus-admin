@@ -184,7 +184,7 @@ const Menu: React.FC = () => {
             <Tooltip title={t('common.operation.edit')}>
               <Button
                 type="text"
-                icon={<Icon icon="fluent-color:calendar-edit-16" className="text-xl" />}
+                icon={<Icon icon="fluent-color:calendar-edit-16" className="text-xl block" />}
                 onClick={() => {
                   dispatch({
                     currentRow: record,
@@ -196,7 +196,7 @@ const Menu: React.FC = () => {
             <Tooltip title={t('common.operation.delete')}>
               <Button
                 type="text"
-                icon={<Icon icon="fluent:delete-dismiss-24-filled" className="text-xl text-[#ff4d4f]" />}
+                icon={<Icon icon="fluent:delete-dismiss-24-filled" className="text-xl block text-[#ff4d4f]" />}
                 onClick={() => delMenu(record.id)}
               />
             </Tooltip>

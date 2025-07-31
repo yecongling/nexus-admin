@@ -114,7 +114,7 @@ const RoleMenuDrawer: React.FC<RoleMenuDrawerProps> = memo(({ open, roleId, onOk
 
   return (
     <Drawer
-      title="授权菜单"
+      title="授权菜单、按钮权限"
       width={400}
       open={open}
       closeIcon={false}

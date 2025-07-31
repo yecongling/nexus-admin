@@ -27,7 +27,7 @@ export interface RoleModel {
   /**
    * 角色状态
    */
-  status: string;
+  status: boolean;
 
   /**
    * 角色描述

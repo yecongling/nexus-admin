@@ -1,18 +1,16 @@
 import type { TableProps } from 'antd';
-import {
-  DeleteOutlined,
-  EditOutlined,
-  ExclamationCircleFilled,
-  MoreOutlined,
-} from '@ant-design/icons';
-import { Tag, Space, Button, Dropdown, App } from 'antd';
+import { DeleteOutlined, EditOutlined, ExclamationCircleFilled, MoreOutlined } from '@ant-design/icons';
+import { Space, Button, Dropdown, App, Tooltip, Switch } from 'antd';
 import { useCallback } from 'react';
 import type { RoleState } from '@/services/system/role/type';
 import type { UseMutationResult } from '@tanstack/react-query';
+import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
+import { usePreferencesStore } from '@/stores/store';
 
 interface RoleTableColumnsProps {
   dispatch: React.Dispatch<Partial<RoleState>>;
   logicDeleteUserMutation: UseMutationResult<any, any, any, unknown>;
+  toggleRoleStatusMutation: UseMutationResult<any, any, any, unknown>;
 }
 
 /**
@@ -23,16 +21,18 @@ interface RoleTableColumnsProps {
 const getRoleTableColumns = ({
   dispatch,
   logicDeleteUserMutation,
+  toggleRoleStatusMutation,
 }: RoleTableColumnsProps): TableProps['columns'] => {
   const { modal } = App.useApp();
-
+  const { preferences } = usePreferencesStore();
+  const { theme } = preferences;
   // 更多操作
   const more = useCallback(
     (row: any) => [
       {
         key: 'edit',
         label: '编辑',
-        icon: <EditOutlined className="text-orange-400" />,
+        icon: <EditOutlined className="text-orange-400! text-xl!" />,
         onClick: () => {
           dispatch({
             openEditModal: true,
@@ -44,7 +44,7 @@ const getRoleTableColumns = ({
       {
         key: 'delete',
         label: '删除',
-        icon: <DeleteOutlined className="text-red-400" />,
+        icon: <DeleteOutlined className="text-xl!" style={{ color: theme.colorError }} />,
         onClick: () => {
           modal.confirm({
             title: '删除角色',
@@ -66,7 +66,7 @@ const getRoleTableColumns = ({
   const columns: TableProps['columns'] = [
     {
       title: '编码',
-      width: 160,
+      width: 80,
       dataIndex: 'roleCode',
       key: 'roleCode',
     },
@@ -95,15 +95,19 @@ const getRoleTableColumns = ({
     },
     {
       title: '状态',
-      width: 80,
+      width: 60,
       dataIndex: 'status',
       key: 'status',
       align: 'center',
-      render(value) {
-        return value ? (
-          <Tag color="success">启用</Tag>
-        ) : (
-          <Tag color="error">停用</Tag>
+      render(value, record) {
+        return (
+          <Switch
+            size="small"
+            value={value}
+            onChange={(checked) => {
+              toggleRoleStatusMutation.mutate({ id: record.id, status: checked });
+            }}
+          />
         );
       },
     },
@@ -115,60 +119,62 @@ const getRoleTableColumns = ({
     },
     {
       title: '操作',
-      width: '14%',
+      width: '12%',
       dataIndex: 'action',
       fixed: 'right',
       align: 'center',
       render(_, record) {
         return (
           <Space size={0}>
-            <Button
-              type="link"
-              size="small"
-              onClick={() => {
-                dispatch({
-                  openEditModal: true,
-                  currentRow: record,
-                  action: 'view',
-                });
-              }}
-            >
-              详情
-            </Button>
-            <Button
-              type="link"
-              size="small"
-              onClick={() => {
-                dispatch({
-                  openEditModal: false,
-                  currentRow: record,
-                  action: 'user',
-                  openRoleUserModal: true,
-                });
-              }}
-            >
-              用户
-            </Button>
-            <Button
-              type="link"
-              size="small"
-              onClick={() => {
-                dispatch({
-                  openEditModal: false,
-                  currentRow: record,
-                  action: 'auth',
-                  openRoleMenuModal: true,
-                });
-              }}
-            >
-              授权菜单
-            </Button>
-            <Dropdown
-              menu={{ items: more(record) }}
-              placement="bottom"
-              trigger={['click']}
-            >
-              <Button type="link" size="small" icon={<MoreOutlined />} />
+            <Tooltip title="详情">
+              <Button
+                type="text"
+                icon={<Icon icon="ix:plant-details" style={{ color: theme.colorPrimary }} className="text-xl block" />}
+                onClick={() => {
+                  dispatch({
+                    openEditModal: true,
+                    currentRow: record,
+                    action: 'view',
+                  });
+                }}
+              />
+            </Tooltip>
+            <Tooltip title="分配用户">
+              <Button
+                type="text"
+                icon={<Icon icon="la:user-plus" style={{ color: theme.colorPrimary }} className="text-xl block" />}
+                onClick={() => {
+                  dispatch({
+                    openEditModal: false,
+                    currentRow: record,
+                    action: 'user',
+                    openRoleUserModal: true,
+                  });
+                }}
+              />
+            </Tooltip>
+            <Tooltip title="授权菜单">
+              <Button
+                type="text"
+                icon={
+                  <Icon
+                    icon="arcticons:ente-authenticator"
+                    style={{ color: theme.colorSuccess }}
+                    className="text-xl block"
+                  />
+                }
+                onClick={() => {
+                  dispatch({
+                    openEditModal: false,
+                    currentRow: record,
+                    action: 'auth',
+                    openRoleMenuModal: true,
+                  });
+                }}
+              />
+            </Tooltip>
+            <Dropdown menu={{ items: more(record) }} placement="bottom" trigger={['click']}>
+              <Button type="text" icon={<MoreOutlined className="text-xl" />} />
             </Dropdown>
           </Space>
         );

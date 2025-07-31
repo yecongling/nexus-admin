@@ -175,6 +175,7 @@ const LeftMenu: React.FC = memo(() => {
       <Spin wrapperClassName="side-menu" spinning={loading} tip="加载中">
         {menuList.length > 0 ? (
           <Menu
+            style={{ borderRight: 0 }}
             mode="inline"
             theme={mode}
             defaultSelectedKeys={[pathname]}

@@ -156,6 +156,5 @@ export function getShortcutLabel(shortcut: string): string {
     .replace('ctrl', isMac ? '⌘' : 'Ctrl')
     .replace('shift', isMac ? '⇧' : 'Shift')
     .replace('alt', isMac ? '⌥' : 'Alt')
-    .replace('meta', isMac ? '⌘' : 'Meta') // 可选
-    .toUpperCase();
+    .replace('meta', isMac ? '⌘' : 'Meta'); // 可选;
 }

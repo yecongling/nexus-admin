@@ -86,6 +86,14 @@ const Role: React.FC = () => {
     },
   });
 
+  // 切换角色状态mutation
+  const toggleRoleStatusMutation = useMutation({
+    mutationFn: (params: { id: string; status: boolean }) => roleService.changeStatus(params),
+    onSuccess() {
+      refetch();
+    },
+  });
+
   // 添加角色mutation
   const addRoleMutation = useMutation({
     mutationFn: (roleData: Record<string, any>) => roleService.addRole(roleData),
@@ -195,6 +203,7 @@ const Role: React.FC = () => {
   const columns = getRoleTableColumns({
     dispatch,
     logicDeleteUserMutation,
+    toggleRoleStatusMutation
   });
 
   return (
