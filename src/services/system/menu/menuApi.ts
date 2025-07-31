@@ -61,7 +61,7 @@ interface IMenuService {
    * 获取所有的菜单目录（如果选中的是按钮，就不止以及菜单）
    * @returns 菜单列表
    */
-  getDirectory(menuType: number): Promise<MenuDirectoryItem[]>;
+  getDirectory(): Promise<MenuDirectoryItem[]>;
 
   /**
    * 新增菜单
@@ -93,11 +93,11 @@ interface IMenuService {
 
   /**
    * 切换菜单状态
-   * @param menuId 菜单ID
+   * @param id 菜单ID
    * @param status 状态
    * @returns 切换结果
    */
-  toggleMenuStatus(menuId: string, status: boolean): Promise<boolean>;
+  toggleMenuStatus(id: string, status: boolean): Promise<boolean>;
 
   /**
    * 导出菜单
@@ -160,11 +160,10 @@ export const menuService: IMenuService = {
    * 获取所有的一级菜单
    * @returns 菜单列表
    */
-  getDirectory(menuType: number): Promise<MenuDirectoryItem[]> {
+  getDirectory(): Promise<MenuDirectoryItem[]> {
     return HttpRequest.get(
       {
         url: MenuApi.getDirectory,
-        params: { menuType },
       },
       { successMessageMode: 'none' },
     );
@@ -216,14 +215,14 @@ export const menuService: IMenuService = {
 
   /**
    * 切换菜单状态
-   * @param menuId 菜单ID
+   * @param id 菜单ID
    * @param status 状态
    * @returns 切换结果
    */
-  toggleMenuStatus(menuId: string, status: boolean): Promise<boolean> {
+  toggleMenuStatus(id: string, status: boolean): Promise<boolean> {
     return HttpRequest.post({
       url: MenuApi.toggleMenuStatus,
-      data: { menuId, status },
+      data: { id, status },
     });
   },
 

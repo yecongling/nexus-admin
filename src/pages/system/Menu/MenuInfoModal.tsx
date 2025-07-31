@@ -78,36 +78,59 @@ const MenuInfoModal: React.FC<MenuInfoModalProps> = ({ visible, currentRow, onOk
   }, [currentRow, form, visible]);
 
   // 递归处理目录数据，对 title 进行国际化
-  const translateDirectory = useCallback((data: any[]) => {
-    return data.map((item) => {
-      // 对 title 字段进行国际化处理
-      const translatedItem = {
-        ...item,
-        title: (
-          <Space>
-            {addIcon(item.icon)}
-            {t(item.title)}
-          </Space>
-        ),
-      };
-      if (item.children && item.children.length > 0) {
-        // 递归处理子项
-        translatedItem.children = translateDirectory(item.children);
-      }
-      return translatedItem;
-    });
-  }, []);
+  const translateDirectory = useCallback(
+    (data: any[], typeFilter?: MenuType): any[] => {
+      const loop = (items: any[]): any[] =>
+        items
+          .filter((item) => {
+            // 如果传入了类型过滤，则只保留匹配类型的项
+            return typeFilter === MenuType.PERMISSION_BUTTON
+              ? item.menuType !== MenuType.PERMISSION_BUTTON
+              : item.menuType === typeFilter;
+          })
+          .map((item) => {
+            const iconNode = item.icon ? addIcon(item.icon) : null;
+
+            const newItem: any = {
+              ...item,
+              selectable:
+                menuType !== MenuType.PERMISSION_BUTTON || (!Array.isArray(item.children) || item.children.length === 0),
+              title: (
+                <Space>
+                  {iconNode}
+                  {t(item.title)}
+                </Space>
+              ),
+            };
+
+            if (Array.isArray(item.children) && item.children.length > 0) {
+              newItem.children = loop(item.children);
+            }
+
+            return newItem;
+          });
+
+      return loop(data);
+    },
+    [t, menuType],
+  );
 
   // 使用 useQuery 获取目录数据
-  const { data: directoryData, isLoading } = useQuery({
-    queryKey: ['sys_menu_directory', menuType],
+  const { data: allDirectoryData, isLoading } = useQuery({
+    queryKey: ['sys_menu_directory'],
     queryFn: async () => {
-      const directory = await menuService.getDirectory(menuType);
-      // 递归处理目录数据
-      return translateDirectory(directory);
+      return await menuService.getDirectory();
     },
     enabled: visible,
   });
+
+  // 根据当前菜单类型进行过滤并国际化
+  const directoryData = useMemo(() => {
+    return translateDirectory(
+      allDirectoryData || [],
+      menuType === MenuType.SUB_MENU || menuType === MenuType.SUB_ROUTE ? MenuType.TOP_LEVEL : menuType,
+    );
+  }, [allDirectoryData, menuType]);
 
   // 处理表单提交
   const handleOk = useCallback(async () => {
@@ -128,13 +151,18 @@ const MenuInfoModal: React.FC<MenuInfoModalProps> = ({ visible, currentRow, onOk
   }, []);
 
   // 处理菜单类型变更
-  const handleMenuTypeChange = useCallback((value: MenuType) => {
-    setMenuType(value);
-    if (value === MenuType.SUB_ROUTE) {
-      form.setFieldsValue({ route: true });
-    }
-    nameRef.current?.focus();
-  }, []);
+  const handleMenuTypeChange = useCallback(
+    (value: MenuType) => {
+      setMenuType(value);
+      requestAnimationFrame(() => {
+        if (value === MenuType.SUB_ROUTE) {
+          form.setFieldsValue({ route: true });
+        }
+        nameRef.current?.focus();
+      });
+    },
+    [form, nameRef],
+  );
 
   // 选择图标
   const handleIconSelect = useCallback((icon: string) => {
@@ -252,7 +280,7 @@ const MenuInfoModal: React.FC<MenuInfoModalProps> = ({ visible, currentRow, onOk
                     trigger={['hover']}
                     placement="bottom"
                     popupRender={() => <IconPanel onSelect={handleIconSelect} />}
-                    overlayClassName="w-[360px] h-[300px] bg-white overflow-y-auto p-2 shadow-xl"
+                    overlayClassName="w-[360px] h-[300px] bg-white overflow-y-auto p-2 shadow-xl transition-all duration-200"
                   >
                     <SettingOutlined className="cursor-pointer" />
                   </Dropdown>

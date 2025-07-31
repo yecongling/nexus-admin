@@ -57,7 +57,7 @@ export default defineConfig({
     },
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
     // 通过rsdcotor分析出来的打包时重复包
-    dedupe: ['@babel/runtime', 'tslib', 'rc-switch', 'rc-checkbox', 'clsx'],
+    dedupe: ['@babel/runtime', 'tslib', 'rc-switch', 'rc-checkbox', 'clsx', 'react-is'],
   },
   dev: {
     // 按需编译
@@ -74,7 +74,6 @@ export default defineConfig({
       css: isDev,
     },
     cleanDistPath: true, // 每次构建前清理dist目录
-    polyfill: 'usage', // 按需引入polyfill
     charset: 'utf8', // 设置输出文件的编码
   },
   source: {
@@ -90,8 +89,8 @@ export default defineConfig({
       strategy: 'split-by-experience',
       // 下面的部分单独分包(这里暂时不分包-原因是：后续的测试中发现不配置下面的选项页面加载反而更快)
       forceSplitting: {
-        axios: /node_modules[\\/]axios/,
-        antd: /node_modules[\\/]antd/,
+        // axios: /node_modules[\\/]axios/,
+        // antd: /node_modules[\\/]antd/,
         //   echarts: /node_modules[\\/]echarts/,
         //   zrender: /node_modules[\\/]zrender/,
         // antdIcons: /node_modules[\\/]@ant-design\/icons/,

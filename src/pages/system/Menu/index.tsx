@@ -1,10 +1,10 @@
-import { isEqual } from 'lodash-es';
-
 import type React from 'react';
 import { useReducer, useState } from 'react';
 import { ExclamationCircleFilled } from '@ant-design/icons';
-import { App, Button, Card, ConfigProvider, Space, Switch, type TableProps } from 'antd';
+import { App, Button, Card, ConfigProvider, Space, Switch, Tooltip, type TableProps } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { Icon } from '@iconify-icon/react';
+import { isEqual } from 'lodash-es';
 
 import { menuService } from '@/services/system/menu/menuApi';
 import MenuInfoModal from './MenuInfoModal';
@@ -78,8 +78,7 @@ const Menu: React.FC = () => {
 
   // 切换菜单状态mutation
   const toggleMenuStatusMutation = useMutation({
-    mutationFn: ({ menuId, status }: { menuId: string; status: boolean }) =>
-      menuService.toggleMenuStatus(menuId, status),
+    mutationFn: ({ id, status }: { id: string; status: boolean }) => menuService.toggleMenuStatus(id, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sys_menu', searchParams] });
     },
@@ -167,7 +166,7 @@ const Menu: React.FC = () => {
             size="small"
             value={value}
             onChange={(checked) => {
-              toggleMenuStatusMutation.mutate({ menuId: record.id, status: checked });
+              toggleMenuStatusMutation.mutate({ id: record.id, status: checked });
             }}
           />
         );
@@ -182,22 +181,25 @@ const Menu: React.FC = () => {
       render: (_: any, record: any) => {
         return (
           <Space size={0}>
-            <Button
-              size="small"
-              type="link"
-              style={{ color: '#fa8c16' }}
-              onClick={() => {
-                dispatch({
-                  currentRow: record,
-                  openEditModal: true,
-                });
-              }}
-            >
-              {t('common.operation.edit')}
-            </Button>
-            <Button size="small" variant="link" color="danger" onClick={() => delMenu(record.id)}>
-              {t('common.operation.delete')}
-            </Button>
+            <Tooltip title={t('common.operation.edit')}>
+              <Button
+                type="text"
+                icon={<Icon icon="fluent-color:calendar-edit-16" className="text-xl" />}
+                onClick={() => {
+                  dispatch({
+                    currentRow: record,
+                    openEditModal: true,
+                  });
+                }}
+              />
+            </Tooltip>
+            <Tooltip title={t('common.operation.delete')}>
+              <Button
+                type="text"
+                icon={<Icon icon="fluent:delete-dismiss-24-filled" className="text-xl text-[#ff4d4f]" />}
+                onClick={() => delMenu(record.id)}
+              />
+            </Tooltip>
           </Space>
         );
       },

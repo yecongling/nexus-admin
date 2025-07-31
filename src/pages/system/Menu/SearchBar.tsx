@@ -25,8 +25,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ onFinish }) => {
           <Form.Item name="menuType" label="菜单类型" colon={false}>
             <Select
               allowClear
+              placeholder="请选择菜单类型"
               options={[
-                { value: '', label: '请选择', disabled: true },
                 { value: 0, label: '一级菜单' },
                 { value: 1, label: '子菜单' },
                 { value: 2, label: '按钮权限' },
@@ -38,8 +38,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ onFinish }) => {
           <Form.Item name="status" label="状态" colon={false}>
             <Select
               allowClear
+              placeholder="请选择状态"
               options={[
-                { value: '', label: '请选择', disabled: true },
                 { value: 1, label: '启用' },
                 { value: 0, label: '停用' },
               ]}
