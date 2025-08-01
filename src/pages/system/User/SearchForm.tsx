@@ -39,7 +39,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch, isLoading }) => {
       }}
     >
       <Card>
-        <Form form={form} onFinish={onSearch} initialValues={{ sex: 0 }}>
+        <Form form={form} onFinish={onSearch}>
           <Row gutter={24}>
             <Col span={6}>
               <Form.Item name="username" label="用户名" colon={false}>
@@ -52,7 +52,6 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch, isLoading }) => {
                   allowClear
                   placeholder="请选择性别"
                   options={[
-                    { value: 0, label: '全部' },
                     { value: 1, label: '男' },
                     { value: 2, label: '女' },
                   ]}
