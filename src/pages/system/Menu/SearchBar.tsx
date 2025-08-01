@@ -4,12 +4,13 @@ import { useTranslation } from 'react-i18next';
 
 type SearchBarProps = {
   onFinish: (values: any) => void;
+  isLoading: boolean;
 };
 
 /**
  * 检索表单
  */
-const SearchBar: React.FC<SearchBarProps> = ({ onFinish }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ onFinish, isLoading }) => {
   const [form] = Form.useForm();
   const { t } = useTranslation();
 
@@ -51,7 +52,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onFinish }) => {
             <Button type="default" icon={<RedoOutlined />}>
               {t('common.operation.reset')}
             </Button>
-            <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
+            <Button type="primary" htmlType="submit" loading={isLoading} icon={<SearchOutlined />}>
               {t('common.operation.search')}
             </Button>
           </Space>

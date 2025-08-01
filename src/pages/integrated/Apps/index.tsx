@@ -2,7 +2,7 @@ import { ApartmentOutlined, ApiOutlined, AppstoreOutlined, SolutionOutlined } fr
 import { useQuery } from '@tanstack/react-query';
 
 import { useDebounceFn } from 'ahooks';
-import { Segmented, type SegmentedProps, Input, type InputRef, Checkbox } from 'antd';
+import { Segmented, type SegmentedProps, Input, type InputRef, Checkbox, Spin } from 'antd';
 import { isEqual } from 'lodash-es';
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
@@ -16,6 +16,7 @@ import { appsService } from '@/services/integrated/apps/appsApi';
 import { useTagStore } from '@/stores/useTagStore.ts';
 import AppCard from './AppCard';
 import './apps.scss';
+import { Icon } from '@iconify-icon/react';
 const { Search } = Input;
 /**
  * 应用设计
@@ -64,7 +65,11 @@ const Apps: React.FC = () => {
   });
 
   // 查询应用数据
-  const { data: result, refetch } = useQuery({
+  const {
+    data: result,
+    refetch,
+    isLoading,
+  } = useQuery({
     queryKey: ['integrated_app', searchParams],
     queryFn: () => appsService.getApps(searchParams),
   });
@@ -142,11 +147,12 @@ const Apps: React.FC = () => {
           <div className="w-[600px] my-4 mx-auto">
             {/* 检索 */}
             <Search
-              enterButton={t('common.operation.search')}
+              enterButton
               allowClear
               placeholder={t('common.placeholder')}
               ref={searchRef}
               size="large"
+              loading={isLoading}
               onSearch={handleSearch}
             />
           </div>
@@ -161,14 +167,18 @@ const Apps: React.FC = () => {
           </div>
         </div>
         {/* 应用列表 */}
-        <div className="flex-1 overflow-x-hidden overflow-y-auto grid content-start grid-cols-1 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5 2k:grid-cols-6 gap-4 pt-2 grow relative">
-          {/* 新建应用卡片 */}
-          {hasAddPermission && <CreateAppCard refresh={refetch} />}
-          {/* 应用列表 */}
-          {(result || []).map((item: App) => (
-            <AppCard key={item.id} app={item} onRefresh={refetch} />
-          ))}
-        </div>
+        {isLoading ? (
+          <Spin indicator={<Icon icon="eos-icons:bubble-loading" width={48} />} />
+        ) : (
+          <div className="flex-1 overflow-x-hidden overflow-y-auto grid content-start grid-cols-1 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5 2k:grid-cols-6 gap-4 pt-2 grow relative">
+            {/* 新建应用卡片 */}
+            {hasAddPermission && <CreateAppCard refresh={refetch} />}
+            {/* 应用列表 */}
+            {(result || []).map((item: App) => (
+              <AppCard key={item.id} app={item} onRefresh={refetch} />
+            ))}
+          </div>
+        )}
       </div>
       {/* 显示标签管理弹窗 */}
       {<TagManagementModal type="app" show={showTagManagementModal} />}

@@ -1,14 +1,11 @@
 import { Button, Card, Spin, Tabs, type TabsProps } from 'antd';
 import type React from 'react';
 import { useEffect, useState } from 'react';
+import { Icon } from '@iconify-icon/react';
 import styles from './message-box.module.scss';
 import MessageList, { type MessageListType } from './MessageList';
 import { groupBy } from 'lodash-es';
-import {
-  MessageOutlined,
-  NotificationOutlined,
-  ReconciliationOutlined,
-} from '@ant-design/icons';
+import { MessageOutlined, NotificationOutlined, ReconciliationOutlined } from '@ant-design/icons';
 /**
  * 通知模块
  */
@@ -54,10 +51,7 @@ const Notify: React.FC = () => {
 
   useEffect(() => {
     // 数据加载完成后将数据进行分组
-    const groupData: { [key: string]: MessageListType } = groupBy(
-      dataSource,
-      'type',
-    );
+    const groupData: { [key: string]: MessageListType } = groupBy(dataSource, 'type');
     setGroupData(groupData);
   }, [dataSource]);
 
@@ -113,11 +107,12 @@ const Notify: React.FC = () => {
   ];
 
   return (
-    <Card
-      className={styles['message-box']}
-      styles={{ body: { height: '100%', padding: '12px' } }}
-    >
-      <Spin spinning={loading} style={{ display: 'block' }}>
+    <Card className={styles['message-box']} styles={{ body: { height: '100%', padding: '12px' } }}>
+      <Spin
+        spinning={loading}
+        indicator={<Icon icon="eos-icons:bubble-loading" width={24} />}
+        style={{ display: 'block' }}
+      >
         <Tabs
           items={tabList}
           defaultActiveKey="message"

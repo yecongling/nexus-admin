@@ -2,6 +2,7 @@ import { Spin, App as AntdApp, Skeleton } from 'antd';
 import type React from 'react';
 import { Suspense, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router';
+import { Icon } from '@iconify-icon/react';
 import { Router } from '@/router/router';
 import { antdUtils } from '@/utils/antdUtil';
 import { useMenuStore } from './stores/store';
@@ -46,7 +47,7 @@ const App: React.FC = () => {
   return (
     <>
       {isLoading ? (
-        <Spin size="large" fullscreen style={{ fontSize: 48 }} />
+        <Spin indicator={<Icon icon="eos-icons:bubble-loading" width={48} />} size="large" fullscreen />
       ) : (
         <Suspense fallback={<Skeleton />}>
           <Router />

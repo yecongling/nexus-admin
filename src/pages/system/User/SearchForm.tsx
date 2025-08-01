@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
  */
 interface SearchFormProps {
   onSearch: (values: UserSearchParams) => void;
+  isLoading: boolean;
 }
 
 /**
@@ -15,7 +16,7 @@ interface SearchFormProps {
  * @param onSearch 搜索回调
  * @returns 搜索表单
  */
-const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
+const SearchForm: React.FC<SearchFormProps> = ({ onSearch, isLoading }) => {
   const [form] = Form.useForm();
   const { t } = useTranslation();
 
@@ -49,8 +50,8 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
               <Form.Item name="sex" label="性别" colon={false}>
                 <Select
                   allowClear
+                  placeholder="请选择性别"
                   options={[
-                    { value: '', label: '请选择', disabled: true },
                     { value: 0, label: '全部' },
                     { value: 1, label: '男' },
                     { value: 2, label: '女' },
@@ -72,7 +73,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
             </Col>
             <Col span={6} style={{ textAlign: 'right' }}>
               <Space>
-                <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
+                <Button type="primary" htmlType="submit" loading={isLoading} icon={<SearchOutlined />}>
                   {t('common.operation.search')}
                 </Button>
                 <Button type="default" icon={<RedoOutlined />} onClick={handleReset}>

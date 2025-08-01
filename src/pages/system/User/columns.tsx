@@ -85,7 +85,7 @@ export const getColumns = (
     width: 60,
     align: 'center',
     render: (text: number) => {
-      return text === 1 ? <Tag color="green">正常</Tag> : <Tag color="gray">冻结</Tag>;
+      return text === 1 ? <Tag color="#87d068">正常</Tag> : <Tag color="gray">冻结</Tag>;
     },
   },
   {

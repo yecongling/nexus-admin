@@ -179,7 +179,7 @@ const AddUser: React.FC<AddUserProps> = ({ open, onOk, onCancel, roleId }) => {
             </Col>
             <Col span={6} style={{ textAlign: 'right' }}>
               <Space>
-                <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
+                <Button type="primary" htmlType="submit" loading={isLoading} icon={<SearchOutlined />}>
                   检索
                 </Button>
                 <Button

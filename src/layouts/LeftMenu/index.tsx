@@ -14,6 +14,7 @@ import {
   ConfigProvider,
   Empty,
 } from 'antd';
+import { Icon } from '@iconify-icon/react';
 import logo from '@/assets/images/icon-192.png';
 import { Link, useLocation, useNavigate } from 'react-router';
 
@@ -172,7 +173,12 @@ const LeftMenu: React.FC = memo(() => {
           </div>
         </Link>
       </div>
-      <Spin wrapperClassName="side-menu" spinning={loading} tip="加载中">
+      <Spin
+        wrapperClassName="side-menu"
+        indicator={<Icon icon="eos-icons:bubble-loading" width={24} />}
+        spinning={loading}
+        tip="加载中"
+      >
         {menuList.length > 0 ? (
           <Menu
             style={{ borderRight: 0 }}

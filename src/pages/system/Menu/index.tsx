@@ -317,7 +317,7 @@ const Menu: React.FC = () => {
         }}
       >
         <Card>
-          <SearchBar onFinish={onFinish} />
+          <SearchBar onFinish={onFinish} isLoading={isLoading} />
         </Card>
       </ConfigProvider>
       {/* 查询表格 */}

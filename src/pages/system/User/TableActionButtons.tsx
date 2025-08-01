@@ -1,5 +1,5 @@
-import { Button, Space, Upload, message } from 'antd';
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { App, Button, Space, Upload } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import { usePermission } from '@/hooks/usePermission';
 import { useTranslation } from 'react-i18next';
 import { Icon } from '@iconify-icon/react';
@@ -18,6 +18,7 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
   refetch,
   selectedRows,
 }) => {
+  const { message } = App.useApp();
   const { t } = useTranslation();
   // 是否有新增权限
   const canAdd = usePermission(['sys:user:add']);
@@ -27,6 +28,8 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
   const canBatchImport = usePermission(['sys:user:import']);
   // 是否有批量导出权限
   const canBatchExport = usePermission(['sys:user:export']);
+  // 是否有从回收站恢复权限
+  const canRecover = usePermission(['sys:user:recover']);
   return (
     <Space>
       {canAdd && (
@@ -72,6 +75,17 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
           onClick={handleBatchDelete}
         >
           {t('common.operation.delete')}
+        </Button>
+      )}
+      {canRecover && (
+        <Button
+          icon={<Icon icon="fa:recycle" className="text-xl! block text-green-500" />}
+          onClick={() => {
+            // 处理恢复操作
+            message.info('恢复功能待实现');
+          }}
+        >
+          {t('common.operation.recycle')}
         </Button>
       )}
     </Space>

@@ -1,12 +1,12 @@
+import type React from 'react';
 import { Navigate, useLocation } from 'react-router';
 import { useUserStore } from '@/stores/userStore';
-
 /**
  * 前置路由拦截（判定用户是否 处于登录状态）
  * @returns
  */
 interface AuthRouterProps {
-  children: JSX.Element;
+  children: React.ReactElement;
 }
 
 /**

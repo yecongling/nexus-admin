@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash-es';
-import { EditOutlined, ExclamationCircleFilled, LockOutlined } from '@ant-design/icons';
+import { ExclamationCircleFilled } from '@ant-design/icons';
 import { Card, Table, App } from 'antd';
 import type React from 'react';
 import { useMemo, useReducer, useState } from 'react';
@@ -222,7 +222,7 @@ const User: React.FC = () => {
   return (
     <>
       {/* 搜索表单 */}
-      <SearchForm onSearch={handleSearch} />
+      <SearchForm onSearch={handleSearch} isLoading={isLoading} />
 
       {/* 查询表格 */}
       <Card style={{ flex: 1, marginTop: '8px', minHeight: 0 }} styles={{ body: { height: '100%' } }} ref={parentRef}>

@@ -293,7 +293,7 @@ const RoleUserDrawer: React.FC<RoleUserDrawerProps> = memo(({ open, roleId, onCa
               </Col>
               <Col span={6} style={{ textAlign: 'right' }}>
                 <Space>
-                  <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
+                  <Button type="primary" htmlType="submit" loading={isLoading} icon={<SearchOutlined />}>
                     检索
                   </Button>
                   <Button

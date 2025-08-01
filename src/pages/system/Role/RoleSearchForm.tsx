@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 interface RoleSearchFormProps {
   onFinish: (values: any) => void;
+  isLoading: boolean;
 }
 
 /**
@@ -12,7 +13,7 @@ interface RoleSearchFormProps {
  * @param props 参数
  * @returns 检索表单
  */
-const RoleSearchForm: React.FC<RoleSearchFormProps> = ({ onFinish }) => {
+const RoleSearchForm: React.FC<RoleSearchFormProps> = ({ onFinish, isLoading }) => {
   // 检索表单
   const [form] = Form.useForm();
   const { t } = useTranslation();
@@ -53,7 +54,7 @@ const RoleSearchForm: React.FC<RoleSearchFormProps> = ({ onFinish }) => {
             </Col>
             <Col span={6} style={{ textAlign: 'right' }}>
               <Space>
-                <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
+                <Button type="primary" htmlType="submit" loading={isLoading} icon={<SearchOutlined />}>
                   {t('common.operation.search')}
                 </Button>
                 <Button

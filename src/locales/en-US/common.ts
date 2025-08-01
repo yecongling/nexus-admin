@@ -25,6 +25,8 @@ const translation = {
     cut: 'cut',
     search: 'search',
     selectAll: 'select all',
+    recover: 'recover',
+    recycle: 'recycle',
   },
   errorMsg: {
     requestFailed: 'request failed',

@@ -25,6 +25,8 @@ const translation = {
     cut: '剪切',
     search: '搜索',
     selectAll: '全选',
+    recover: '恢复',
+    recycle: '回收站'
   },
   errorMsg: {
     requestFailed: '请求失败',
