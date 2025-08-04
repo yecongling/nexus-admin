@@ -22,6 +22,7 @@ export const getColumns = (
     dataIndex: 'id',
     title: 'ID',
     key: 'id',
+    width: 40,
     hidden: true,
   },
   {
@@ -90,7 +91,7 @@ export const getColumns = (
   },
   {
     title: '操作',
-    width: '10%',
+    width: 160,
     dataIndex: 'action',
     fixed: 'right',
     align: 'center',

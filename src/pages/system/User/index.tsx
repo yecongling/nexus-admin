@@ -18,6 +18,7 @@ import { usePreferencesStore } from '@/stores/store';
 import { Icon } from '@iconify-icon/react';
 import Operation from './Operation';
 import { MyIcon } from '@/components/MyIcon';
+import ResizableTable from '@/components/base/ResizableTable';
 
 /**
  * 用户管理
@@ -255,7 +256,7 @@ const User: React.FC = () => {
         />
 
         {/* 表格数据 */}
-        <Table
+        <ResizableTable
           size="small"
           style={{ marginTop: '8px' }}
           bordered
