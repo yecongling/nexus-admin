@@ -1,4 +1,4 @@
-import { ManOutlined, WomanOutlined, MoreOutlined } from '@ant-design/icons';
+import { ManOutlined, WomanOutlined } from '@ant-design/icons';
 import { Button, Space, Tag, Image, Dropdown, type TableProps, type MenuProps, Tooltip } from 'antd';
 import type { UserModel } from '@/services/system/user/type';
 import type { ThemePreferences } from '@/stores/storeState';
