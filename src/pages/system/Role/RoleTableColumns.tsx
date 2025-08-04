@@ -169,7 +169,7 @@ const getRoleTableColumns = ({
                 }}
               />
             </Tooltip>
-            <Dropdown menu={{ items: more(record) }} placement="bottom" trigger={['click']}>
+            <Dropdown menu={{ items: more(record) }} placement="bottomRight" trigger={['click']}>
               <Button type="text" icon={<MoreOutlined className="text-xl" />} />
             </Dropdown>
           </Space>
