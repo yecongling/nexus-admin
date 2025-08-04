@@ -23,13 +23,7 @@ interface UserInfoModalProps {
  * @param userInfo 用户信息
  * @returns
  */
-const UserInfoModal: React.FC<UserInfoModalProps> = ({
-  visible,
-  onOk,
-  onCancel,
-  userInfo,
-  action,
-}) => {
+const UserInfoModal: React.FC<UserInfoModalProps> = ({ visible, onOk, onCancel, userInfo, action }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string>();
@@ -117,9 +111,10 @@ const UserInfoModal: React.FC<UserInfoModalProps> = ({
 
   return (
     <DragModal
-      title={userInfo ? '编辑用户' : '新增用户'}
+      title={action === 'view' ? '用户详情' : action === 'add' ? '新增用户' : '编辑用户'}
       open={visible}
       onOk={handleOk}
+      okButtonProps={{ disabled: action === 'view' }}
       onCancel={handleCancel}
       width={600}
     >
@@ -140,18 +135,14 @@ const UserInfoModal: React.FC<UserInfoModalProps> = ({
           name="username"
           rules={[{ required: true }, { min: 3, message: '用户名至少3个字符' }]}
         >
-          <Input placeholder="请输入用户名" autoFocus/>
+          <Input placeholder="请输入用户名" autoFocus />
         </Form.Item>
 
-        <Form.Item
-          label="真实姓名"
-          name="realName"
-          rules={[{ required: true }]}
-        >
+        <Form.Item label="真实姓名" name="realName" rules={[{ required: true }]}>
           <Input placeholder="请输入真实姓名" />
         </Form.Item>
 
-        <Form.Item label="头像" valuePropName='avatar'>
+        <Form.Item label="头像" valuePropName="avatar">
           <Upload
             listType="picture-card"
             showUploadList={false}
@@ -159,11 +150,7 @@ const UserInfoModal: React.FC<UserInfoModalProps> = ({
             beforeUpload={beforeUpload}
             onChange={handleChange}
           >
-            {imageUrl ? (
-              <img src={imageUrl} alt="avatar" style={{ width: '100%' }} />
-            ) : (
-              uploadButton
-            )}
+            {imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
           </Upload>
         </Form.Item>
 
@@ -176,11 +163,7 @@ const UserInfoModal: React.FC<UserInfoModalProps> = ({
           />
         </Form.Item>
 
-        <Form.Item
-          label="邮箱"
-          name="email"
-          rules={[{ required: true }, { type: 'email' }]}
-        >
+        <Form.Item label="邮箱" name="email" rules={[{ required: true }, { type: 'email' }]}>
           <Input placeholder="请输入邮箱" />
         </Form.Item>
 
@@ -189,11 +172,7 @@ const UserInfoModal: React.FC<UserInfoModalProps> = ({
         </Form.Item>
 
         {!userInfo && (
-          <Form.Item
-            label="密码"
-            name="password"
-            rules={[{ required: true }, { min: 8, message: '密码至少8个字符' }]}
-          >
+          <Form.Item label="密码" name="password" rules={[{ required: true }, { min: 8, message: '密码至少8个字符' }]}>
             <Input.Password placeholder="请输入密码" />
           </Form.Item>
         )}

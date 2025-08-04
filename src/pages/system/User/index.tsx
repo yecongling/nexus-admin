@@ -16,12 +16,14 @@ import UserPasswordModal from './UserPasswordModal';
 import { useTranslation } from 'react-i18next';
 import { usePreferencesStore } from '@/stores/store';
 import { Icon } from '@iconify-icon/react';
+import Operation from './Operation';
+import { MyIcon } from '@/components/MyIcon';
 
 /**
  * 用户管理
  */
 const User: React.FC = () => {
-  const { modal } = App.useApp();
+  const { modal, message } = App.useApp();
   const { preferences } = usePreferencesStore();
   const { theme } = preferences;
   const { t } = useTranslation();
@@ -36,6 +38,8 @@ const User: React.FC = () => {
       openEditModal: false,
       // 修改密码弹窗的打开状态
       openPasswordModal: false,
+      // 操作记录弹窗的打开状态
+      openOperationModal: false,
       // 当前编辑的行数据
       currentRow: null,
       // 当前选中的行数据
@@ -193,10 +197,30 @@ const User: React.FC = () => {
       },
     },
     {
+      key: 'assignRole',
+      label: '分配角色',
+      icon: <MyIcon type="nexus-assigned" className="text-xl! block" />,
+      onClick: () => {
+        message.warning('分配角色功能待实现');
+      },
+    },
+    {
       key: 'freeze',
       label: record.status === 1 ? '冻结' : '解冻',
       icon: <Icon icon="fluent-color:lock-shield-32" className="text-xl! block" />,
       onClick: () => handleUpdateStatusMutation.mutate(record),
+    },
+    {
+      key: 'operation',
+      label: '操作记录',
+      icon: <Icon icon="fluent-color:history-48" className="text-xl! block" />,
+      onClick: () => {
+        // 打开操作记录弹窗
+        dispatch({
+          openOperationModal: true,
+          currentRow: record,
+        });
+      },
     },
     {
       key: 'delete',
@@ -288,6 +312,17 @@ const User: React.FC = () => {
         userInfo={state.currentRow}
         onClose={closePasswordModal}
         onOk={closePasswordModal}
+      />
+
+      {/* 操作记录弹窗 */}
+      <Operation
+        userInfo={state.currentRow}
+        visible={state.openOperationModal}
+        onCancel={() => {
+          dispatch({
+            openOperationModal: false,
+          });
+        }}
       />
     </>
   );

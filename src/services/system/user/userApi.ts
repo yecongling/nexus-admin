@@ -151,7 +151,7 @@ export const userService: IUserService = {
    */
   async logicDeleteUsers(ids: string[]): Promise<boolean> {
     const response = await HttpRequest.post({
-      url: UserAction.deleteUsers,
+      url: UserAction.logicDeleteUsers,
       data: ids,
     });
     return response;

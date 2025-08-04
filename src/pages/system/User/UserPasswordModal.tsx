@@ -1,7 +1,7 @@
 import type React from 'react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { zxcvbn } from '@zxcvbn-ts/core';
-import { Input, Form, Progress, Row, Col, App } from 'antd';
+import { Input, Form, Progress, Row, Col, App, type InputRef } from 'antd';
 import { keys, values } from 'lodash-es';
 import type { UserModel } from '@/services/system/user/type';
 import { useMutation } from '@tanstack/react-query';
@@ -9,6 +9,7 @@ import { userService } from '@/services/system/user/userApi';
 import DragModal from '@/components/modal/DragModal';
 import styles from './strengthMeter.module.scss';
 import { strengthMeterOptions } from './config';
+import { useTranslation } from 'react-i18next';
 
 interface UserPasswordModalProps {
   open: boolean;
@@ -23,6 +24,8 @@ interface UserPasswordModalProps {
 const UserPasswordModal: React.FC<UserPasswordModalProps> = ({ open, onClose, userInfo, onOk }) => {
   const { modal, message } = App.useApp();
   const [form] = Form.useForm();
+  const { t } = useTranslation();
+  const passwordRef = useRef<InputRef>(null);
 
   useEffect(() => {
     if (open) {
@@ -58,6 +61,13 @@ const UserPasswordModal: React.FC<UserPasswordModalProps> = ({ open, onClose, us
       });
   };
 
+  // 窗口打开后的回调
+  const onAfterOpenChange = (open: boolean) => {
+    if (open) {
+      passwordRef.current?.focus();
+    }
+  };
+
   // 更新用户密码
   const updatePassword = useMutation({
     mutationFn: ({ id, password }: { id: string; password: string }) => userService.changeUserPwd(id, password),
@@ -74,7 +84,7 @@ const UserPasswordModal: React.FC<UserPasswordModalProps> = ({ open, onClose, us
   });
 
   return (
-    <DragModal title="更新用户密码" open={open} onCancel={onClose} onOk={handleOk}>
+    <DragModal title="更新用户密码" open={open} onCancel={onClose} onOk={handleOk} afterOpenChange={onAfterOpenChange}>
       <Form form={form} labelCol={{ span: 4 }} wrapperCol={{ span: 19 }}>
         {/* 隐藏的用户ID */}
         <Form.Item name="id" hidden>
@@ -84,7 +94,7 @@ const UserPasswordModal: React.FC<UserPasswordModalProps> = ({ open, onClose, us
           <Input disabled />
         </Form.Item>
         <Form.Item label="密码" name="password" rules={[{ required: true }, { min: 8, message: '密码至少8个字符' }]}>
-          <Input.Password />
+          <Input.Password ref={passwordRef} />
         </Form.Item>
         <Form.Item
           label="确认密码"
@@ -117,8 +127,7 @@ const UserPasswordModal: React.FC<UserPasswordModalProps> = ({ open, onClose, us
       <Row justify="space-around" className={styles['process-steps']}>
         {keys(strengthMeterOptions).map((value: string) => (
           <Col span={4} key={value}>
-            {/* 这里后续改造国际化的时候替换 */}
-            {value}
+            {t(`user.passowrd.${value}`)}
           </Col>
         ))}
       </Row>
