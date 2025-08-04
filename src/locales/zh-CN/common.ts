@@ -26,7 +26,8 @@ const translation = {
     search: '搜索',
     selectAll: '全选',
     recover: '恢复',
-    recycle: '回收站'
+    recycle: '回收站',
+    more: '更多',
   },
   errorMsg: {
     requestFailed: '请求失败',

@@ -27,6 +27,7 @@ const translation = {
     selectAll: 'select all',
     recover: 'recover',
     recycle: 'recycle',
+    more: 'more',
   },
   errorMsg: {
     requestFailed: 'request failed',

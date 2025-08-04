@@ -104,7 +104,7 @@ const Header = () => {
               <SettingOutlined style={{ cursor: 'pointer', fontSize: '18px' }} onClick={() => setOpenSetting(true)} />
             </Tooltip>
             <Dropdown menu={{ items: menuItems }} placement="bottom">
-              <MyIcon type="fusion-language" style={{ cursor: 'pointer', fontSize: '18px' }} />
+              <MyIcon type="nexus-language" style={{ cursor: 'pointer', fontSize: '18px' }} />
             </Dropdown>
             <FullScreen />
             {/* 用户信息 */}

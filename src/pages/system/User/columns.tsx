@@ -111,7 +111,12 @@ export const getColumns = (
           />
         </Tooltip>
         <Dropdown menu={{ items: handleMore(record) }} placement="bottom" trigger={['click']}>
-          <Button type="link" size="small" icon={<MoreOutlined />} />
+          <Tooltip title={t('common.operation.more')}>
+            <Button
+              type="text"
+              icon={<Icon icon="fluent:more-vertical-16-filled" className="text-xl block" />}
+            />
+          </Tooltip>
         </Dropdown>
       </Space>
     ),
