@@ -1,7 +1,7 @@
 import type { LineRenderProps } from '@flowgram.ai/free-lines-plugin';
-import { useVisible } from './use-visible';
+import type React from 'react';
 import { IconPlusCircle } from './button';
-import { useCallback } from 'react';
+import { useVisible } from './use-visible';
 import './index.scss';
 
 /**
@@ -16,7 +16,7 @@ export const LineAddButton: React.FC<LineRenderProps> = (props) => {
   /**
    * 连接线上的图标点击
    */
-  const onClick = useCallback(() => {}, []);
+  const onClick = () => {};
 
   if (!visible) {
     return <></>;

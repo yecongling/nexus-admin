@@ -1,7 +1,6 @@
 import { LockOutlined, UnlockOutlined } from '@ant-design/icons';
 import { usePlayground } from '@flowgram.ai/free-layout-editor';
 import { Button, Tooltip } from 'antd';
-import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -15,9 +14,9 @@ export const Readonly = () => {
   /**
    * 切换只读模式
    */
-  const toggleReadonly = useCallback(() => {
+  const toggleReadonly = () => {
     playground.config.readonly = !playground.config.readonly;
-  }, [playground]);
+  };
 
   return (
     <Tooltip title={t(playground.config.readonly ? 'editable' : 'readonly')}>

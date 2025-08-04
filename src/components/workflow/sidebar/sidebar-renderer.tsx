@@ -1,15 +1,8 @@
-import {
-  IsSidebarContext,
-  SidebarContext,
-} from '@/context/workflow/sidebar-context';
-import type { FlowNodeMeta } from '@/types/workflow/node';
-import {
-  PlaygroundEntityContext,
-  useClientContext,
-  useRefresh,
-} from '@flowgram.ai/free-layout-editor';
+import { IsSidebarContext, SidebarContext } from '@/context/workflow/sidebar-context';
+import { PlaygroundEntityContext, useClientContext, useRefresh } from '@flowgram.ai/free-layout-editor';
 import { Drawer } from 'antd';
-import { useCallback, useContext, useEffect, useMemo } from 'react';
+import { useContext, useEffect } from 'react';
+import type { FlowNodeMeta } from '@/types/workflow/node';
 import { SidebarNodeRenderer } from './sidebar-node-renderer';
 
 /**
@@ -26,9 +19,9 @@ const SidebarRenderer: React.FC = () => {
   /**
    * 关闭侧边栏
    */
-  const handleClose = useCallback(() => {
+  const handleClose = () => {
     setNodeId(undefined);
-  }, []);
+  };
 
   /**
    * 监听画布实例变更
@@ -56,10 +49,7 @@ const SidebarRenderer: React.FC = () => {
        */
       if (selection.selection.length === 0) {
         handleClose();
-      } else if (
-        selection.selection.length === 1 &&
-        selection.selection[0] !== node
-      ) {
+      } else if (selection.selection.length === 1 && selection.selection[0] !== node) {
         handleClose();
       }
     });
@@ -86,13 +76,7 @@ const SidebarRenderer: React.FC = () => {
   /**
    * 节点渲染
    */
-  const visible = useMemo(() => {
-    if (!node) {
-      return false;
-    }
-    const { disableSideBar = false } = node.getNodeMeta<FlowNodeMeta>();
-    return !disableSideBar;
-  }, [node]);
+  const visible = node ? !node.getNodeMeta<FlowNodeMeta>().disableSideBar : false;
 
   if (playground.config.readonly) {
     return null;
@@ -101,16 +85,14 @@ const SidebarRenderer: React.FC = () => {
    * 内容
    */
   const content = node ? (
-    <PlaygroundEntityContext.Provider key={node.id} value={node}>
+    <PlaygroundEntityContext key={node.id} value={node}>
       <SidebarNodeRenderer node={node} />
-    </PlaygroundEntityContext.Provider>
+    </PlaygroundEntityContext>
   ) : null;
 
   return (
     <Drawer mask={false} open={visible} onClose={handleClose}>
-      <IsSidebarContext.Provider value={true}>
-        {content}
-      </IsSidebarContext.Provider>
+      <IsSidebarContext value={true}>{content}</IsSidebarContext>
     </Drawer>
   );
 };

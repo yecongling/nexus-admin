@@ -1,5 +1,4 @@
-import { Skeleton } from 'antd';
-import React, { type ReactNode, Suspense, useMemo } from 'react';
+import React, { useMemo, type ReactNode } from 'react';
 import { Navigate, useRoutes } from 'react-router';
 import { useMenuStore } from '@/stores/store';
 import type { RouteObject } from '@/types/route';
@@ -67,9 +66,7 @@ const generateRouter = (routers: RouteObject[]) => {
      * 错误边界组件（用于单个页面渲染错误的时候显示，单个模块渲染失败不应该影响整个系统的渲染失败）
      */
     item.element = (
-      <Suspense fallback={<Skeleton />}>
         <item.component />
-      </Suspense>
     );
     item.handle = {
       menuKey: item?.handle?.menuKey,

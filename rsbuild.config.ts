@@ -3,6 +3,7 @@ import { pluginHtmlMinifierTerser } from 'rsbuild-plugin-html-minifier-terser';
 import { pluginMockServer } from 'rspack-plugin-mock/rsbuild';
 import { defineConfig } from '@rsbuild/core';
 import { pluginImageCompress } from '@rsbuild/plugin-image-compress';
+import { pluginBabel } from '@rsbuild/plugin-babel';
 import { pluginReact } from '@rsbuild/plugin-react';
 import { pluginSvgr } from '@rsbuild/plugin-svgr';
 import { pluginSass } from '@rsbuild/plugin-sass';
@@ -16,6 +17,12 @@ export default defineConfig({
       splitChunks: {
         react: true,
         router: true,
+      },
+    }),
+    pluginBabel({
+      include: /\.(?:jsx|tsx)$/,
+      babelLoaderOptions(opts) {
+        opts.plugins?.unshift('babel-plugin-react-compiler');
       },
     }),
     // 将SVG转换为React组件

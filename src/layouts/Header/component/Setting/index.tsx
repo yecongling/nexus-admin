@@ -1,6 +1,6 @@
 import { ClearOutlined, CloseOutlined, CopyOutlined, RedoOutlined } from '@ant-design/icons';
 import type React from 'react';
-import { memo, useState } from 'react';
+import { useState } from 'react';
 import { App, Button, ConfigProvider, Drawer, Segmented, Space, Tabs, type TabsProps } from 'antd';
 import { usePreferencesStore } from '@/stores/store';
 import Block from './Block';
@@ -19,7 +19,7 @@ export interface SettingProps {
 }
 
 /* 系统配置界面 */
-const Setting: React.FC<SettingProps> = memo(({ open, setOpen }) => {
+const Setting: React.FC<SettingProps> = ({ open, setOpen }) => {
   // 从全局状态库中获取数据
   const { resetPreferences } = usePreferencesStore();
   const [selectedKey, setSelectedKey] = useState<string>('theme');
@@ -160,7 +160,7 @@ const Setting: React.FC<SettingProps> = memo(({ open, setOpen }) => {
       <Tabs activeKey={selectedKey} items={tabsItems} tabBarStyle={{ marginBottom: '8px' }} />
     </Drawer>
   );
-});
+};
 
 Setting.propTypes = {};
 export default Setting;

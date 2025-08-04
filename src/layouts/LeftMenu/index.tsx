@@ -1,5 +1,5 @@
 import type React from 'react';
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Layout,
   Image,
@@ -36,7 +36,7 @@ type MenuItem = Required<MenuProps>['items'][number];
 /**
  * 左边的菜单栏
  */
-const LeftMenu: React.FC = memo(() => {
+const LeftMenu: React.FC = () => {
   const { preferences, updatePreferences } = usePreferencesStore();
   // 从状态库中获取状态
   const { sidebar, theme, navigation, app } = preferences;
@@ -59,9 +59,7 @@ const LeftMenu: React.FC = memo(() => {
     mode = 'dark';
   }
   // 是否暗黑模式
-  const isDark = useMemo(() => {
-    return mode === 'dark' || semiDarkSidebar;
-  }, [mode, semiDarkSidebar]);
+  const isDark = mode === 'dark' || semiDarkSidebar;
 
   const getItem = (
     label: any,
@@ -80,24 +78,21 @@ const LeftMenu: React.FC = memo(() => {
   };
 
   // 处理后台返回菜单数据
-  const deepLoopFloat = useCallback(
-    (menuList: RouteItem[], newArr: MenuItem[] = []) => {
-      for (const item of menuList) {
-        // 处理子路由和权限按钮不显示
-        if (item?.meta?.menuType === 2 || item?.meta?.menuType === 3 || item?.hidden) {
-          continue;
-        }
-        // 下面判断代码解释 *** !item?.children?.length   ==>   (!item.children || item.children.length === 0)
-        if (!item?.children?.length) {
-          newArr.push(getItem(item.meta?.title, item.path, getIcon(item.meta?.icon)));
-          continue;
-        }
-        newArr.push(getItem(item.meta?.title, item.path, getIcon(item.meta?.icon), deepLoopFloat(item.children)));
+  const deepLoopFloat = (menuList: RouteItem[], newArr: MenuItem[] = []) => {
+    for (const item of menuList) {
+      // 处理子路由和权限按钮不显示
+      if (item?.meta?.menuType === 2 || item?.meta?.menuType === 3 || item?.hidden) {
+        continue;
       }
-      return newArr;
-    },
-    [menuList],
-  );
+      // 下面判断代码解释 *** !item?.children?.length   ==>   (!item.children || item.children.length === 0)
+      if (!item?.children?.length) {
+        newArr.push(getItem(item.meta?.title, item.path, getIcon(item.meta?.icon)));
+        continue;
+      }
+      newArr.push(getItem(item.meta?.title, item.path, getIcon(item.meta?.icon), deepLoopFloat(item.children)));
+    }
+    return newArr;
+  };
 
   /**
    * 菜单点击跳转
@@ -264,6 +259,6 @@ const LeftMenu: React.FC = memo(() => {
       </div>
     </Layout.Sider>
   );
-});
+};
 
 export default LeftMenu;

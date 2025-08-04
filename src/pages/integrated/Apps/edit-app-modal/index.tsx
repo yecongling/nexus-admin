@@ -1,5 +1,5 @@
 import { useKeyPress } from 'ahooks';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import DragModal from '@/components/modal/DragModal';
 
@@ -50,9 +50,9 @@ const EditAppModal: React.FC<EditAppModalProps> = ({
   const [description, setDescription] = useState<string>(appDescription);
 
   // 保存操作
-  const submit = useCallback(() => {
+  const submit = () => {
     // 验证名称必填
-  }, [name, appIcon, description, onConfirm, onCancel, t]);
+  };
 
   // 键盘操作
   useKeyPress(['meta.enter', 'ctrl.enter'], () => {});

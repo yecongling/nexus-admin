@@ -7,7 +7,7 @@ import {
 } from '@flowgram.ai/free-layout-editor';
 import '@flowgram.ai/free-layout-editor/index.css';
 import { Card, Space, Button } from 'antd';
-import { useCallback, useRef } from 'react';
+import { useRef } from 'react';
 import { useEditorProps } from '@/hooks/workflow/use-editor-props';
 import { SidebarProvider } from './sidebar/sidebar-provider';
 import SidebarRenderer from './sidebar/sidebar-renderer';
@@ -29,11 +29,11 @@ const Workflow: React.FC<WorkflowProps> = (props) => {
   }
 
   // 处理保存流程数据
-  const handleSave = useCallback((data: WorkflowJSON) => {
+  const handleSave = (data: WorkflowJSON) => {
     // 保存数据前需要先进行验证和处理
     // TODO: 保存流程数据
     console.log('Saving workflow data...', data);
-  }, []);
+  };
 
   // 定义流程编辑器属性
   const editorProps = useEditorProps(initialData, nodeRegistries, handleSave);

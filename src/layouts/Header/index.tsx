@@ -1,5 +1,5 @@
 import { Badge, Dropdown, FloatButton, Layout, type MenuProps, Skeleton, Space, Tooltip } from 'antd';
-import React, { memo, useState, Suspense, useMemo } from 'react';
+import React, { useState, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   BellOutlined,
@@ -25,7 +25,7 @@ const Setting = React.lazy(() => import('./component/Setting'));
 /**
  * 顶部布局内容
  */
-const Header: React.FC = memo(() => {
+const Header = () => {
   const [openSetting, setOpenSetting] = useState<boolean>(false);
   // 从全局状态中获取配置是否开启面包屑、图标
   const { preferences, updatePreferences } = usePreferencesStore();
@@ -33,14 +33,10 @@ const Header: React.FC = memo(() => {
   const { t } = useTranslation();
 
   // 显示顶部菜单
-  const showHeaderNav = useMemo(() => {
-    return app.layout === 'header-nav' || app.layout === 'mixed-nav' || app.layout === 'header-mixed-nav';
-  }, [app.layout]);
+  const showHeaderNav = app.layout === 'header-nav' || app.layout === 'mixed-nav' || app.layout === 'header-mixed-nav';
 
   // 顶部菜单主题
-  const themeHeader = useMemo(() => {
-    return theme.semiDarkHeader ? 'dark' : 'light';
-  }, [theme.semiDarkHeader]);
+  const themeHeader = theme.semiDarkHeader ? 'dark' : 'light';
 
   /**
    * 跳转到github
@@ -129,5 +125,5 @@ const Header: React.FC = memo(() => {
       </Suspense>
     </>
   );
-});
+};
 export default Header;

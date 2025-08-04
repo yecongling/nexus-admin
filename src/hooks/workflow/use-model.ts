@@ -7,7 +7,7 @@ import {
   useNodeRender,
   type WorkflowNodeEntity,
 } from '@flowgram.ai/free-layout-editor';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 
 /**
  * 创建节点模型的
@@ -18,7 +18,7 @@ export const useModel = () => {
 
   const formModel = node.getData(FlowNodeFormData).getFormModel<FormModelV2>();
 
-  const model = useMemo(() => new CommentEditorModel(), []);
+  const model = new CommentEditorModel();
 
   // 同步失焦状态
   useEffect(() => {

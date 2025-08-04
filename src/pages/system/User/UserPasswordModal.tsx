@@ -1,5 +1,5 @@
 import type React from 'react';
-import { memo, useEffect } from 'react';
+import { useEffect } from 'react';
 import { zxcvbn } from '@zxcvbn-ts/core';
 import { Input, Form, Progress, Row, Col, App } from 'antd';
 import { keys, values } from 'lodash-es';
@@ -20,7 +20,7 @@ interface UserPasswordModalProps {
 /**
  * 更新用户密码弹窗
  */
-const UserPasswordModal: React.FC<UserPasswordModalProps> = memo(({ open, onClose, userInfo, onOk }) => {
+const UserPasswordModal: React.FC<UserPasswordModalProps> = ({ open, onClose, userInfo, onOk }) => {
   const { modal, message } = App.useApp();
   const [form] = Form.useForm();
 
@@ -124,6 +124,6 @@ const UserPasswordModal: React.FC<UserPasswordModalProps> = memo(({ open, onClos
       </Row>
     </DragModal>
   );
-});
+};
 
 export default UserPasswordModal;

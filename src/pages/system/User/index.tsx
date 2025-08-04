@@ -2,7 +2,7 @@ import { isEqual } from 'lodash-es';
 import { ExclamationCircleFilled } from '@ant-design/icons';
 import { Card, Table, App } from 'antd';
 import type React from 'react';
-import { useMemo, useReducer, useState } from 'react';
+import { useReducer, useState } from 'react';
 import useParentSize from '@/hooks/useParentSize';
 import { userService } from '@/services/system/user/userApi';
 import type { UserSearchParams } from './types';
@@ -179,45 +179,41 @@ const User: React.FC = () => {
   };
 
   // 表格操作列中的更多操作
-  const columns = useMemo(
-    () =>
-      getColumns(handleEdit, handleDetail, t, theme, (record) => [
-        {
-          key: 'updatePwd',
-          label: '修改密码',
-          icon: <Icon icon="fluent:password-reset-48-regular" className="text-xl! block text-orange-300" />,
-          onClick: () => {
-            /* 打开密码编辑弹窗 */
-            dispatch({
-              openPasswordModal: true,
-              currentRow: record,
-            });
+  const columns = getColumns(handleEdit, handleDetail, t, theme, (record) => [
+    {
+      key: 'updatePwd',
+      label: '修改密码',
+      icon: <Icon icon="fluent:password-reset-48-regular" className="text-xl! block text-orange-300" />,
+      onClick: () => {
+        /* 打开密码编辑弹窗 */
+        dispatch({
+          openPasswordModal: true,
+          currentRow: record,
+        });
+      },
+    },
+    {
+      key: 'freeze',
+      label: record.status === 1 ? '冻结' : '解冻',
+      icon: <Icon icon="fluent-color:lock-shield-32" className="text-xl! block" />,
+      onClick: () => handleUpdateStatusMutation.mutate(record),
+    },
+    {
+      key: 'delete',
+      label: t('common.operation.delete'),
+      icon: <Icon icon="fluent:delete-dismiss-24-filled" className="text-xl! block text-[#ff4d4f]!" />,
+      onClick: () => {
+        modal.confirm({
+          title: '删除用户',
+          icon: <ExclamationCircleFilled />,
+          content: '确定删除该用户吗？数据删除后请在回收站中恢复！',
+          onOk() {
+            logicDeleteUserMutation.mutate([record.id]);
           },
-        },
-        {
-          key: 'freeze',
-          label: record.status === 1 ? '冻结' : '解冻',
-          icon: <Icon icon="fluent-color:lock-shield-32" className="text-xl! block" />,
-          onClick: () => handleUpdateStatusMutation.mutate(record),
-        },
-        {
-          key: 'delete',
-          label: t('common.operation.delete'),
-          icon: <Icon icon="fluent:delete-dismiss-24-filled" className="text-xl! block text-[#ff4d4f]!" />,
-          onClick: () => {
-            modal.confirm({
-              title: '删除用户',
-              icon: <ExclamationCircleFilled />,
-              content: '确定删除该用户吗？数据删除后请在回收站中恢复！',
-              onOk() {
-                logicDeleteUserMutation.mutate([record.id]);
-              },
-            });
-          },
-        },
-      ]),
-    [],
-  );
+        });
+      },
+    },
+  ]);
 
   return (
     <>

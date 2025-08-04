@@ -1,61 +1,51 @@
 import DragModal from '@/components/modal/DragModal';
 import { Input } from 'antd';
 import type React from 'react';
-import { memo } from 'react';
 import TemplateTypeDropdown from '../components/TemplateTypeDropdown';
 
 /**
  * 模版中心
  * @returns
  */
-const AppTemplates: React.FC<AppsTemplateModelProps> = memo(
-  ({ open, onClose, onCreateFromBlank }) => {
-    /**
-     * 模版中心头部检索
-     */
-    const onSearch = (type: number, value: string) => {
-      console.log(type, value);
-    };
+const AppTemplates: React.FC<AppsTemplateModelProps> = ({ open, onClose, onCreateFromBlank }) => {
+  /**
+   * 模版中心头部检索
+   */
+  const onSearch = (type: number, value: string) => {
+    console.log(type, value);
+  };
 
-    /**
-     * 模版中心头部类型切换
-     */
-    const onTypeChange = (type: number[]) => {
-      console.log(type);
-    };
+  /**
+   * 模版中心头部类型切换
+   */
+  const onTypeChange = (type: number[]) => {
+    console.log(type);
+  };
 
-    return (
-      <DragModal
-        footer={null}
-        centered
-        style={{ height: '95vh' }} // 控制 Modal 外壳
-        styles={{ body: { height: 'calc(95vh - 92px)', overflowY: 'auto' } }}
-        width="95%"
-        open={open}
-        title={
-          <TemplateHeaders onSearch={onSearch} onTypeChange={onTypeChange} />
-        }
-        onCancel={onClose}
-      >
-        <div className="relative flex h-full overflow-y-auto">
-          <div className="h-full w-[200px] p-4">左边分类</div>
-          <div className="h-full flex-1 shrink-0 grow overflow-auto border-l p-6 pt-2 border-[#1018280a]">
-            右边模板
-          </div>
-        </div>
-      </DragModal>
-    );
-  },
-);
+  return (
+    <DragModal
+      footer={null}
+      centered
+      style={{ height: '95vh' }} // 控制 Modal 外壳
+      styles={{ body: { height: 'calc(95vh - 92px)', overflowY: 'auto' } }}
+      width="95%"
+      open={open}
+      title={<TemplateHeaders onSearch={onSearch} onTypeChange={onTypeChange} />}
+      onCancel={onClose}
+    >
+      <div className="relative flex h-full overflow-y-auto">
+        <div className="h-full w-[200px] p-4">左边分类</div>
+        <div className="h-full flex-1 shrink-0 grow overflow-auto border-l p-6 pt-2 border-[#1018280a]">右边模板</div>
+      </div>
+    </DragModal>
+  );
+};
 export default AppTemplates;
 
 /**
  * 模版中心头部
  */
-const TemplateHeaders: React.FC<TemplateHeadersProps> = ({
-  onTypeChange,
-  onSearch,
-}) => {
+const TemplateHeaders: React.FC<TemplateHeadersProps> = ({ onTypeChange, onSearch }) => {
   return (
     <div className="flex justify-between items-center">
       <div className="min-w-[180px] pl-5">

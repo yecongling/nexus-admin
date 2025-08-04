@@ -1,5 +1,5 @@
 import { Button, Card, Dropdown, Empty, Input, type MenuProps, Tree } from 'antd';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { DataNode } from 'antd/es/tree';
 import { MyIcon } from '@/components/MyIcon';
 import {
@@ -25,7 +25,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
  * 端点类型树
  * @returns
  */
-const EndpointTypeTree: React.FC<EndpointTypeTreeProps> = memo(({ onSelect }) => {
+const EndpointTypeTree: React.FC<EndpointTypeTreeProps> = ({ onSelect }) => {
   // 检索框的值和搜索的关键字
   const [inputValue, setInputValue] = useState<string>('');
   // 树结构展开的节点
@@ -193,7 +193,7 @@ const EndpointTypeTree: React.FC<EndpointTypeTreeProps> = memo(({ onSelect }) =>
    * 数据转换，处理其中的icon
    * @param data 数据
    */
-  const transformData = useCallback((data: any[], expanded: string[]): any[] => {
+  const transformData = (data: any[], expanded: string[]): any[] => {
     return data.map((item: any) => {
       // 转为树节点需要的key
       item.key = item.id;
@@ -210,10 +210,10 @@ const EndpointTypeTree: React.FC<EndpointTypeTreeProps> = memo(({ onSelect }) =>
       }
       return item;
     });
-  }, []);
+  };
 
   // 右键点击事件
-  const handleRightClick = useCallback((event: any) => {
+  const handleRightClick = (event: any) => {
     event.event.preventDefault();
     // 如果是右键的配置节点，则不响应, 这里类型判断有误dang，需要处理
     if (event.node.isConfig) {
@@ -240,7 +240,7 @@ const EndpointTypeTree: React.FC<EndpointTypeTreeProps> = memo(({ onSelect }) =>
       endpointConfigs: node.endpointConfigs,
     }); // 获取当前点击节点的 key
     setVisible(true); // 显示右键菜单
-  }, []);
+  };
 
   /**
    * 类型数据确定
@@ -367,7 +367,7 @@ const EndpointTypeTree: React.FC<EndpointTypeTreeProps> = memo(({ onSelect }) =>
       />
     </>
   );
-});
+};
 
 export default EndpointTypeTree;
 

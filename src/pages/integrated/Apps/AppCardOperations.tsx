@@ -1,12 +1,11 @@
-import { Divider, App as AntdApp } from 'antd';
 import { EditOutlined, CopyOutlined, ExportOutlined, SwitcherOutlined, DeleteOutlined } from '@ant-design/icons';
-import type React from 'react';
-import { useCallback } from 'react';
+import { Divider, App as AntdApp } from 'antd';
 import { useTranslation } from 'react-i18next';
+import type React from 'react';
 import type { HtmlContentProps } from '@/components/popover';
 import type { App } from '@/services/integrated/apps/app';
-import { useMutation } from '@tanstack/react-query';
 import { appsService } from '@/services/integrated/apps/appsApi';
+import { useMutation } from '@tanstack/react-query';
 
 interface AppCardOperationsProps extends HtmlContentProps {
   app: App;
@@ -84,16 +83,16 @@ const AppCardOperations: React.FC<AppCardOperationsProps> = ({
   /**
    * 确认删除应用
    */
-  const onConfirmDelete = useCallback(() => {
+  const onConfirmDelete = () => {
     deleteAppMutation.mutate(id);
-  }, [id, onRefresh]);
+  };
 
   /**
    * 编辑应用
    */
-  const onEdit = useCallback(async () => {
+  const onEdit = async () => {
     updateAppMutation.mutate(app);
-  }, [app, onRefresh]);
+  };
 
   /**
    * 复制应用(有一个复制弹窗)

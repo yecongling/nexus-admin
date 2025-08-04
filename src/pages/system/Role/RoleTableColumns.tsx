@@ -1,7 +1,6 @@
 import type { TableProps } from 'antd';
 import { ExclamationCircleFilled, MoreOutlined } from '@ant-design/icons';
 import { Space, Button, Dropdown, App, Tooltip, Switch } from 'antd';
-import { useCallback } from 'react';
 import type { RoleState } from '@/services/system/role/type';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { Icon } from '@iconify-icon/react/dist/iconify.mjs';
@@ -27,38 +26,35 @@ const getRoleTableColumns = ({
   const { preferences } = usePreferencesStore();
   const { theme } = preferences;
   // 更多操作
-  const more = useCallback(
-    (row: any) => [
-      {
-        key: 'edit',
-        label: '编辑',
-        icon: <Icon icon="fluent-color:calendar-edit-16" className="text-xl! block" />,
-        onClick: () => {
-          dispatch({
-            openEditModal: true,
-            currentRow: row,
-            action: 'edit',
-          });
-        },
+  const more = (row: any) => [
+    {
+      key: 'edit',
+      label: '编辑',
+      icon: <Icon icon="fluent-color:calendar-edit-16" className="text-xl! block" />,
+      onClick: () => {
+        dispatch({
+          openEditModal: true,
+          currentRow: row,
+          action: 'edit',
+        });
       },
-      {
-        key: 'delete',
-        label: '删除',
-        icon: <Icon icon="fluent:delete-dismiss-24-filled" className="text-xl! block text-[#ff4d4f]" />,
-        onClick: () => {
-          modal.confirm({
-            title: '删除角色',
-            icon: <ExclamationCircleFilled />,
-            content: '确定删除该角色吗？数据删除后将无法恢复！',
-            onOk() {
-              logicDeleteUserMutation.mutate([row.id]);
-            },
-          });
-        },
+    },
+    {
+      key: 'delete',
+      label: '删除',
+      icon: <Icon icon="fluent:delete-dismiss-24-filled" className="text-xl! block text-[#ff4d4f]" />,
+      onClick: () => {
+        modal.confirm({
+          title: '删除角色',
+          icon: <ExclamationCircleFilled />,
+          content: '确定删除该角色吗？数据删除后将无法恢复！',
+          onOk() {
+            logicDeleteUserMutation.mutate([row.id]);
+          },
+        });
       },
-    ],
-    [],
-  );
+    },
+  ];
 
   /**
    * 表格列配置

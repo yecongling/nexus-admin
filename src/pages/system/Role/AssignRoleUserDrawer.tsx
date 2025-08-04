@@ -29,7 +29,7 @@ import {
   type TableProps,
   Tooltip,
 } from 'antd';
-import { memo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import AddUser from './AddUserModal';
 import { roleService } from '@/services/system/role/roleApi';
 import type { UserSearchParams } from '@/services/system/role/type';
@@ -40,7 +40,7 @@ import { usePreferencesStore } from '@/stores/store';
  * 给角色分配用户
  * @returns
  */
-const RoleUserDrawer: React.FC<RoleUserDrawerProps> = memo(({ open, roleId, onCancel }) => {
+const RoleUserDrawer: React.FC<RoleUserDrawerProps> = ({ open, roleId, onCancel }) => {
   const { modal, message } = App.useApp();
   const { preferences } = usePreferencesStore();
   const { theme } = preferences;
@@ -349,7 +349,7 @@ const RoleUserDrawer: React.FC<RoleUserDrawerProps> = memo(({ open, roleId, onCa
       <AddUser roleId={roleId} open={openAddUser} onCancel={cancelAddUser} onOk={handleOk} />
     </ConfigProvider>
   );
-});
+};
 
 export default RoleUserDrawer;
 

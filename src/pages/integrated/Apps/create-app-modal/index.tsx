@@ -1,4 +1,4 @@
-import { memo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button, Input, Select, Space, type InputRef } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import { ApartmentOutlined, ArrowRightOutlined } from '@ant-design/icons';
@@ -13,7 +13,7 @@ import { getShortcutLabel } from '@/utils/utils';
  * 添加项目弹窗
  * @returns
  */
-const AppInfoModal: React.FC<AppInfoModalProps> = memo(({ open, onOk, onCancel, onCreateFromTemplate }) => {
+const AppInfoModal: React.FC<AppInfoModalProps> = ({ open, onOk, onCancel, onCreateFromTemplate }) => {
   const inputRef = useRef<InputRef>(null);
   // 项目类型
   const [type, setType] = useState<number>(1);
@@ -248,7 +248,7 @@ const AppInfoModal: React.FC<AppInfoModalProps> = memo(({ open, onOk, onCancel, 
       </div>
     </DragModal>
   );
-});
+};
 export default AppInfoModal;
 
 /**

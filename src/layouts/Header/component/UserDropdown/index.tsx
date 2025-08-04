@@ -1,6 +1,6 @@
 import { App, Avatar, Divider, Dropdown, theme, type MenuProps } from 'antd';
 import type { ReactNode } from 'react';
-import React, { memo } from 'react';
+import type React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import {
@@ -22,9 +22,9 @@ import { useUserStore } from '@/stores/userStore';
  * 用户信息下拉框
  * @returns
  */
-const UserDropdown: React.FC = memo(() => {
+const UserDropdown: React.FC = () => {
   const { updatePreferences } = usePreferencesStore();
-  const userStore = useUserStore();
+  const userStore = useUserStore(); 
   const { token } = theme.useToken();
   const { modal } = App.useApp();
   const { t } = useTranslation();
@@ -195,9 +195,7 @@ const UserDropdown: React.FC = memo(() => {
           <Avatar size="large" src={avatar} />
         </div>
         <Divider style={{ margin: '2px 0' }} />
-        {React.cloneElement(menus as React.ReactElement, {
-          style: { boxShadow: 'none' },
-        })}
+        {menus}
       </div>
     );
   };
@@ -216,6 +214,6 @@ const UserDropdown: React.FC = memo(() => {
       </div>
     </Dropdown>
   );
-});
+};
 
 export default UserDropdown;

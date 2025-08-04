@@ -11,8 +11,8 @@ export function NodeModalRenderer(props: { node: FlowNodeEntity }) {
   const { node } = props;
   const nodeRender = useNodeRender(node);
   return (
-    <NodeRenderContext.Provider value={nodeRender}>
+    <NodeRenderContext value={nodeRender}>
       {nodeRender.form?.render()}
-    </NodeRenderContext.Provider>
+    </NodeRenderContext>
   );
 }

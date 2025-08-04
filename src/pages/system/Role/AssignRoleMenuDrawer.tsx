@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CloseOutlined, DownOutlined, FolderFilled, FolderOpenFilled } from '@ant-design/icons';
 import { Button, Checkbox, Drawer, Space, Tree, type TreeProps } from 'antd';
 import { roleService } from '@/services/system/role/roleApi';
@@ -10,7 +10,7 @@ import { getIcon } from '@/utils/utils';
  * 角色菜单授权界面
  * @returns
  */
-const RoleMenuDrawer: React.FC<RoleMenuDrawerProps> = memo(({ open, roleId, onOk, onCancel }) => {
+const RoleMenuDrawer: React.FC<RoleMenuDrawerProps> = ({ open, roleId, onOk, onCancel }) => {
   // 树组件的数据
   const [treeData, setTreeData] = useState<any[]>([]);
   // 选中的节点
@@ -53,7 +53,7 @@ const RoleMenuDrawer: React.FC<RoleMenuDrawerProps> = memo(({ open, roleId, onOk
    * @param data 原始数据
    * @param expanded 需要展开的数据
    */
-  const transformData = useCallback((data: any, expanded: string[]) => {
+  const transformData = (data: any, expanded: string[]) => {
     return data.map((item: any) => {
       if (item.icon) {
         item.icon = getIcon(item.icon);
@@ -68,7 +68,7 @@ const RoleMenuDrawer: React.FC<RoleMenuDrawerProps> = memo(({ open, roleId, onOk
       item.name = t(item.name);
       return item;
     });
-  }, []);
+  };
 
   /**
    * 全选/取消全选
@@ -108,9 +108,9 @@ const RoleMenuDrawer: React.FC<RoleMenuDrawerProps> = memo(({ open, roleId, onOk
    * @param checkedKeys 选中的节点
    * @param e
    */
-  const handleChecked: TreeProps['onCheck'] = useCallback((checkedKeysValue: any) => {
+  const handleChecked: TreeProps['onCheck'] = (checkedKeysValue: any) => {
     setChecked((checkedKeysValue as any).checked);
-  }, []);
+  };
 
   return (
     <Drawer
@@ -174,7 +174,7 @@ const RoleMenuDrawer: React.FC<RoleMenuDrawerProps> = memo(({ open, roleId, onOk
       )}
     </Drawer>
   );
-});
+};
 export default RoleMenuDrawer;
 
 export type RoleMenuDrawerProps = {

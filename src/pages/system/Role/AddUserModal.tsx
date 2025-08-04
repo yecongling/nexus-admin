@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { isEqual } from 'lodash-es';
 import { SearchOutlined, RedoOutlined, ManOutlined, WomanOutlined } from '@ant-design/icons';
 import { Button, Card, Col, Form, Input, type InputRef, Row, Select, Space, Table, type TableProps } from 'antd';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { UserSearchParams } from '@/services/system/role/type';
 import DragModal from '@/components/modal/DragModal';
 import { roleService } from '@/services/system/role/roleApi';
@@ -50,7 +50,7 @@ const AddUser: React.FC<AddUserProps> = ({ open, onOk, onCancel, roleId }) => {
   /**
    * 表单检索
    */
-  const onFinish = useCallback((values: UserSearchParams) => {
+  const onFinish = (values: UserSearchParams) => {
     const search = {
       ...values,
       pageNum: searchParams.pageNum,
@@ -63,7 +63,7 @@ const AddUser: React.FC<AddUserProps> = ({ open, onOk, onCancel, roleId }) => {
       return;
     }
     setSearchParams((prev) => ({ ...prev, ...search }));
-  }, []);
+  };
 
   /**
    * 定义表格的列

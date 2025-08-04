@@ -3,7 +3,7 @@ import { Dropdown, Form, Input, InputNumber, type InputRef, Radio, Space, Switch
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import type React from 'react';
-import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import DragModal from '@/components/modal/DragModal';
 import { menuService } from '@/services/system/menu/menuApi';
 import { addIcon } from '@/utils/utils';
@@ -78,42 +78,39 @@ const MenuInfoModal: React.FC<MenuInfoModalProps> = ({ visible, currentRow, onOk
   }, [currentRow, form, visible]);
 
   // 递归处理目录数据，对 title 进行国际化
-  const translateDirectory = useCallback(
-    (data: any[], typeFilter?: MenuType): any[] => {
-      const loop = (items: any[]): any[] =>
-        items
-          .filter((item) => {
-            // 如果传入了类型过滤，则只保留匹配类型的项
-            return typeFilter === MenuType.PERMISSION_BUTTON
-              ? item.menuType !== MenuType.PERMISSION_BUTTON
-              : item.menuType === typeFilter;
-          })
-          .map((item) => {
-            const iconNode = item.icon ? addIcon(item.icon) : null;
+  const translateDirectory = (data: any[], typeFilter?: MenuType): any[] => {
+    const loop = (items: any[]): any[] =>
+      items
+        .filter((item) => {
+          // 如果传入了类型过滤，则只保留匹配类型的项
+          return typeFilter === MenuType.PERMISSION_BUTTON
+            ? item.menuType !== MenuType.PERMISSION_BUTTON
+            : item.menuType === typeFilter;
+        })
+        .map((item) => {
+          const iconNode = item.icon ? addIcon(item.icon) : null;
 
-            const newItem: any = {
-              ...item,
-              selectable:
-                menuType !== MenuType.PERMISSION_BUTTON || (!Array.isArray(item.children) || item.children.length === 0),
-              title: (
-                <Space>
-                  {iconNode}
-                  {t(item.title)}
-                </Space>
-              ),
-            };
+          const newItem: any = {
+            ...item,
+            selectable:
+              menuType !== MenuType.PERMISSION_BUTTON || !Array.isArray(item.children) || item.children.length === 0,
+            title: (
+              <Space>
+                {iconNode}
+                {t(item.title)}
+              </Space>
+            ),
+          };
 
-            if (Array.isArray(item.children) && item.children.length > 0) {
-              newItem.children = loop(item.children);
-            }
+          if (Array.isArray(item.children) && item.children.length > 0) {
+            newItem.children = loop(item.children);
+          }
 
-            return newItem;
-          });
+          return newItem;
+        });
 
-      return loop(data);
-    },
-    [t, menuType],
-  );
+    return loop(data);
+  };
 
   // 使用 useQuery 获取目录数据
   const { data: allDirectoryData, isLoading } = useQuery({
@@ -125,15 +122,13 @@ const MenuInfoModal: React.FC<MenuInfoModalProps> = ({ visible, currentRow, onOk
   });
 
   // 根据当前菜单类型进行过滤并国际化
-  const directoryData = useMemo(() => {
-    return translateDirectory(
-      allDirectoryData || [],
-      menuType === MenuType.SUB_MENU || menuType === MenuType.SUB_ROUTE ? MenuType.TOP_LEVEL : menuType,
-    );
-  }, [allDirectoryData, menuType]);
+  const directoryData = translateDirectory(
+    allDirectoryData || [],
+    menuType === MenuType.SUB_MENU || menuType === MenuType.SUB_ROUTE ? MenuType.TOP_LEVEL : menuType,
+  );
 
   // 处理表单提交
-  const handleOk = useCallback(async () => {
+  const handleOk = async () => {
     try {
       const values = await form.validateFields();
       const formData: MenuData = {
@@ -148,38 +143,35 @@ const MenuInfoModal: React.FC<MenuInfoModalProps> = ({ visible, currentRow, onOk
         form.focusField(firstErrorField);
       }
     }
-  }, []);
+  };
 
   // 处理菜单类型变更
-  const handleMenuTypeChange = useCallback(
-    (value: MenuType) => {
-      setMenuType(value);
-      requestAnimationFrame(() => {
-        if (value === MenuType.SUB_ROUTE) {
-          form.setFieldsValue({ route: true });
-        }
-        nameRef.current?.focus();
-      });
-    },
-    [form, nameRef],
-  );
+  const handleMenuTypeChange = (value: MenuType) => {
+    setMenuType(value);
+    requestAnimationFrame(() => {
+      if (value === MenuType.SUB_ROUTE) {
+        form.setFieldsValue({ route: true });
+      }
+      nameRef.current?.focus();
+    });
+  };
 
   // 选择图标
-  const handleIconSelect = useCallback((icon: string) => {
+  const handleIconSelect = (icon: string) => {
     if (icon) {
       form.setFieldsValue({ icon });
     }
-  }, []);
+  };
 
   // 弹窗打开后的处理
-  const handleAfterOpenChange = useCallback((open: boolean) => {
+  const handleAfterOpenChange = (open: boolean) => {
     if (open) {
       nameRef.current?.focus();
     }
-  }, []);
+  };
 
   // 根据菜单类型判断是否显示路由相关字段
-  const showRouteFields = useMemo(() => menuType !== MenuType.PERMISSION_BUTTON, [menuType]);
+  const showRouteFields = menuType !== MenuType.PERMISSION_BUTTON;
 
   return (
     <DragModal
@@ -188,7 +180,7 @@ const MenuInfoModal: React.FC<MenuInfoModalProps> = ({ visible, currentRow, onOk
         body: {
           padding: '20px 40px',
           overflowY: 'auto',
-          height: 600
+          height: 600,
         },
       }}
       title={`${currentRow ? '编辑' : '新增'}菜单数据`}

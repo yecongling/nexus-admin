@@ -4,13 +4,13 @@ import { tagsService } from '@/services/common/tags/tagsApi';
 import type { Tag } from '@/services/common/tags/tagsModel';
 import { useTagStore } from '@/stores/useTagStore';
 import cn from '@/utils/classnames';
-import {PlusOutlined, SearchOutlined, TagOutlined, TagsOutlined} from '@ant-design/icons';
+import { PlusOutlined, SearchOutlined, TagOutlined, TagsOutlined } from '@ant-design/icons';
 import { useMutation } from '@tanstack/react-query';
 import { useUnmount } from 'ahooks';
 import { App, Checkbox, Divider, Input } from 'antd';
 import { noop } from 'lodash-es';
 import type React from 'react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type TagSelectorProps = {
@@ -36,8 +36,7 @@ type PanelProps = {
 const Panel: React.FC<PanelProps> = (props) => {
   const { t } = useTranslation();
   const { notification } = App.useApp();
-  const { type, targetID, value, selectedTags, onCacheUpdate, onChange } =
-    props;
+  const { type, targetID, value, selectedTags, onCacheUpdate, onChange } = props;
   const { tagList, setTagList, setShowTagManagementModal } = useTagStore();
 
   // 选中的标签id
@@ -51,31 +50,21 @@ const Panel: React.FC<PanelProps> = (props) => {
   };
 
   // 不存在的节点
-  const notExisted = useMemo(() => {
-    return tagList.every((tag) => tag.type === type && tag.name !== keywords);
-  }, [type, tagList, keywords]);
+  const notExisted = tagList.every((tag) => tag.type === type && tag.name !== keywords);
 
   // 过滤已经选中的标签列表
-  const filteredSelectedTagList = useMemo(() => {
-    return selectedTags.filter((tag) => tag.name.includes(keywords));
-  }, [keywords, selectedTags]);
+  const filteredSelectedTagList = selectedTags.filter((tag) => tag.name.includes(keywords));
 
   // 过滤后的标签列表
-  const filteredTagList = useMemo(() => {
-    return tagList.filter(
-      (tag) =>
-        tag.type === type &&
-        !value.includes(tag.id) &&
-        tag.name.includes(keywords),
-    );
-  }, [type, tagList, value, keywords]);
+  const filteredTagList = tagList.filter(
+    (tag) => tag.type === type && !value.includes(tag.id) && tag.name.includes(keywords),
+  );
 
   const [creating, setCreating] = useState<boolean>(false);
 
   // 标签新建
   const createTagMutation = useMutation({
-    mutationFn: ({ name, type }: { name: string; type: string }) =>
-      tagsService.addTag({ name, type }),
+    mutationFn: ({ name, type }: { name: string; type: string }) => tagsService.addTag({ name, type }),
     // 请求前设置状态
     onMutate: () => {
       setCreating(true);
@@ -99,8 +88,7 @@ const Panel: React.FC<PanelProps> = (props) => {
 
   // 标签绑定
   const bindTagMutation = useMutation({
-    mutationFn: (tagIDs: string[]) =>
-      tagsService.bindTag(tagIDs, targetID, type),
+    mutationFn: (tagIDs: string[]) => tagsService.bindTag(tagIDs, targetID, type),
     onSuccess: () => {
       notification.success({
         message: t('common.actionMsg.modifiedSuccessfully'),
@@ -155,13 +143,10 @@ const Panel: React.FC<PanelProps> = (props) => {
   /**
    * 值未改变
    */
-  const valueNotChanged = useMemo(() => {
-    return (
-      value.length === selectedTagIDs.length &&
-      value.every((v) => selectedTagIDs.includes(v)) &&
-      selectedTagIDs.every((v) => value.includes(v))
-    );
-  }, [value, selectedTagIDs]);
+  const valueNotChanged =
+    value.length === selectedTagIDs.length &&
+    value.every((v) => selectedTagIDs.includes(v)) &&
+    selectedTagIDs.every((v) => value.includes(v));
 
   /**
    * 处理值改变
@@ -170,16 +155,12 @@ const Panel: React.FC<PanelProps> = (props) => {
     const addTagIDs = selectedTagIDs.filter((v) => !!value.includes(v));
     const removeTagIDs = value.filter((v) => !selectedTagIDs.includes(v));
 
-    const selectedTags = tagList.filter((tag) =>
-      selectedTagIDs.includes(tag.id),
-    );
+    const selectedTags = tagList.filter((tag) => selectedTagIDs.includes(tag.id));
     onCacheUpdate(selectedTags);
 
     Promise.all([
       ...(addTagIDs.length ? [bindTagMutation.mutateAsync(addTagIDs)] : []),
-      ...(removeTagIDs.length
-        ? removeTagIDs.map((id) => unbindTagMutation.mutateAsync(id))
-        : []),
+      ...(removeTagIDs.length ? removeTagIDs.map((id) => unbindTagMutation.mutateAsync(id)) : []),
     ]).finally(() => {
       if (onChange) {
         onChange();
@@ -213,7 +194,10 @@ const Panel: React.FC<PanelProps> = (props) => {
       {/* 检索到不存在的提示创建标签 */}
       {keywords && notExisted && (
         <div className="p-1">
-          <div className="flex cursor-pointer items-center gap-2 rounded-lg py-[6px] pl-3 pr-2 hover:bg-gray-200" onClick={createNewTag}>
+          <div
+            className="flex cursor-pointer items-center gap-2 rounded-lg py-[6px] pl-3 pr-2 hover:bg-gray-200"
+            onClick={createNewTag}
+          >
             <PlusOutlined className="h-4 w-4 text-[#354052]" />
             <div className="grow truncate text-sm leading-5 text-[#354052]">
               {t('common.tag.create')}
@@ -222,9 +206,7 @@ const Panel: React.FC<PanelProps> = (props) => {
           </div>
         </div>
       )}
-      {keywords && notExisted && filteredTagList.length > 0 && (
-        <Divider className="!my-0 !h-[1px]" />
-      )}
+      {keywords && notExisted && filteredTagList.length > 0 && <Divider className="!my-0 !h-[1px]" />}
       {/* 过滤后的标签和过滤后选中的标签 */}
       {(filteredTagList.length > 0 || filteredSelectedTagList.length > 0) && (
         <div className="max-h-[172px] overflow-auto p-1">
@@ -234,15 +216,8 @@ const Panel: React.FC<PanelProps> = (props) => {
               className="flex cursor-pointer items-center gap-2 rounded-lg py-[6px] pl-3 pr-2 hover:bg-gray-200"
               onClick={() => selectTag(tag)}
             >
-              <Checkbox
-                checked={selectedTagIDs.includes(tag.id)}
-                className="shrink-0"
-                onChange={noop}
-              />
-              <div
-                title={tag.name}
-                className="grow truncate text-sm leading-5 text-[#354052]"
-              >
+              <Checkbox checked={selectedTagIDs.includes(tag.id)} className="shrink-0" onChange={noop} />
+              <div title={tag.name} className="grow truncate text-sm leading-5 text-[#354052]">
                 {tag.name}
               </div>
             </div>
@@ -253,15 +228,8 @@ const Panel: React.FC<PanelProps> = (props) => {
               className="flex cursor-pointer items-center gap-2 rounded-lg py-[6px] pl-3 pr-2 hover:bg-gray-200"
               onClick={() => selectTag(tag)}
             >
-              <Checkbox
-                className="shrink-0"
-                checked={selectedTagIDs.includes(tag.id)}
-                onChange={noop}
-              />
-              <div
-                title={tag.name}
-                className="grow truncate text-sm leading-5 text-[#354052]"
-              >
+              <Checkbox className="shrink-0" checked={selectedTagIDs.includes(tag.id)} onChange={noop} />
+              <div title={tag.name} className="grow truncate text-sm leading-5 text-[#354052]">
                 {tag.name}
               </div>
             </div>
@@ -269,26 +237,23 @@ const Panel: React.FC<PanelProps> = (props) => {
         </div>
       )}
       {/* 如果过滤后没有标签提示没有 */}
-      {!keywords &&
-        !filteredTagList.length &&
-        !filteredSelectedTagList.length && (
-          <div className="p-1">
-            <div className="flex flex-col items-center gap-1 p-3">
-              <TagOutlined className="h-6 w-6 !text-gray-400 text-xl" />
-              <div className="text-sm leading-[14px] text-gray-400">
-                {t('common.tag.noTag')}
-              </div>
-            </div>
+      {!keywords && !filteredTagList.length && !filteredSelectedTagList.length && (
+        <div className="p-1">
+          <div className="flex flex-col items-center gap-1 p-3">
+            <TagOutlined className="h-6 w-6 !text-gray-400 text-xl" />
+            <div className="text-sm leading-[14px] text-gray-400">{t('common.tag.noTag')}</div>
           </div>
-        )}
+        </div>
+      )}
       <Divider className="!my-0 !h-[1px]" />
       {/* 管理标签 */}
       <div className="p-1">
-        <div className="flex cursor-pointer items-center gap-2 rounded-lg py-[6px] pl-3 pr-2  hover:bg-gray-200" onClick={() => setShowTagManagementModal(true)}>
+        <div
+          className="flex cursor-pointer items-center gap-2 rounded-lg py-[6px] pl-3 pr-2  hover:bg-gray-200"
+          onClick={() => setShowTagManagementModal(true)}
+        >
           <TagsOutlined className="h-4 w-4 text-gray-400" />
-          <div className="grow truncate text-sm leading-5 text-gray-400">
-            {t('common.tag.manageTags')}
-          </div>
+          <div className="grow truncate text-sm leading-5 text-gray-400">{t('common.tag.manageTags')}</div>
         </div>
       </div>
     </div>
@@ -323,15 +288,12 @@ const TagSelector: React.FC<TagSelectorProps> = ({
   /**
    * 用于显示选中标签的内容
    */
-  const triggerContent = useMemo(() => {
-    if (selectedTags?.length) {
-      return selectedTags
+  const triggerContent = selectedTags?.length
+    ? selectedTags
         .filter((tag) => tagList.find((t) => t.id === tag.id))
         .map((tag) => tag.name)
-        .join(', ');
-    }
-    return '';
-  }, [selectedTags, tagList]);
+        .join(', ')
+    : '';
 
   /**
    * 触发器内容

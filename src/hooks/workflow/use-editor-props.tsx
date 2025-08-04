@@ -1,5 +1,4 @@
 import { debounce } from 'lodash-es';
-import { useMemo } from 'react';
 
 import { WorkflowNodeLinesData, type FreeLayoutProps } from '@flowgram.ai/free-layout-editor';
 import { createFreeLinesPlugin } from '@flowgram.ai/free-lines-plugin';
@@ -33,8 +32,7 @@ export function useEditorProps(
   nodeRegistries: FlowNodeRegistry[],
   handleSave?: (data: FlowDocumentJSON) => void,
 ): FreeLayoutProps {
-  return useMemo<FreeLayoutProps>(
-    () => ({
+  return {
       // 支持背景
       background: true,
 
@@ -168,7 +166,6 @@ export function useEditorProps(
        */
       history: {
         enable: true,
-        enableChangeNode: true,
       },
 
       /**
@@ -294,7 +291,5 @@ export function useEditorProps(
          */
         createContextMenuPlugin({}),
       ],
-    }),
-    [],
-  );
+    }
 }

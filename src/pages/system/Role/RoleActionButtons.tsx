@@ -1,10 +1,9 @@
 import { PlusOutlined, ExclamationCircleFilled, ImportOutlined } from '@ant-design/icons';
+import { Icon } from '@iconify-icon/react';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { App, Button, Space } from 'antd';
-import type React from 'react';
-import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Icon } from '@iconify-icon/react';
+import type React from 'react';
 
 interface RoleActionButtonsProps {
   onAddRoleClick: () => void;
@@ -21,7 +20,7 @@ const RoleActionButtons: React.FC<RoleActionButtonsProps> = ({ onAddRoleClick, s
   const { modal } = App.useApp();
   const { t } = useTranslation();
   // 批量处理删除
-  const onBatchDelete = useCallback(() => {
+  const onBatchDelete = () => {
     modal.confirm({
       title: '批量删除',
       icon: <ExclamationCircleFilled />,
@@ -31,7 +30,7 @@ const RoleActionButtons: React.FC<RoleActionButtonsProps> = ({ onAddRoleClick, s
         logicDeleteUserMutation.mutate(ids);
       },
     });
-  }, []);
+  };
 
   return (
     <Space>
@@ -41,7 +40,13 @@ const RoleActionButtons: React.FC<RoleActionButtonsProps> = ({ onAddRoleClick, s
       <Button type="default" icon={<ImportOutlined />}>
         {t('common.operation.import')}
       </Button>
-      <Button type="default" danger icon={<Icon icon="fluent:delete-dismiss-24-filled" className="text-xl! block text-[#ff4d4f]!" />} disabled={selRows.length === 0} onClick={onBatchDelete}>
+      <Button
+        type="default"
+        danger
+        icon={<Icon icon="fluent:delete-dismiss-24-filled" className="text-xl! block text-[#ff4d4f]!" />}
+        disabled={selRows.length === 0}
+        onClick={onBatchDelete}
+      >
         {t('common.operation.delete')}
       </Button>
     </Space>
