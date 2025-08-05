@@ -22,28 +22,27 @@ export const getColumns = (
     dataIndex: 'id',
     title: 'ID',
     key: 'id',
-    width: 40,
     hidden: true,
   },
   {
     dataIndex: 'username',
     title: '用户名',
     key: 'username',
-    width: 80,
+    width: 160,
     align: 'left',
   },
   {
     dataIndex: 'realName',
     title: '真实名',
     key: 'realName',
-    width: 80,
+    width: 140,
     align: 'left',
   },
   {
     dataIndex: 'sex',
     title: '性别',
     key: 'sex',
-    width: 40,
+    width: 80,
     align: 'center',
     render: (text: number) => {
       return text === 1 ? <ManOutlined className="text-blue-400!" /> : <WomanOutlined className="text-pink-400!" />;
@@ -69,21 +68,21 @@ export const getColumns = (
     dataIndex: 'birthday',
     title: '生日',
     key: 'birthday',
-    width: 80,
+    width: 120,
     align: 'center',
   },
   {
     dataIndex: 'email',
     title: '邮箱',
     key: 'email',
-    width: 80,
+    width: 120,
     align: 'center',
   },
   {
     dataIndex: 'status',
     title: '状态',
     key: 'status',
-    width: 60,
+    width: 80,
     align: 'center',
     render: (text: number) => {
       return text === 1 ? <Tag color="#87d068">正常</Tag> : <Tag color="gray">冻结</Tag>;
@@ -91,7 +90,7 @@ export const getColumns = (
   },
   {
     title: '操作',
-    width: 160,
+    width: 120,
     dataIndex: 'action',
     fixed: 'right',
     align: 'center',
