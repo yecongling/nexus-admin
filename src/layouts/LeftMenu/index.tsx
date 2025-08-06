@@ -140,7 +140,9 @@ const LeftMenu: React.FC = () => {
               src={logo}
               preview={false}
             />
-            <span className="system-name">Nexus Admin</span>
+            <span className="system-name" style={{ color: colorPrimary }}>
+              Nexus Admin
+            </span>
           </section>
         </Link>
       </div>
