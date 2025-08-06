@@ -1,31 +1,11 @@
 import type React from 'react';
 import { useEffect, useState } from 'react';
-import {
-  Layout,
-  Image,
-  Spin,
-  Menu,
-  type MenuProps,
-  Button,
-  Divider,
-  Space,
-  Segmented,
-  Tooltip,
-  ConfigProvider,
-  Empty,
-} from 'antd';
+import { Layout, Image, Spin, Menu, type MenuProps, Empty } from 'antd';
 import { Icon } from '@iconify-icon/react';
 import logo from '@/assets/images/icon-192.png';
 import { Link, useLocation, useNavigate } from 'react-router';
 
 import './leftMenu.scss';
-import {
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  MoonOutlined,
-  QuestionCircleOutlined,
-  SunOutlined,
-} from '@ant-design/icons';
 import type { RouteItem } from '@/types/route';
 import { getIcon, getOpenKeys, searchRoute } from '@/utils/utils';
 import { useMenuStore, usePreferencesStore } from '@/stores/store';
@@ -37,9 +17,10 @@ type MenuItem = Required<MenuProps>['items'][number];
  * 左边的菜单栏
  */
 const LeftMenu: React.FC = () => {
-  const { preferences, updatePreferences } = usePreferencesStore();
+  const { preferences } = usePreferencesStore();
   // 从状态库中获取状态
   const { sidebar, theme, navigation, app } = preferences;
+  const { accordion } = navigation;
   const { menus } = useMenuStore();
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -58,9 +39,6 @@ const LeftMenu: React.FC = () => {
   if (semiDarkSidebar) {
     mode = 'dark';
   }
-  // 是否暗黑模式
-  const isDark = mode === 'dark' || semiDarkSidebar;
-
   const getItem = (
     label: any,
     key?: React.Key | null,
@@ -119,6 +97,7 @@ const LeftMenu: React.FC = () => {
 
   // 设置当前展开的 subMenu
   const onOpenChange = (openKeys: string[]) => {
+    if (!accordion) return setOpenKeys(openKeys);
     if (openKeys.length < 1) return setOpenKeys(openKeys);
     const latestOpenKey = openKeys[openKeys.length - 1];
     if (latestOpenKey.includes(openKeys[0])) return setOpenKeys(openKeys);
@@ -140,9 +119,11 @@ const LeftMenu: React.FC = () => {
       collapsedWidth={48}
       className="ant-menu"
       style={{
-        overflowX: 'hidden',
+        overflow: 'hidden',
+        position: 'relative',
+        transition: 'width .2s cubic-bezier(.34,.69,.1,1)',
         zIndex: 999,
-        boxShadow: '0 2px 5px 0 rgba(0, 0, 0, 0.08)',
+        boxShadow: '0 2px 5px #00000014',
       }}
       collapsible
       width={width}
@@ -151,21 +132,16 @@ const LeftMenu: React.FC = () => {
     >
       <div className="flex justify-between items-center toolbox">
         <Link to="/" style={{ width: '100%' }}>
-          <div className="h-16 flex items-center justify-center">
-            <Image width={25} src={logo} preview={false} />
-            {!collapsed && (
-              <p
-                style={{
-                  fontWeight: 'bold',
-                  margin: '0 12px',
-                  fontSize: '20px',
-                  color: colorPrimary,
-                }}
-              >
-                Nexus
-              </p>
-            )}
-          </div>
+          <section className="system-logo h-16 flex items-center shrink-0 box-border">
+            <Image
+              width={32}
+              height={32}
+              className="rounded-s-md transition-all duration-200 overflow-hidden shrink-0"
+              src={logo}
+              preview={false}
+            />
+            <span className="system-name">Nexus Admin</span>
+          </section>
         </Link>
       </div>
       <Spin
@@ -180,7 +156,7 @@ const LeftMenu: React.FC = () => {
             mode="inline"
             theme={mode}
             defaultSelectedKeys={[pathname]}
-            openKeys={navigation.accordion ? openKeys : undefined}
+            openKeys={openKeys}
             items={menuList}
             onClick={clickMenu}
             onOpenChange={onOpenChange}
@@ -189,74 +165,6 @@ const LeftMenu: React.FC = () => {
           <Empty description={<>暂无菜单，请检查用户角色是否具有菜单！</>} />
         )}
       </Spin>
-      <Divider style={{ margin: '0 0 8px 0' }} />
-      <div
-        className="flex justify-center content-center"
-        style={{
-          height: collapsed ? '140px' : '40px',
-        }}
-      >
-        <Space direction={collapsed ? 'vertical' : 'horizontal'} align="center" className="justify-center">
-          <ConfigProvider
-            theme={{
-              components: {
-                Segmented: {
-                  itemHoverColor: isDark ? '#eee' : 'rgba(0,0,0,0.88)',
-                  itemColor: isDark ? '#fff' : 'rgba(0, 0, 0, 0.65)',
-                  itemSelectedBg: isDark ? colorPrimary : '#fff',
-                  itemSelectedColor: isDark ? '#fff' : 'rgba(0,0,0,0.88)',
-                  trackBg: isDark ? '#001529' : '#f5f5f5',
-                },
-              },
-            }}
-          >
-            <Segmented
-              onChange={(value) => updatePreferences('theme', 'mode', value)}
-              vertical={collapsed}
-              size="small"
-              options={[
-                {
-                  label: collapsed ? '' : 'light',
-                  value: 'light',
-                  icon: <SunOutlined />,
-                },
-                {
-                  label: collapsed ? '' : 'dark',
-                  value: 'dark',
-                  icon: <MoonOutlined />,
-                },
-              ]}
-            />
-          </ConfigProvider>
-          <Tooltip title="帮助文档">
-            <Button
-              size="small"
-              color="default"
-              variant="filled"
-              shape="circle"
-              icon={<QuestionCircleOutlined style={{ color: isDark ? 'white' : 'black' }} />}
-            />
-          </Tooltip>
-          <Button
-            size="small"
-            color="default"
-            variant="filled"
-            shape="circle"
-            style={{
-              cursor: 'pointer',
-              fontSize: '16px',
-            }}
-            icon={
-              collapsed ? (
-                <MenuUnfoldOutlined style={{ color: isDark ? 'white' : 'black' }} />
-              ) : (
-                <MenuFoldOutlined style={{ color: isDark ? 'white' : 'black' }} />
-              )
-            }
-            onClick={() => updatePreferences('sidebar', 'collapsed', !collapsed)}
-          />
-        </Space>
-      </div>
     </Layout.Sider>
   );
 };

@@ -1,4 +1,4 @@
-import { Badge, Dropdown, FloatButton, Layout, type MenuProps, Skeleton, Space, Tooltip } from 'antd';
+import { Badge, Button, Dropdown, FloatButton, Layout, type MenuProps, Skeleton, Space, Tooltip } from 'antd';
 import React, { useState, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -6,6 +6,8 @@ import {
   GithubOutlined,
   LockOutlined,
   MailOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
 
@@ -29,7 +31,8 @@ const Header = () => {
   const [openSetting, setOpenSetting] = useState<boolean>(false);
   // 从全局状态中获取配置是否开启面包屑、图标
   const { preferences, updatePreferences } = usePreferencesStore();
-  const { breadcrumb, header, app, theme } = preferences;
+  const { breadcrumb, header, app, theme, sidebar } = preferences;
+  const { collapsed } = sidebar;
   const { t } = useTranslation();
 
   // 显示顶部菜单
@@ -67,11 +70,24 @@ const Header = () => {
     <>
       {header.enable ? (
         <Layout.Header
-          className="ant-layout-header flex"
+          className="ant-layout-header flex items-center"
           style={{
             borderBottom: ' 1px solid #e9edf0',
           }}
         >
+          <Button
+            size="small"
+            color="default"
+            variant="filled"
+            shape="circle"
+            style={{
+              cursor: 'pointer',
+              fontSize: '16px',
+              marginLeft: '6px'
+            }}
+            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={() => updatePreferences('sidebar', 'collapsed', !collapsed)}
+          />
           {/* 面包屑 */}
           {breadcrumb.enable && <BreadcrumbNav />}
           {/* 显示头部横向的菜单 */}

@@ -1,12 +1,32 @@
-.ant-menu {
-  > .ant-layout-sider-children {
-    display: flex;
-    flex-direction: column;
-  }
-}
-
 .side-menu {
   flex: 1;
   overflow-y: auto;
 }
 
+.system-logo {
+  height: 56px;
+  padding: 0 12px;
+  font-size: 20px;
+
+  .system-name {
+    padding-left: 12px;
+    white-space: nowrap;
+    transition: color .3s;
+    line-height: 1.5;
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+.ant-layout-sider-collapsed {
+  .system-logo {
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .system-name {
+      display: none;
+    }
+  }
+}
