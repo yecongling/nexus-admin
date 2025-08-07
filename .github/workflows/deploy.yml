@@ -22,7 +22,7 @@ jobs:
         run: yarn
 
       - name: Build project
-        run: yarn build
+        run: yarn build:prod
 
       - name: Add known hosts
         run: |

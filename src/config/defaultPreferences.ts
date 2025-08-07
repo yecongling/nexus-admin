@@ -17,7 +17,7 @@ export const defaultPreferences: Preferences = {
     enableRefreshToken: false,
     isMobile: false,
     layout: "sidebar-nav",
-    locale: "en-US",
+    locale: "zh-CN",
     loginExpiredMode: "page",
     name: "fusion",
     preferencesButtonPosition: "auto",

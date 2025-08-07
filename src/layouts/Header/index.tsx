@@ -1,28 +1,33 @@
-import { Badge, Button, Dropdown, FloatButton, Layout, type MenuProps, Skeleton, Space, Tooltip } from 'antd';
-import React, { useState, Suspense, memo, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
+import {
+  Badge,
+  Dropdown,
+  FloatButton,
+  Layout,
+  Skeleton,
+  Space,
+  Tooltip,
+} from "antd";
+import React, { useState, Suspense, memo, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import {
   BellOutlined,
   GithubOutlined,
   LockOutlined,
   MailOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
   SettingOutlined,
-} from '@ant-design/icons';
+} from "@ant-design/icons";
 
-import { languages } from '@/locales/language';
-import { MyIcon } from '@/components/MyIcon';
-import { changeLanguage } from '@/locales/i18next-config';
-import { usePreferencesStore } from '@/stores/store';
-import BreadcrumbNav from './component/BreadcrumbNav';
-import FullScreen from './component/FullScreen';
-import MessageBox from './component/MessageBox';
-import UserDropdown from './component/UserDropdown';
-import LayoutMenu from '../menu';
-import SearchMenuModal from './component/SearchMenuModal';
+import { usePreferencesStore } from "@/stores/store";
+import BreadcrumbNav from "./component/BreadcrumbNav";
+import FullScreen from "./component/FullScreen";
+import MessageBox from "./component/MessageBox";
+import UserDropdown from "./component/UserDropdown";
+import LayoutMenu from "../menu";
+import SearchMenuModal from "./component/SearchMenuModal";
+import CollapseSwitch from "./component/CollapseSwitch";
+import LanguageSwitch from "./component/LanguageSwitch";
 
-const Setting = React.lazy(() => import('./component/Setting'));
+const Setting = React.lazy(() => import("./component/Setting"));
 
 /**
  * 顶部布局内容
@@ -31,44 +36,24 @@ const Header = () => {
   const [openSetting, setOpenSetting] = useState<boolean>(false);
   // 从全局状态中获取配置是否开启面包屑、图标
   const { preferences, updatePreferences } = usePreferencesStore();
-  const { breadcrumb, header, app, theme, sidebar } = preferences;
-  const { collapsed } = sidebar;
+  const { breadcrumb, header, app, theme } = preferences;
   const { t } = useTranslation();
 
   // 显示顶部菜单
-  const showHeaderNav = useMemo(() => {
-    return app.layout === 'header-nav' || app.layout === 'mixed-nav' || app.layout === 'header-mixed-nav';
-  }, [app.layout]);
+  const showHeaderNav =
+    app.layout === "header-nav" ||
+    app.layout === "mixed-nav" ||
+    app.layout === "header-mixed-nav";
 
   // 顶部菜单主题
-  const themeHeader = useMemo(() => {
-    return theme.semiDarkHeader ? 'dark' : 'light';
-  }, [theme.semiDarkHeader]);
+  const themeHeader = theme.semiDarkHeader ? "dark" : "light";
 
   /**
    * 跳转到github
    */
-  const routeGitHub = () => {
-    window.open('https://github.com/yecongling/nexus-web', '_blank');
-  };
-
-  /**
-   * 下拉语言选项
-   */
-  const menuItems: MenuProps['items'] = languages.map((item: any) => ({
-    key: item.value,
-    label: item.name,
-    onClick: () => changeLocale(item.value),
-  }));
-
-  /**
-   * 切换语言
-   * @param locale 语言
-   */
-  const changeLocale = (locale: string) => {
-    updatePreferences('app', 'locale', locale);
-    changeLanguage(locale);
-  };
+  const routeGitHub = useCallback(() => {
+    window.open("https://github.com/yecongling/nexus-web", "_blank");
+  }, []);
 
   return (
     <>
@@ -76,56 +61,57 @@ const Header = () => {
         <Layout.Header
           className="ant-layout-header flex items-center"
           style={{
-            borderBottom: ' 1px solid #e9edf0',
+            borderBottom: " 1px solid #e9edf0",
           }}
         >
-          <Button
-            size="small"
-            color="default"
-            variant="filled"
-            shape="circle"
-            style={{
-              cursor: 'pointer',
-              fontSize: '16px',
-              marginLeft: '6px'
-            }}
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={() => updatePreferences('sidebar', 'collapsed', !collapsed)}
-          />
+          {/* 侧边栏切换按钮 */}
+          <CollapseSwitch />
           {/* 面包屑 */}
           {breadcrumb.enable && <BreadcrumbNav />}
           {/* 显示头部横向的菜单 */}
-          <div className={`menu-align-${header.menuAlign} flex h-full min-w-0 flex-1 items-center`}>
-            {showHeaderNav && <LayoutMenu className="w-full" mode="horizontal" theme={themeHeader} />}
+          <div
+            className={`menu-align-${header.menuAlign} flex h-full min-w-0 flex-1 items-center`}
+          >
+            {showHeaderNav && (
+              <LayoutMenu
+                className="w-full"
+                mode="horizontal"
+                theme={themeHeader}
+              />
+            )}
           </div>
           <Space size="large" className="flex justify-end items-center toolbox">
             <SearchMenuModal />
             <Tooltip placement="bottom" title="github">
-              <GithubOutlined style={{ cursor: 'pointer', fontSize: '18px' }} onClick={routeGitHub} />
+              <GithubOutlined
+                style={{ cursor: "pointer", fontSize: "18px" }}
+                onClick={routeGitHub}
+              />
             </Tooltip>
-            <Tooltip placement="bottom" title={t('layout.header.lock')}>
+            <Tooltip placement="bottom" title={t("layout.header.lock")}>
               <LockOutlined
-                style={{ cursor: 'pointer', fontSize: '18px' }}
+                style={{ cursor: "pointer", fontSize: "18px" }}
                 onClick={() => {
-                  updatePreferences('widget', 'lockScreenStatus', true);
+                  updatePreferences("widget", "lockScreenStatus", true);
                 }}
               />
             </Tooltip>
             {/* 邮件 */}
             <Badge count={5}>
-              <MailOutlined style={{ cursor: 'pointer', fontSize: '18px' }} />
+              <MailOutlined style={{ cursor: "pointer", fontSize: "18px" }} />
             </Badge>
             <Dropdown placement="bottom" popupRender={() => <MessageBox />}>
               <Badge count={5}>
-                <BellOutlined style={{ cursor: 'pointer', fontSize: '18px' }} />
+                <BellOutlined style={{ cursor: "pointer", fontSize: "18px" }} />
               </Badge>
             </Dropdown>
-            <Tooltip placement="bottomRight" title={t('layout.header.setting')}>
-              <SettingOutlined style={{ cursor: 'pointer', fontSize: '18px' }} onClick={() => setOpenSetting(true)} />
+            <Tooltip placement="bottomRight" title={t("layout.header.setting")}>
+              <SettingOutlined
+                style={{ cursor: "pointer", fontSize: "18px" }}
+                onClick={() => setOpenSetting(true)}
+              />
             </Tooltip>
-            <Dropdown menu={{ items: menuItems }} placement="bottom">
-              <MyIcon type="nexus-language" style={{ cursor: 'pointer', fontSize: '18px' }} />
-            </Dropdown>
+            <LanguageSwitch />
             <FullScreen />
             {/* 用户信息 */}
             <UserDropdown />
@@ -134,7 +120,7 @@ const Header = () => {
       ) : (
         <FloatButton
           icon={<SettingOutlined />}
-          tooltip={<span>{t('layout.header.setting')}</span>}
+          tooltip={<span>{t("layout.header.setting")}</span>}
           style={{ right: 24, bottom: 24 }}
           onClick={() => setOpenSetting(true)}
         />

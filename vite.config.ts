@@ -1,11 +1,22 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-oxc";
 import tailwindcss from "@tailwindcss/vite";
+import viteCompression from "vite-plugin-compression";
 import path from "path";
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    viteCompression({
+      verbose: true,
+      disable: false,
+      threshold: 10240,
+      algorithm: "gzip",
+      ext: ".gz",
+    }),
+  ],
   // 配置分包
   build: {
     // 压缩css代码
@@ -27,10 +38,21 @@ export default defineConfig({
         // 按文件类型进行拆分文件夹
         assetFileNames: "static/[ext]/[name]-[hash].[ext]",
         // 手动拆分代码
-        manualChunks: {
-          react: ["react", "react-dom"],
-          antd: ["antd"],
-          "antd-icons": ["@ant-design/icons"],
+        advancedChunks: {
+          groups: [
+            {
+              name: "react",
+              test: /node_modules[\\/]react/,
+            },
+            {
+              name: "antd",
+              test: /node_modules[\\/]antd/,
+            },
+            {
+              name: "antd-icons",
+              test: /node_modules[\\/]@ant-design\/icons/,
+            },
+          ],
         },
       },
     },

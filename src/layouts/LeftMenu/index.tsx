@@ -91,9 +91,9 @@ const LeftMenu: React.FC = () => {
         const title = route.meta?.title;
         if (title) document.title = `Nexus - ${t(title)}`;
       }
-      if (!collapsed) setOpenKeys(openKey);
+      setOpenKeys(openKey);
     }
-  }, [pathname, collapsed, menus]);
+  }, [pathname, menus]);
 
   // 设置当前展开的 subMenu
   const onOpenChange = (openKeys: string[]) => {

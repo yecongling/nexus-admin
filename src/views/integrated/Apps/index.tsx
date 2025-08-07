@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import TagManagementModal from '@/components/base/tag-management';
 import TagFilter from '@/components/base/tag-management/TagFilter.tsx';
 import { usePermission } from '@/hooks/usePermission';
-import CreateAppCard from '@/pages/integrated/Apps/NewAppCard.tsx';
+import CreateAppCard from '@/views/integrated/Apps/NewAppCard.tsx';
 import type { App, AppSearchParams } from '@/services/integrated/apps/app';
 import { appsService } from '@/services/integrated/apps/appsApi';
 import { useTagStore } from '@/stores/useTagStore.ts';

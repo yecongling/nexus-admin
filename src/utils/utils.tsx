@@ -21,7 +21,7 @@ export function handleRouter(routerList: RouteItem[], newArr: RouteObject[] = []
     };
     if (typeof item === 'object' && item.path && item.route) {
       menu.path = item.path;
-      menu.component = LazyLoad(item.component);
+      menu.component = LazyLoad(item.component).type;
       // 这里要添加id
       newArr.push(menu);
     }

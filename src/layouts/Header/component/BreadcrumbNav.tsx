@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { Breadcrumb } from 'antd';
 import { Link, useLocation } from 'react-router';
 import type { RouteItem } from '@/types/route';
@@ -47,7 +47,7 @@ const BreadcrumbNav: React.FC = () => {
     </>
   );
 };
-export default BreadcrumbNav;
+export default memo(BreadcrumbNav);
 
 /**
  * 根据路径生成面包屑的路径内容
