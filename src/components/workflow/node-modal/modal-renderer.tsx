@@ -2,7 +2,7 @@ import DragModal from '@/components/modal/DragModal';
 import { IsNodeModalContext, NodeModalContext } from '@/context/workflow/node-modal-context';
 import type { FlowNodeMeta } from '@/types/workflow/node';
 import { PlaygroundEntityContext, useClientContext, useRefresh } from '@flowgram.ai/free-layout-editor';
-import { useContext, useEffect } from 'react';
+import { useCallback, useContext, useEffect, useMemo } from 'react';
 import { NodeModalRenderer } from './node-modal-renderer';
 
 /**
@@ -19,15 +19,17 @@ const ModalRenderer: React.FC = () => {
   /**
    * 关闭弹窗
    */
-  const handleClose = () => setNodeId(undefined);
+  const handleClose = useCallback(() => {
+    setNodeId(undefined);
+  }, []);
 
   /**
    * 点击确定
    */
-  const handleOk = () => {
+  const handleOk = useCallback(() => {
     console.log('点击了确定，更新节点数据');
     setNodeId(undefined);
-  };
+  }, []);
 
   /**
    * 监听画布实例变更
@@ -61,7 +63,13 @@ const ModalRenderer: React.FC = () => {
   /**
    * 节点渲染
    */
-  const visible = node ? !node.getNodeMeta<FlowNodeMeta>().disableModal : false;
+  const visible = useMemo(() => {
+    if (!node) {
+      return false;
+    }
+    const { disableModal = false } = node.getNodeMeta<FlowNodeMeta>();
+    return !disableModal;
+  }, [node]);
 
   if (playground.config.readonly) {
     return null;

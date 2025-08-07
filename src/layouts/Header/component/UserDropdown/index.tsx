@@ -1,5 +1,5 @@
 import { App, Avatar, Divider, Dropdown, theme, type MenuProps } from 'antd';
-import type { ReactNode } from 'react';
+import { memo, type ReactNode } from 'react';
 import type React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -216,4 +216,4 @@ const UserDropdown: React.FC = () => {
   );
 };
 
-export default UserDropdown;
+export default memo(UserDropdown);

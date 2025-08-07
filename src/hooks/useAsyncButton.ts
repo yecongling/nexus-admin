@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from "react";
 
 interface AsyncButtonProps {
   onSuccess?: (data: any) => void;
@@ -12,7 +12,10 @@ interface AsyncButtonProps {
  * @param options - 配置选项
  * @returns 包含 loading 状态和点击处理函数
  */
-export function useAsyncButton<T>(asyncFunction: (...args: any[]) => Promise<T>, options: AsyncButtonProps = {}) {
+export function useAsyncButton<T>(
+  asyncFunction: (...args: any[]) => Promise<T>,
+  options: AsyncButtonProps = {}
+) {
   const { onSuccess, onError, cooldown } = options;
   const [loading, setLoading] = useState(false);
   const [cooldownRemaining, setCooldownRemaining] = useState(0);
@@ -22,7 +25,7 @@ export function useAsyncButton<T>(asyncFunction: (...args: any[]) => Promise<T>,
   /**
    * 开始定时
    */
-  const startCooldown = () => {
+  const startCooldown = useCallback(() => {
     if (!cooldown) return;
     setCooldownRemaining(cooldown / 1000);
     const startTime = Date.now();
@@ -36,26 +39,34 @@ export function useAsyncButton<T>(asyncFunction: (...args: any[]) => Promise<T>,
         setCooldownRemaining(remaining);
       }
     }, 1000);
-  };
+  }, [cooldown]);
 
   /**
    * 按钮点击处理函数
    */
-  const run = async (...args: any[]) => {
-    if (loading || cooldownRemaining > 0) return; // 如果正在加载或冷却中，则不执行
-    try {
-      setLoading(true);
-      const result = await asyncFunction(...args);
-      onSuccess?.(result);
-      startCooldown(); // 开始冷却
-      return result;
-    } catch (error) {
-      onError?.(error);
-      throw error; // 抛出错误以供外部处理
-    } finally {
-      setLoading(false);
-    }
-  };
+  const run = useCallback(
+    async (...args: any[]) => {
+      if (loading || cooldownRemaining > 0) return; // 如果正在加载或冷却中，则不执行
+      try {
+        setLoading(true);
+        const result = await asyncFunction(...args);
+        onSuccess?.(result);
+        startCooldown(); // 开始冷却
+        return result;
+      } catch (error) {
+        onError?.(error);
+        throw error; // 抛出错误以供外部处理
+      } finally {
+        setLoading(false);
+      }
+    },
+    [loading, cooldownRemaining, asyncFunction, onSuccess, startCooldown]
+  );
 
-  return { loading, cooldownRemaining, run, disabled: loading || cooldownRemaining > 0 };
+  return {
+    loading,
+    cooldownRemaining,
+    run,
+    disabled: loading || cooldownRemaining > 0,
+  };
 }

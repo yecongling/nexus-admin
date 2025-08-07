@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { Layout, Image, Spin, Menu, type MenuProps, Empty } from 'antd';
 import { Icon } from '@iconify-icon/react';
 import logo from '@/assets/images/icon-192.png';
@@ -56,7 +56,7 @@ const LeftMenu: React.FC = () => {
   };
 
   // 处理后台返回菜单数据
-  const deepLoopFloat = (menuList: RouteItem[], newArr: MenuItem[] = []) => {
+  const deepLoopFloat = useCallback((menuList: RouteItem[], newArr: MenuItem[] = []) => {
     for (const item of menuList) {
       // 处理子路由和权限按钮不显示
       if (item?.meta?.menuType === 2 || item?.meta?.menuType === 3 || item?.hidden) {
@@ -70,7 +70,7 @@ const LeftMenu: React.FC = () => {
       newArr.push(getItem(item.meta?.title, item.path, getIcon(item.meta?.icon), deepLoopFloat(item.children)));
     }
     return newArr;
-  };
+  }, []);
 
   /**
    * 菜单点击跳转
@@ -171,4 +171,4 @@ const LeftMenu: React.FC = () => {
   );
 };
 
-export default LeftMenu;
+export default memo(LeftMenu);

@@ -1,5 +1,5 @@
 import { Badge, Button, Dropdown, FloatButton, Layout, type MenuProps, Skeleton, Space, Tooltip } from 'antd';
-import React, { useState, Suspense } from 'react';
+import React, { useState, Suspense, memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   BellOutlined,
@@ -36,10 +36,14 @@ const Header = () => {
   const { t } = useTranslation();
 
   // 显示顶部菜单
-  const showHeaderNav = app.layout === 'header-nav' || app.layout === 'mixed-nav' || app.layout === 'header-mixed-nav';
+  const showHeaderNav = useMemo(() => {
+    return app.layout === 'header-nav' || app.layout === 'mixed-nav' || app.layout === 'header-mixed-nav';
+  }, [app.layout]);
 
   // 顶部菜单主题
-  const themeHeader = theme.semiDarkHeader ? 'dark' : 'light';
+  const themeHeader = useMemo(() => {
+    return theme.semiDarkHeader ? 'dark' : 'light';
+  }, [theme.semiDarkHeader]);
 
   /**
    * 跳转到github
@@ -142,4 +146,4 @@ const Header = () => {
     </>
   );
 };
-export default Header;
+export default memo(Header);

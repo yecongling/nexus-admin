@@ -6,6 +6,7 @@ import {
 import { ConfigProvider } from 'antd';
 import { NodeRenderContext } from '@/context/workflow/node-render-context';
 import NodeWrapper from './node-wrapper';
+import { useCallback } from 'react';
 
 /**
  * 节点渲染方法（所有节点渲染的入口）
@@ -23,9 +24,9 @@ export const BaseNode = ({ node }: { node: FlowNodeEntity }) => {
   /**
    * 用于让 Tooltip 跟随节点缩放, 这个可以根据不同的 ui 库自己实现
    */
-  const getPopupContainer = (node?: HTMLElement) => {
+  const getPopupContainer = useCallback((node?: HTMLElement) => {
     return node || document.body;
-  };
+  }, []);
 
   return (
     <ConfigProvider

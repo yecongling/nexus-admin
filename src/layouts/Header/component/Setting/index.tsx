@@ -1,6 +1,6 @@
 import { ClearOutlined, CloseOutlined, CopyOutlined, RedoOutlined } from '@ant-design/icons';
 import type React from 'react';
-import { useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { App, Button, ConfigProvider, Drawer, Segmented, Space, Tabs, type TabsProps } from 'antd';
 import { usePreferencesStore } from '@/stores/store';
 import Block from './Block';
@@ -26,24 +26,26 @@ const Setting: React.FC<SettingProps> = ({ open, setOpen }) => {
   const { modal, message } = App.useApp();
 
   // 分段器的值
-  const segmentedItems = [
-    {
-      label: '外观',
-      value: 'theme',
-    },
-    {
-      label: '布局',
-      value: 'layout',
-    },
-    {
-      label: '快捷键',
-      value: 'shortcut',
-    },
-    {
-      label: '通用',
-      value: 'common',
-    },
-  ];
+  const segmentedItems = useMemo(() => {
+    return [
+      {
+        label: '外观',
+        value: 'theme',
+      },
+      {
+        label: '布局',
+        value: 'layout',
+      },
+      {
+        label: '快捷键',
+        value: 'shortcut',
+      },
+      {
+        label: '通用',
+        value: 'common',
+      },
+    ];
+  }, []);
 
   // Tabs的选项
   const tabsItems: TabsProps['items'] = [
@@ -162,5 +164,4 @@ const Setting: React.FC<SettingProps> = ({ open, setOpen }) => {
   );
 };
 
-Setting.propTypes = {};
-export default Setting;
+export default memo(Setting);

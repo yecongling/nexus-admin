@@ -10,7 +10,7 @@ import { useUnmount } from 'ahooks';
 import { App, Checkbox, Divider, Input } from 'antd';
 import { noop } from 'lodash-es';
 import type React from 'react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type TagSelectorProps = {
@@ -50,15 +50,24 @@ const Panel: React.FC<PanelProps> = (props) => {
   };
 
   // 不存在的节点
-  const notExisted = tagList.every((tag) => tag.type === type && tag.name !== keywords);
+ const notExisted = useMemo(() => {
+    return tagList.every((tag) => tag.type === type && tag.name !== keywords);
+  }, [type, tagList, keywords]);
 
   // 过滤已经选中的标签列表
-  const filteredSelectedTagList = selectedTags.filter((tag) => tag.name.includes(keywords));
+  const filteredSelectedTagList = useMemo(() => {
+    return selectedTags.filter((tag) => tag.name.includes(keywords));
+  }, [keywords, selectedTags]);
 
   // 过滤后的标签列表
-  const filteredTagList = tagList.filter(
-    (tag) => tag.type === type && !value.includes(tag.id) && tag.name.includes(keywords),
-  );
+  const filteredTagList = useMemo(() => {
+    return tagList.filter(
+      (tag) =>
+        tag.type === type &&
+        !value.includes(tag.id) &&
+        tag.name.includes(keywords),
+    );
+  }, [type, tagList, value, keywords]);
 
   const [creating, setCreating] = useState<boolean>(false);
 
@@ -143,10 +152,13 @@ const Panel: React.FC<PanelProps> = (props) => {
   /**
    * 值未改变
    */
-  const valueNotChanged =
-    value.length === selectedTagIDs.length &&
-    value.every((v) => selectedTagIDs.includes(v)) &&
-    selectedTagIDs.every((v) => value.includes(v));
+ const valueNotChanged = useMemo(() => {
+    return (
+      value.length === selectedTagIDs.length &&
+      value.every((v) => selectedTagIDs.includes(v)) &&
+      selectedTagIDs.every((v) => value.includes(v))
+    );
+  }, [value, selectedTagIDs]);
 
   /**
    * 处理值改变
@@ -288,12 +300,15 @@ const TagSelector: React.FC<TagSelectorProps> = ({
   /**
    * 用于显示选中标签的内容
    */
-  const triggerContent = selectedTags?.length
-    ? selectedTags
+ const triggerContent = useMemo(() => {
+    if (selectedTags?.length) {
+      return selectedTags
         .filter((tag) => tagList.find((t) => t.id === tag.id))
         .map((tag) => tag.name)
-        .join(', ')
-    : '';
+        .join(', ');
+    }
+    return '';
+  }, [selectedTags, tagList]);
 
   /**
    * 触发器内容

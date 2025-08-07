@@ -8,7 +8,7 @@ import {useQuery} from '@tanstack/react-query';
 import {useDebounceFn} from 'ahooks';
 import {Dropdown, Button, Space, Input} from 'antd';
 import type React from 'react';
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {tagsService} from '@/services/common/tags/tagsApi';
 import type {Tag} from '@/services/common/tags/tagsModel';
@@ -57,14 +57,20 @@ const TagFilter: React.FC<TagFilterProps> = ({type, value, onChange}) => {
   /**
    * 过滤后的标签
    */
-  const filteredTagList = data?.filter(
-    (tag) => tag.type === type && tag.name.includes(searchKeyword),
-  ) || []
+  const filteredTagList = useMemo(() => {
+    return (
+      data?.filter(
+        (tag) => tag.type === type && tag.name.includes(searchKeyword),
+      ) || []
+    );
+  }, [type, data, searchKeyword]);
 
   /**
    * 当前选中的标签
    */
-  const currentTag = data?.find((tag) => tag.id === value[0]);
+  const currentTag = useMemo(() => {
+    return data?.find((tag) => tag.id === value[0]);
+  }, [value, data]);
 
   /**
    * 选中标签

@@ -1,32 +1,7 @@
 {
-  "compilerOptions": {
-    "lib": ["DOM", "ES2020"],
-    "jsx": "preserve",
-    "target": "ES2020",
-    "experimentalDecorators": true,
-    "strictPropertyInitialization":false,
-    "noEmit": true,
-    "skipLibCheck": true,
-    "allowJs": true,
-    "useDefineForClassFields": true,
-
-    /* modules */
-    "module": "ESNext",
-    "isolatedModules": true,
-    "resolveJsonModule": true,
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-
-    /* type checking */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "baseUrl": ".", // 项目根目录
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    }
-  },
-  "include": ["src", "public/font"]
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
 }

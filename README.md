@@ -4,13 +4,13 @@
 # 集成信息管理平台，用于将多种协议、多种系统进行耦合，通过配置服务并发布，可做到让不同厂商的系统进行最简化的系统对接
 
 # 框架技术： 
-- react@18.3.1  
+- react@19.1.9  
 - antd@latest 
-- rsbuild 构建工具
+- vite@latest 构建工具
 - zustand@latest 状态管理
 - sass@latest
 - react-router@latest
-- react-dom@18.3.1
+- react-dom@19.1.7
 - axios@latest
 - @tanstack/react-query@latest
 # 注意

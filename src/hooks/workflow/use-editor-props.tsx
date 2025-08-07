@@ -22,6 +22,7 @@ import BaseNode from '@/components/workflow/nodes/base-node';
 import { defaultFormMeta } from '@/components/workflow/nodes/default-form-meta';
 import { createContextMenuPlugin } from '@/components/workflow/plugins/context-menu-plugin/context-menu-plugin';
 import type { FlowDocumentJSON, FlowNodeRegistry } from '@/types/workflow/node';
+import { useMemo } from 'react';
 
 /**
  * 定义流程编辑器画布属性
@@ -32,7 +33,7 @@ export function useEditorProps(
   nodeRegistries: FlowNodeRegistry[],
   handleSave?: (data: FlowDocumentJSON) => void,
 ): FreeLayoutProps {
-  return {
+  return useMemo(() => ({
       // 支持背景
       background: true,
 
@@ -291,5 +292,5 @@ export function useEditorProps(
          */
         createContextMenuPlugin({}),
       ],
-    }
+    }), [])
 }

@@ -1,4 +1,4 @@
-import { CommentEditorFormField } from '@/components/workflow/nodes/comment/constant';
+import { CommentEditorFormField } from "@/components/workflow/nodes/comment/constant";
 import {
   FlowNodeFormData,
   type FormModelV2,
@@ -8,8 +8,8 @@ import {
   useCurrentEntity,
   usePlayground,
   useService,
-} from '@flowgram.ai/free-layout-editor';
-import { useEffect, useState } from 'react';
+} from "@flowgram.ai/free-layout-editor";
+import { useCallback, useEffect, useState } from "react";
 
 /**
  * 判定尺寸
@@ -27,14 +27,18 @@ export const useSize = () => {
   const formModel = node.getData(FlowNodeFormData).getFormModel<FormModelV2>();
 
   // 获取输入的宽高
-  const formSize = formModel.getValueIn<{ width: number; height: number }>(CommentEditorFormField.Size);
+  const formSize = formModel.getValueIn<{ width: number; height: number }>(
+    CommentEditorFormField.Size
+  );
 
   const [width, setWidth] = useState<number>(formSize?.width ?? size.width);
   const [height, setHeight] = useState<number>(formSize?.height ?? size.height);
 
   // 初始化表单
   useEffect(() => {
-    const initSize = formModel.getValueIn<{ width: number; height: number }>(CommentEditorFormField.Size);
+    const initSize = formModel.getValueIn<{ width: number; height: number }>(
+      CommentEditorFormField.Size
+    );
     if (!initSize) {
       formModel.setValueIn(CommentEditorFormField.Size, {
         width,
@@ -49,7 +53,9 @@ export const useSize = () => {
       if (name !== CommentEditorFormField.Size) {
         return;
       }
-      const newSize = formModel.getValueIn<{ width: number; height: number }>(CommentEditorFormField.Size);
+      const newSize = formModel.getValueIn<{ width: number; height: number }>(
+        CommentEditorFormField.Size
+      );
       if (!newSize) return;
       setWidth(newSize.width);
       setHeight(newSize.height);
@@ -58,7 +64,7 @@ export const useSize = () => {
   }, [formModel]);
 
   // 尺寸变化监听
-  const onResize = () => {
+  const onResize = useCallback(() => {
     const resizeState = {
       width,
       height,
@@ -75,7 +81,12 @@ export const useSize = () => {
      * @param delta
      * @returns
      */
-    const resizing = (delta: { top: number; right: number; bottom: number; left: number }) => {
+    const resizing = (delta: {
+      top: number;
+      right: number;
+      bottom: number;
+      left: number;
+    }) => {
       if (!resizeState) return;
       const { zoom } = playground.config;
 
@@ -87,12 +98,24 @@ export const useSize = () => {
       const minWidth = 120;
       const minHeight = 80;
 
-      const newWidth = Math.max(minWidth, resizeState.originalWidth + right - left);
-      const newHeight = Math.max(minHeight, resizeState.originalHeight + bottom - top);
+      const newWidth = Math.max(
+        minWidth,
+        resizeState.originalWidth + right - left
+      );
+      const newHeight = Math.max(
+        minHeight,
+        resizeState.originalHeight + bottom - top
+      );
 
       //如果宽度或高度小于最小值，则不更新偏移量
-      const newOffsetX = (left > 0 || right < 0) && newWidth <= minWidth ? resizeState.offsetX : left / 2 + right / 2;
-      const newOffsetY = (top > 0 || bottom < 0) && newHeight <= minHeight ? resizeState.offsetY : top;
+      const newOffsetX =
+        (left > 0 || right < 0) && newWidth <= minWidth
+          ? resizeState.offsetX
+          : left / 2 + right / 2;
+      const newOffsetY =
+        (top > 0 || bottom < 0) && newHeight <= minHeight
+          ? resizeState.offsetY
+          : top;
 
       const newPositionX = resizeState.positionX + newOffsetX;
       const newPositionY = resizeState.positionY + newOffsetY;
@@ -139,7 +162,7 @@ export const useSize = () => {
               ],
             },
           },
-          { noApply: true },
+          { noApply: true }
         );
         formModel.setValueIn(CommentEditorFormField.Size, {
           width: resizeState.width,
@@ -152,7 +175,7 @@ export const useSize = () => {
       resizing,
       resizeEnd,
     };
-  };
+  }, [node, width, height, transform, playground, formModel, historyService]);
 
   return {
     width,

@@ -8,7 +8,7 @@ import {
 } from '@flowgram.ai/free-layout-editor';
 import { Button, Tooltip } from 'antd';
 import type React from 'react';
-import type { MouseEvent } from 'react';
+import { useCallback, type MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconComment } from '../icons/icon-comment';
 import { WorkflowNodeType } from '../nodes/constants';
@@ -27,18 +27,18 @@ export const Comment: React.FC = () => {
   /**
    * 计算注释的位置
    */
-  const calcNodePosition = (e: MouseEvent<HTMLButtonElement>) => {
+  const calcNodePosition = useCallback((e: MouseEvent<HTMLButtonElement>) => {
     const mousePosition = playground.config.getPosFromMouseEvent(e);
     return {
       x: mousePosition.x,
       y: mousePosition.y - 75,
     };
-  };
+  }, [playground]);
 
   /**
    * 创建注释节点
    */
-  const createComment = async (e: MouseEvent<HTMLButtonElement>) => {
+  const createComment = useCallback(async (e: MouseEvent<HTMLButtonElement>) => {
     const canvasPosition = calcNodePosition(e);
     // 创建节点
     const node = document.createWorkflowNodeByType(WorkflowNodeType.Comment, canvasPosition);
@@ -48,7 +48,7 @@ export const Comment: React.FC = () => {
     selectService.selectNode(node);
     // 开始拖拽
     dragService.startDragSelectedNodes(e);
-  };
+  }, [calcNodePosition, document, dragService, selectService]);
 
   return (
     <Tooltip title={t('workflow.tools.comment')}>

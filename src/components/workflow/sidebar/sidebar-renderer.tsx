@@ -1,7 +1,7 @@
 import { IsSidebarContext, SidebarContext } from '@/context/workflow/sidebar-context';
 import { PlaygroundEntityContext, useClientContext, useRefresh } from '@flowgram.ai/free-layout-editor';
 import { Drawer } from 'antd';
-import { useContext, useEffect } from 'react';
+import { useCallback, useContext, useEffect, useMemo } from 'react';
 import type { FlowNodeMeta } from '@/types/workflow/node';
 import { SidebarNodeRenderer } from './sidebar-node-renderer';
 
@@ -19,9 +19,9 @@ const SidebarRenderer: React.FC = () => {
   /**
    * 关闭侧边栏
    */
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setNodeId(undefined);
-  };
+  }, []);
 
   /**
    * 监听画布实例变更
@@ -76,7 +76,13 @@ const SidebarRenderer: React.FC = () => {
   /**
    * 节点渲染
    */
-  const visible = node ? !node.getNodeMeta<FlowNodeMeta>().disableSideBar : false;
+ const visible = useMemo(() => {
+    if (!node) {
+      return false;
+    }
+    const { disableSideBar = false } = node.getNodeMeta<FlowNodeMeta>();
+    return !disableSideBar;
+  }, [node]);
 
   if (playground.config.readonly) {
     return null;
