@@ -18,14 +18,14 @@ import {
 } from "@ant-design/icons";
 
 import { usePreferencesStore } from "@/stores/store";
-import BreadcrumbNav from "./component/BreadcrumbNav";
 import FullScreen from "./component/FullScreen";
 import MessageBox from "./component/MessageBox";
 import UserDropdown from "./component/UserDropdown";
-import LayoutMenu from "../menu";
 import SearchMenuModal from "./component/SearchMenuModal";
 import CollapseSwitch from "./component/CollapseSwitch";
 import LanguageSwitch from "./component/LanguageSwitch";
+import BreadcrumbNavWrapper from "./component/BreadcrumbNavWrapper";
+import HeaderMenu from "./component/HeaderMenu";
 
 const Setting = React.lazy(() => import("./component/Setting"));
 
@@ -34,19 +34,17 @@ const Setting = React.lazy(() => import("./component/Setting"));
  */
 const Header = () => {
   const [openSetting, setOpenSetting] = useState<boolean>(false);
-  // 从全局状态中获取配置是否开启面包屑、图标
-  const { preferences, updatePreferences } = usePreferencesStore();
-  const { breadcrumb, header, app, theme } = preferences;
+  // 只获取更新配置的函数
+  // 这样可以避免在组件中使用usePreferencesStore时，导致组件重新
+  const updatePreferences = usePreferencesStore(
+    (state) => state.updatePreferences
+  );
+  // 获取配置是否开启头部
+  // 这样可以避免在组件中使用usePreferencesStore时，导致组件重新
+  const headerEnable = usePreferencesStore(
+    (state) => state.preferences.header.enable
+  );
   const { t } = useTranslation();
-
-  // 显示顶部菜单
-  const showHeaderNav =
-    app.layout === "header-nav" ||
-    app.layout === "mixed-nav" ||
-    app.layout === "header-mixed-nav";
-
-  // 顶部菜单主题
-  const themeHeader = theme.semiDarkHeader ? "dark" : "light";
 
   /**
    * 跳转到github
@@ -57,7 +55,7 @@ const Header = () => {
 
   return (
     <>
-      {header.enable ? (
+      {headerEnable ? (
         <Layout.Header
           className="ant-layout-header flex items-center"
           style={{
@@ -67,19 +65,9 @@ const Header = () => {
           {/* 侧边栏切换按钮 */}
           <CollapseSwitch />
           {/* 面包屑 */}
-          {breadcrumb.enable && <BreadcrumbNav />}
+          <BreadcrumbNavWrapper />
           {/* 显示头部横向的菜单 */}
-          <div
-            className={`menu-align-${header.menuAlign} flex h-full min-w-0 flex-1 items-center`}
-          >
-            {showHeaderNav && (
-              <LayoutMenu
-                className="w-full"
-                mode="horizontal"
-                theme={themeHeader}
-              />
-            )}
-          </div>
+          <HeaderMenu />
           <Space size="large" className="flex justify-end items-center toolbox">
             <SearchMenuModal />
             <Tooltip placement="bottom" title="github">

@@ -10,7 +10,9 @@ import { memo, useCallback } from "react";
  * @returns
  */
 const LanguageSwitch = () => {
-  const { updatePreferences } = usePreferencesStore();
+  const updatePreferences = usePreferencesStore(
+    (state) => state.updatePreferences
+  );
   /**
    * 下拉语言选项
    */
