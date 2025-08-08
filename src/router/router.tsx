@@ -9,21 +9,21 @@ import { LazyLoad } from './lazyLoad';
 const errorRoutes: RouteObject[] = [
   {
     path: '/500',
-    component: LazyLoad('error/500.tsx').type,
+    component: LazyLoad('error/500.tsx'),
     handle: {
       menuKey: '500',
     },
   },
   {
     path: '/404',
-    component: LazyLoad('error/404.tsx').type,
+    component: LazyLoad('error/404.tsx'),
     handle: {
       menuKey: '404',
     },
   },
   {
     path: '/403',
-    component: LazyLoad('error/403.tsx').type,
+    component: LazyLoad('error/403.tsx'),
     handle: {
       menuKey: '403',
     },
@@ -49,7 +49,7 @@ export const dynamicRoutes: RouteObject[] = [
   },
   {
     path: '/login',
-    component: LazyLoad('Login').type,
+    component: LazyLoad('Login'),
     handle: {
       menuKey: 'login',
     },

@@ -1,12 +1,12 @@
-# Nexus
+# Nexus-Admin  Rsbuild分支
 
-
-# 集成信息管理平台，用于将多种协议、多种系统进行耦合，通过配置服务并发布，可做到让不同厂商的系统进行最简化的系统对接
+# 项目介绍
+Nexus-Admin 是一个基于 React 19.1.9 版本的管理系统，使用 Rsbuild 构建工具，基于 Ant Design 组件库，采用 TypeScript 编写。该项目的主要功能是集成信息管理平台，用于将多种协议、多种系统进行耦合，通过配置服务并发布，可做到让不同厂商的系统进行最简化的系统对接
 
 # 框架技术： 
 - react@19.1.9  
 - antd@latest 
-- vite@latest 构建工具
+- rsbuild@latest 构建工具
 - zustand@latest 状态管理
 - sass@latest
 - react-router@latest

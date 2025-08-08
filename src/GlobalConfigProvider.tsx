@@ -1,5 +1,5 @@
 import { ConfigProvider, App as AntdApp } from "antd";
-import React from "react";
+import type React from "react";
 import App from "./App";
 import zhCN from "antd/locale/zh_CN";
 import enUS from "antd/locale/en_US";
