@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-oxc";
+import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import viteCompression from "vite-plugin-compression";
 import path from "path";
@@ -42,7 +42,7 @@ export default defineConfig({
           groups: [
             {
               name: "react",
-              test: /node_modules[\\/]react/,
+              test: /node_modules[\\/]react(?:-dom)/,
             },
             {
               name: "antd",

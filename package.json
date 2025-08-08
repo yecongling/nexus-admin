@@ -54,7 +54,7 @@
     "@types/react-dom": "^19.1.7",
     "@types/react-is": "^19.0.0",
     "@types/react-resizable": "^3.0.8",
-    "@vitejs/plugin-react-oxc": "^0.4.0",
+    "@vitejs/plugin-react": "^5.0.0",
     "babel-plugin-react-compiler": "^19.1.0-rc.2",
     "eslint": "^9.30.1",
     "eslint-plugin-react-hooks": "^5.2.0",

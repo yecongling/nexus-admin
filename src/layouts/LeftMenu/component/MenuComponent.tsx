@@ -1,14 +1,14 @@
-import { memo, useCallback, useEffect, useState } from 'react';
-import { Empty, Menu, Spin, type MenuProps } from 'antd';
-import { useLocation, useNavigate } from 'react-router';
-import { useTranslation } from 'react-i18next';
-import { Icon } from '@iconify-icon/react';
-import { useMenuStore, usePreferencesStore } from '@/stores/store';
-import { getIcon, getOpenKeys, searchRoute } from '@/utils/utils';
-import type { RouteItem } from '@/types/route';
-import { useShallow } from 'zustand/shallow';
+import { memo, useCallback, useEffect, useState } from "react";
+import { Empty, Menu, Spin, type MenuProps } from "antd";
+import { useLocation, useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
+import { Icon } from "@iconify-icon/react";
+import { useMenuStore, usePreferencesStore } from "@/stores/store";
+import { getIcon, getOpenKeys, searchRoute } from "@/utils/utils";
+import type { RouteItem } from "@/types/route";
+import { useShallow } from "zustand/shallow";
 
-type MenuItem = Required<MenuProps>['items'][number];
+type MenuItem = Required<MenuProps>["items"][number];
 
 /**
  * 菜单组件
@@ -20,19 +20,22 @@ const MenuComponent = () => {
   const { pathname } = useLocation();
 
   const menus = useMenuStore((state) => state.menus);
-  const { accordion, dynamicTitle } = usePreferencesStore(
+  const { accordion, dynamicTitle, collapsed } = usePreferencesStore(
     useShallow((state) => ({
       accordion: state.preferences.navigation.accordion,
       dynamicTitle: state.preferences.app.dynamicTitle,
+      collapsed: state.preferences.sidebar.collapsed,
     }))
   );
   const mode = usePreferencesStore((state) => {
     let mode = state.preferences.theme.mode;
-    if (mode === 'auto') {
-      mode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    if (mode === "auto") {
+      mode = window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
     }
     if (state.preferences.theme.semiDarkSidebar) {
-      mode = 'dark';
+      mode = "dark";
     }
     return mode;
   });
@@ -46,7 +49,7 @@ const MenuComponent = () => {
     key?: React.Key | null,
     icon?: React.ReactNode,
     children?: MenuItem[],
-    type?: 'group',
+    type?: "group"
   ): MenuItem => {
     return {
       key,
@@ -57,21 +60,37 @@ const MenuComponent = () => {
     } as MenuItem;
   };
 
-  const deepLoopFloat = useCallback((menuList: RouteItem[], newArr: MenuItem[] = []) => {
-    for (const item of menuList) {
-      if (item?.meta?.menuType === 2 || item?.meta?.menuType === 3 || item?.hidden) {
-        continue;
+  const deepLoopFloat = useCallback(
+    (menuList: RouteItem[], newArr: MenuItem[] = []) => {
+      for (const item of menuList) {
+        if (
+          item?.meta?.menuType === 2 ||
+          item?.meta?.menuType === 3 ||
+          item?.hidden
+        ) {
+          continue;
+        }
+        if (!item?.children?.length) {
+          newArr.push(
+            getItem(item.meta?.title, item.path, getIcon(item.meta?.icon))
+          );
+          continue;
+        }
+        newArr.push(
+          getItem(
+            item.meta?.title,
+            item.path,
+            getIcon(item.meta?.icon),
+            deepLoopFloat(item.children)
+          )
+        );
       }
-      if (!item?.children?.length) {
-        newArr.push(getItem(item.meta?.title, item.path, getIcon(item.meta?.icon)));
-        continue;
-      }
-      newArr.push(getItem(item.meta?.title, item.path, getIcon(item.meta?.icon), deepLoopFloat(item.children)));
-    }
-    return newArr;
-  }, []);
+      return newArr;
+    },
+    []
+  );
 
-  const clickMenu: MenuProps['onClick'] = ({ key }: { key: string }) => {
+  const clickMenu: MenuProps["onClick"] = ({ key }: { key: string }) => {
     navigate(key);
   };
 
@@ -85,7 +104,7 @@ const MenuComponent = () => {
       }
       setOpenKeys(openKey);
     }
-  }, [pathname, menus, dynamicTitle, t]);
+  }, [pathname, collapsed, menus, dynamicTitle, t]);
 
   const onOpenChange = (openKeys: string[]) => {
     if (!accordion) return setOpenKeys(openKeys);
