@@ -6,6 +6,7 @@ import { Icon } from '@iconify-icon/react';
 import { useMenuStore, usePreferencesStore } from '@/stores/store';
 import { getIcon, getOpenKeys, searchRoute } from '@/utils/utils';
 import type { RouteItem } from '@/types/route';
+import { useShallow } from 'zustand/shallow';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -19,10 +20,12 @@ const MenuComponent = () => {
   const { pathname } = useLocation();
 
   const menus = useMenuStore((state) => state.menus);
-  const { accordion, dynamicTitle } = usePreferencesStore((state) => ({
-    accordion: state.preferences.navigation.accordion,
-    dynamicTitle: state.preferences.app.dynamicTitle,
-  }));
+  const { accordion, dynamicTitle } = usePreferencesStore(
+    useShallow((state) => ({
+      accordion: state.preferences.navigation.accordion,
+      dynamicTitle: state.preferences.app.dynamicTitle,
+    }))
+  );
   const mode = usePreferencesStore((state) => {
     let mode = state.preferences.theme.mode;
     if (mode === 'auto') {

@@ -1,9 +1,10 @@
 import { Input, type InputRef } from "antd";
 import favicon from "@/assets/images/icon-512.png";
 import type React from "react";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import style from "./screenLock.module.scss";
 import { usePreferencesStore } from "@/stores/store";
+import { useShallow } from "zustand/shallow";
 
 /**
  * 锁屏操作
@@ -11,9 +12,12 @@ import { usePreferencesStore } from "@/stores/store";
  */
 const ScreenLock: React.FC = () => {
   // 状态
-  const { preferences, updatePreferences } = usePreferencesStore();
-  const { widget } = preferences;
-  const { lockScreenStatus } = widget;
+  const { lockScreenStatus, updatePreferences } = usePreferencesStore(
+    useShallow((state) => ({
+      lockScreenStatus: state.preferences.widget.lockScreenStatus,
+      updatePreferences: state.updatePreferences,
+    })),
+  );
   const pwdRef = useRef<InputRef>(null);
 
   // 页面锁屏时，聚焦到密码框
@@ -26,12 +30,9 @@ const ScreenLock: React.FC = () => {
   /**
    * 验证解锁密码
    */
-  const validatePassword = (e: any) => {
-    console.log(e.target.value);
-
-    // 如果密码验证正确，则解除锁屏
+  const validatePassword = useCallback(() => {
     updatePreferences("widget", "lockScreenStatus", false);
-  };
+  }, [updatePreferences]);
 
   return lockScreenStatus ? (
     <div className={style["screen-lock"]}>

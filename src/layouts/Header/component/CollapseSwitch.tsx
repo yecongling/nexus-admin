@@ -5,9 +5,13 @@ import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 
 const CollapseSwitch: React.FC = () => {
   // 从全局状态中获取配置是否开启面包屑、图标
-  const { preferences, updatePreferences } = usePreferencesStore();
-  const { sidebar } = preferences;
-  const { collapsed } = sidebar;
+  const collapsed = usePreferencesStore(
+    (state) => state.preferences.sidebar.collapsed
+  );
+  // 从全局状态中更新配置是否开启面包屑、图标
+  const updatePreferences = usePreferencesStore(
+    (state) => state.updatePreferences
+  );
   return (
     <Button
       size="small"

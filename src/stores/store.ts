@@ -1,7 +1,7 @@
-import { create } from 'zustand';
-import { persist, type PersistOptions } from 'zustand/middleware';
-import { defaultPreferences } from '@/config/defaultPreferences';
-import type { Preferences } from './storeState';
+import { create } from "zustand";
+import { persist, type PersistOptions } from "zustand/middleware";
+import { defaultPreferences } from "@/config/defaultPreferences";
+import type { Preferences } from "./storeState";
 
 // 定义category和key的类型
 export type Category = keyof Preferences;
@@ -53,10 +53,10 @@ const usePreferencesStore = create<PreferencesStore>()(
       resetPreferences: () => set({ preferences: defaultPreferences }),
     }),
     {
-      name: 'preferences',
+      name: "preferences",
       getStorage: () => localStorage,
-    } as PersistOptions<PreferencesStore>,
-  ),
+    } as PersistOptions<PreferencesStore>
+  )
 );
 
 export { useMenuStore, usePreferencesStore };

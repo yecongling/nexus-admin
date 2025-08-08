@@ -1,5 +1,8 @@
-import { useService, WorkflowDragService } from '@flowgram.ai/free-layout-editor';
-import { usePreferencesStore } from '@/stores/store';
+import {
+  useService,
+  WorkflowDragService,
+} from "@flowgram.ai/free-layout-editor";
+import { usePreferencesStore } from "@/stores/store";
 
 /**
  * 左边可添加的节点面板
@@ -10,8 +13,9 @@ const NodeAddPanel: React.FC = () => {
   // 拖拽服务
   const startDragService = useService<WorkflowDragService>(WorkflowDragService);
   // 主题
-  const { preferences } = usePreferencesStore();
-  const { theme } = preferences;
+  const colorPrimary = usePreferencesStore(
+    (state) => state.preferences.theme.colorPrimary
+  );
 
   return (
     <div className="workflow-sidebar flex flex-col flex-auto">
@@ -20,13 +24,13 @@ const NodeAddPanel: React.FC = () => {
       </div>
       <div
         className="w-full h-full"
-        style={{ backgroundColor: theme.colorPrimary }}
+        style={{ backgroundColor: colorPrimary }}
         onMouseDown={(e) =>
-          startDragService.startDragCard('card', e, {
+          startDragService.startDragCard("card", e, {
             data: {
-              type: 'card',
-              title: '卡片',
-              content: '卡片内容',
+              type: "card",
+              title: "卡片",
+              content: "卡片内容",
             },
           })
         }

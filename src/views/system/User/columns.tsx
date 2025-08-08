@@ -1,7 +1,6 @@
 import { ManOutlined, WomanOutlined } from '@ant-design/icons';
 import { Button, Space, Tag, Image, Dropdown, type TableProps, type MenuProps, Tooltip } from 'antd';
 import type { UserModel } from '@/services/system/user/type';
-import type { ThemePreferences } from '@/stores/storeState';
 import { Icon } from '@iconify-icon/react';
 
 /**
@@ -15,7 +14,7 @@ export const getColumns = (
   handleEdit: (record: UserModel) => void,
   handleDetail: (record: UserModel) => void,
   t: (key: string) => string,
-  theme: ThemePreferences,
+  colorPrimary: string,
   handleMore: (record: UserModel) => MenuProps['items'],
 ): TableProps<UserModel>['columns'] => [
   {
@@ -99,7 +98,7 @@ export const getColumns = (
         <Tooltip title={t('common.operation.detail')}>
           <Button
             type="text"
-            icon={<Icon icon="ix:plant-details" style={{ color: theme.colorPrimary }} className="text-xl block" />}
+            icon={<Icon icon="ix:plant-details" style={{ color: colorPrimary }} className="text-xl block" />}
             onClick={() => handleDetail(record)}
           />
         </Tooltip>

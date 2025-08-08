@@ -1,15 +1,18 @@
 import { usePreferencesStore } from "@/stores/store";
 import LayoutMenu from "../../menu";
+import { useShallow } from "zustand/shallow";
 
 /**
  * 顶部菜单
  */
 const HeaderMenu = () => {
-  const { layout, menuAlign, semiDarkHeader } = usePreferencesStore((state) => ({
-    layout: state.preferences.app.layout,
-    menuAlign: state.preferences.header.menuAlign,
-    semiDarkHeader: state.preferences.theme.semiDarkHeader,
-  }));
+  const { layout, menuAlign, semiDarkHeader } = usePreferencesStore(
+    useShallow((state) => ({
+      layout: state.preferences.app.layout,
+      menuAlign: state.preferences.header.menuAlign,
+      semiDarkHeader: state.preferences.theme.semiDarkHeader,
+    }))
+  );
 
   const showHeaderNav =
     layout === "header-nav" ||

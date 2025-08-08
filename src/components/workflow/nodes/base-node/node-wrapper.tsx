@@ -1,15 +1,15 @@
-import { SidebarContext } from '@/context/workflow/sidebar-context';
-import { useNodeRenderContext } from '@/context/workflow/use-node-render-context';
+import { SidebarContext } from "@/context/workflow/sidebar-context";
+import { useNodeRenderContext } from "@/context/workflow/use-node-render-context";
 import {
   useClientContext,
   useNodeRender,
   WorkflowPortRender,
-} from '@flowgram.ai/free-layout-editor';
-import { useContext, useState } from 'react';
-import { scrollToView } from './util';
-import './node-wrapper.scss';
-import { NodeModalContext } from '@/context/workflow/node-modal-context';
-import { usePreferencesStore } from '@/stores/store';
+} from "@flowgram.ai/free-layout-editor";
+import { useContext, useState } from "react";
+import { scrollToView } from "./util";
+import "./node-wrapper.scss";
+import { NodeModalContext } from "@/context/workflow/node-modal-context";
+import { usePreferencesStore } from "@/stores/store";
 
 /**
  * 节点包裹器属性
@@ -32,8 +32,10 @@ const NodeWrapper: React.FC<NodeWrapperProps> = ({
   children,
 }) => {
   // 获取主题配置
-  const { preferences } = usePreferencesStore();
-  const { theme } = preferences;
+  const colorPrimary = usePreferencesStore(
+    (state) => state.preferences.theme.colorPrimary
+  );
+
   // 获取当前渲染的节点
   const nodeRenderCtx = useNodeRenderContext();
   const nodeRender = useNodeRender();
@@ -50,7 +52,11 @@ const NodeWrapper: React.FC<NodeWrapperProps> = ({
 
   // 节点端口渲染(端口样式-后续版本支持)
   const portsRender = ports.map((port) => (
-    <WorkflowPortRender key={port.id} entity={port} secondaryColor={theme.colorPrimary}/>
+    <WorkflowPortRender
+      key={port.id}
+      entity={port}
+      secondaryColor={colorPrimary}
+    />
   ));
 
   return (
@@ -91,8 +97,8 @@ const NodeWrapper: React.FC<NodeWrapperProps> = ({
         }}
         data-node-selected={String(selected)}
         style={{
-          outline: form?.state.invalid ? '1px solid red' : 'none',
-          border: selected ? `2px solid ${theme.colorPrimary}` : 'none',
+          outline: form?.state.invalid ? "1px solid red" : "none",
+          border: selected ? `2px solid ${colorPrimary}` : "none",
         }}
       >
         {children}

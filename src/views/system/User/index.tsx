@@ -1,31 +1,32 @@
-import { isEqual } from 'lodash-es';
-import { ExclamationCircleFilled } from '@ant-design/icons';
-import { Card, Table, App } from 'antd';
-import type React from 'react';
-import { useMemo, useReducer, useState } from 'react';
-import useParentSize from '@/hooks/useParentSize';
-import { userService } from '@/services/system/user/userApi';
-import type { UserSearchParams } from './types';
-import { getColumns } from './columns';
-import SearchForm from './SearchForm';
-import UserInfoModal from './UserInfoModal';
-import type { UserModel } from '@/services/system/user/type';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import TableActionButtons from './TableActionButtons';
-import UserPasswordModal from './UserPasswordModal';
-import { useTranslation } from 'react-i18next';
-import { usePreferencesStore } from '@/stores/store';
-import { Icon } from '@iconify-icon/react';
-import Operation from './Operation';
-import { MyIcon } from '@/components/MyIcon';
+import { isEqual } from "lodash-es";
+import { ExclamationCircleFilled } from "@ant-design/icons";
+import { Card, Table, App } from "antd";
+import type React from "react";
+import { useMemo, useReducer, useState } from "react";
+import useParentSize from "@/hooks/useParentSize";
+import { userService } from "@/services/system/user/userApi";
+import type { UserSearchParams } from "./types";
+import { getColumns } from "./columns";
+import SearchForm from "./SearchForm";
+import UserInfoModal from "./UserInfoModal";
+import type { UserModel } from "@/services/system/user/type";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import TableActionButtons from "./TableActionButtons";
+import UserPasswordModal from "./UserPasswordModal";
+import { useTranslation } from "react-i18next";
+import { usePreferencesStore } from "@/stores/store";
+import { Icon } from "@iconify-icon/react";
+import Operation from "./Operation";
+import { MyIcon } from "@/components/MyIcon";
 
 /**
  * 用户管理
  */
 const User: React.FC = () => {
   const { modal, message } = App.useApp();
-  const { preferences } = usePreferencesStore();
-  const { theme } = preferences;
+  const colorPrimary = usePreferencesStore(
+    (state) => state.preferences.theme.colorPrimary
+  );
   const { t } = useTranslation();
   // 合并状态
   const [state, dispatch] = useReducer(
@@ -45,8 +46,8 @@ const User: React.FC = () => {
       // 当前选中的行数据
       selectedRows: [],
       // 当前操作
-      action: '',
-    },
+      action: "",
+    }
   );
 
   // 容器高度计算（表格）
@@ -64,7 +65,7 @@ const User: React.FC = () => {
     data: result,
     refetch,
   } = useQuery({
-    queryKey: ['sys_users', searchParams],
+    queryKey: ["sys_users", searchParams],
     queryFn: () => userService.queryUsers({ ...searchParams }),
   });
 
@@ -100,7 +101,7 @@ const User: React.FC = () => {
     dispatch({
       openEditModal: true,
       currentRow: record,
-      action: 'edit',
+      action: "edit",
     });
   };
 
@@ -109,7 +110,7 @@ const User: React.FC = () => {
     dispatch({
       openEditModal: true,
       currentRow: record,
-      action: 'view',
+      action: "view",
     });
   };
 
@@ -118,16 +119,16 @@ const User: React.FC = () => {
     dispatch({
       openEditModal: true,
       currentRow: null,
-      action: 'add',
+      action: "add",
     });
   };
 
   // 处理批量删除
   const handleBatchDelete = () => {
     modal.confirm({
-      title: '确定要删除选中的用户吗？',
+      title: "确定要删除选中的用户吗？",
       icon: <ExclamationCircleFilled />,
-      content: '此操作将删除选中的用户，删除后可在回收站中进行恢复，是否继续？',
+      content: "此操作将删除选中的用户，删除后可在回收站中进行恢复，是否继续？",
       onOk() {
         const ids = state.selectedRows.map((row: Partial<UserModel>) => row.id);
         // 调用批量删除接口(逻辑删除)
@@ -138,7 +139,11 @@ const User: React.FC = () => {
 
   // 处理用户更新状态
   const handleUpdateStatusMutation = useMutation({
-    mutationFn: (record: UserModel) => userService.updateBatchUserStatus([record.id], record.status === 1 ? 0 : 1),
+    mutationFn: (record: UserModel) =>
+      userService.updateBatchUserStatus(
+        [record.id],
+        record.status === 1 ? 0 : 1
+      ),
     onSuccess: () => {
       refetch();
     },
@@ -146,7 +151,8 @@ const User: React.FC = () => {
 
   // 更新用户mutation
   const updateUserMutation = useMutation({
-    mutationFn: (values: Partial<UserModel>) => userService.updateUser({ id: state.currentRow.id, ...values }),
+    mutationFn: (values: Partial<UserModel>) =>
+      userService.updateUser({ id: state.currentRow.id, ...values }),
     onSuccess: () => {
       dispatch({
         openEditModal: false,
@@ -183,61 +189,82 @@ const User: React.FC = () => {
   };
 
   // 表格操作列中的更多操作
-  const columns = useMemo(() => getColumns(handleEdit, handleDetail, t, theme, (record) => [
-    {
-      key: 'updatePwd',
-      label: '修改密码',
-      icon: <Icon icon="fluent:password-reset-48-regular" className="text-xl! block text-orange-300" />,
-      onClick: () => {
-        /* 打开密码编辑弹窗 */
-        dispatch({
-          openPasswordModal: true,
-          currentRow: record,
-        });
-      },
-    },
-    {
-      key: 'assignRole',
-      label: '分配角色',
-      icon: <MyIcon type="nexus-assigned" className="text-xl! block" />,
-      onClick: () => {
-        message.warning('分配角色功能待实现');
-      },
-    },
-    {
-      key: 'freeze',
-      label: record.status === 1 ? '冻结' : '解冻',
-      icon: <Icon icon="fluent-color:lock-shield-32" className="text-xl! block" />,
-      onClick: () => handleUpdateStatusMutation.mutate(record),
-    },
-    {
-      key: 'operation',
-      label: '操作记录',
-      icon: <Icon icon="fluent-color:history-48" className="text-xl! block" />,
-      onClick: () => {
-        // 打开操作记录弹窗
-        dispatch({
-          openOperationModal: true,
-          currentRow: record,
-        });
-      },
-    },
-    {
-      key: 'delete',
-      label: t('common.operation.delete'),
-      icon: <Icon icon="fluent:delete-dismiss-24-filled" className="text-xl! block text-[#ff4d4f]!" />,
-      onClick: () => {
-        modal.confirm({
-          title: '删除用户',
-          icon: <ExclamationCircleFilled />,
-          content: '确定删除该用户吗？数据删除后请在回收站中恢复！',
-          onOk() {
-            logicDeleteUserMutation.mutate([record.id]);
+  const columns = useMemo(
+    () =>
+      getColumns(handleEdit, handleDetail, t, colorPrimary, (record) => [
+        {
+          key: "updatePwd",
+          label: "修改密码",
+          icon: (
+            <Icon
+              icon="fluent:password-reset-48-regular"
+              className="text-xl! block text-orange-300"
+            />
+          ),
+          onClick: () => {
+            /* 打开密码编辑弹窗 */
+            dispatch({
+              openPasswordModal: true,
+              currentRow: record,
+            });
           },
-        });
-      },
-    },
-  ]), []);
+        },
+        {
+          key: "assignRole",
+          label: "分配角色",
+          icon: <MyIcon type="nexus-assigned" className="text-xl! block" />,
+          onClick: () => {
+            message.warning("分配角色功能待实现");
+          },
+        },
+        {
+          key: "freeze",
+          label: record.status === 1 ? "冻结" : "解冻",
+          icon: (
+            <Icon
+              icon="fluent-color:lock-shield-32"
+              className="text-xl! block"
+            />
+          ),
+          onClick: () => handleUpdateStatusMutation.mutate(record),
+        },
+        {
+          key: "operation",
+          label: "操作记录",
+          icon: (
+            <Icon icon="fluent-color:history-48" className="text-xl! block" />
+          ),
+          onClick: () => {
+            // 打开操作记录弹窗
+            dispatch({
+              openOperationModal: true,
+              currentRow: record,
+            });
+          },
+        },
+        {
+          key: "delete",
+          label: t("common.operation.delete"),
+          icon: (
+            <Icon
+              icon="fluent:delete-dismiss-24-filled"
+              className="text-xl! block text-[#ff4d4f]!"
+            />
+          ),
+          onClick: () => {
+            modal.confirm({
+              title: "删除用户",
+              icon: <ExclamationCircleFilled />,
+              content: "确定删除该用户吗？数据删除后请在回收站中恢复！",
+              onOk() {
+                logicDeleteUserMutation.mutate([record.id]);
+              },
+            });
+          },
+        },
+      ]),
+    []
+  );
 
   return (
     <>
@@ -245,7 +272,11 @@ const User: React.FC = () => {
       <SearchForm onSearch={handleSearch} isLoading={isLoading} />
 
       {/* 查询表格 */}
-      <Card style={{ flex: 1, marginTop: '8px', minHeight: 0 }} styles={{ body: { height: '100%' } }} ref={parentRef}>
+      <Card
+        style={{ flex: 1, marginTop: "8px", minHeight: 0 }}
+        styles={{ body: { height: "100%" } }}
+        ref={parentRef}
+      >
         {/* 操作按钮 */}
         <TableActionButtons
           handleAdd={handleAdd}
@@ -257,7 +288,7 @@ const User: React.FC = () => {
         {/* 表格数据 */}
         <Table
           size="small"
-          style={{ marginTop: '8px' }}
+          style={{ marginTop: "8px" }}
           bordered
           pagination={{
             pageSize: searchParams.pageSize,
@@ -279,7 +310,7 @@ const User: React.FC = () => {
           columns={columns}
           loading={isLoading}
           rowKey="id"
-          scroll={{ y: height - 128, x: 'max-content' }}
+          scroll={{ y: height - 128, x: "max-content" }}
           rowSelection={{
             onChange: (_selectedRowKeys, selectedRows) => {
               dispatch({
