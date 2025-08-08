@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { Button, Checkbox, Col, Form, Image, Input, Row } from 'antd';
 import logo from '@/assets/images/icon-512.png';
 import { LockOutlined, SecurityScanOutlined, UserOutlined } from '@ant-design/icons';
-import styles from './login.module.css';
+import styles from './login.module.scss';
 import filing from '@/assets/images/filing.png';
 import { useNavigate } from 'react-router';
 import { loginService } from '@/services/login/loginApi';
