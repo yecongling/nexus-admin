@@ -24,9 +24,9 @@ const Content: React.FC = () => {
     >
       <Suspense fallback={<Skeleton />}>
         <ErrorBoundary key={location.pathname} fallback={<ErrorFallback />}>
-          {/* <AuthRouter> */}
-          <Outlet />
-          {/* </AuthRouter> */}
+          <AuthRouter>
+            <Outlet />
+          </AuthRouter>
         </ErrorBoundary>
       </Suspense>
     </Layout.Content>
