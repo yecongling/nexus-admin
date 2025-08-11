@@ -1,38 +1,41 @@
-import React, { useMemo, type ReactNode } from 'react';
-import { Navigate, useRoutes } from 'react-router';
-import { useMenuStore } from '@/stores/store';
-import type { RouteObject } from '@/types/route';
-import { handleRouter } from '@/utils/utils';
-import { LazyLoad } from './lazyLoad';
+import React, { useMemo, type ReactNode } from "react";
+import {
+  Navigate,
+  useRoutes
+} from "react-router";
+import { useMenuStore } from "@/stores/store";
+import type { RouteObject } from "@/types/route";
+import { handleRouter } from "@/utils/utils";
+import { LazyLoad } from "./lazyLoad";
 
 // 默认的错误路由
 const errorRoutes: RouteObject[] = [
   {
-    path: '/500',
-    component: LazyLoad('error/500.tsx'),
+    path: "/500",
+    component: LazyLoad("error/500.tsx"),
     handle: {
-      menuKey: '500',
+      menuKey: "500",
     },
   },
   {
-    path: '/404',
-    component: LazyLoad('error/404.tsx'),
+    path: "/404",
+    component: LazyLoad("error/404.tsx"),
     handle: {
-      menuKey: '404',
+      menuKey: "404",
     },
   },
   {
-    path: '/403',
-    component: LazyLoad('error/403.tsx'),
+    path: "/403",
+    component: LazyLoad("error/403.tsx"),
     handle: {
-      menuKey: '403',
+      menuKey: "403",
     },
   },
   {
-    path: '*',
+    path: "*",
     component: () => <Navigate replace to="/404" />,
     handle: {
-      menuKey: '404',
+      menuKey: "404",
     },
   },
 ];
@@ -40,18 +43,20 @@ const errorRoutes: RouteObject[] = [
 // 动态路由
 export const dynamicRoutes: RouteObject[] = [
   {
-    path: '/',
-    component: React.lazy(() => import('@/layouts/index.tsx')) as unknown as ReactNode,
+    path: "/",
+    component: React.lazy(
+      () => import("@/layouts/index.tsx")
+    ) as unknown as ReactNode,
     children: [],
     handle: {
-      menuKey: 'home',
+      menuKey: "home",
     },
   },
   {
-    path: '/login',
-    component: LazyLoad('Login'),
+    path: "/login",
+    component: LazyLoad("Login"),
     handle: {
-      menuKey: 'login',
+      menuKey: "login",
     },
   },
 ];
@@ -65,9 +70,7 @@ const generateRouter = (routers: RouteObject[]) => {
     /**
      * 错误边界组件（用于单个页面渲染错误的时候显示，单个模块渲染失败不应该影响整个系统的渲染失败）
      */
-    item.element = (
-        <item.component />
-    );
+    item.element = <item.component />;
     item.handle = {
       menuKey: item?.handle?.menuKey,
     };

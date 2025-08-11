@@ -37,7 +37,7 @@ const App: React.FC = () => {
     antdUtils.setModalInstance(modal);
 
     if (!isLogin || location.pathname === '/login') {
-      navigate('/login');
+      navigate('/login', { replace: true });
     } else {
       // 查询菜单数据
       refetch();
