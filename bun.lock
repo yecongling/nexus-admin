@@ -21,7 +21,7 @@
         "crypto-js": "^4.2.0",
         "dayjs": "^1.11.13",
         "echarts": "^6.0.0",
-        "i18next": "^25.3.3",
+        "i18next": "^25.3.4",
         "jsencrypt": "^3.3.2",
         "lodash-es": "^4.17.21",
         "react": "^19.1.1",
@@ -658,7 +658,7 @@
 
     "i18n-js": ["i18n-js@4.5.1", "", { "dependencies": { "bignumber.js": "*", "lodash": "*", "make-plural": "*" } }, "sha512-n7jojFj1WC0tztgr0I8jqTXuIlY1xNzXnC3mjKX/YjJhimdM+jXM8vOmn9d3xQFNC6qDHJ4ovhdrGXrRXLIGkA=="],
 
-    "i18next": ["i18next@25.3.3", "https://registry.npmmirror.com/i18next/-/i18next-25.3.3.tgz", { "dependencies": { "@babel/runtime": "^7.27.6" }, "peerDependencies": { "typescript": "^5" }, "optionalPeers": ["typescript"] }, "sha512-fYMO4abhuXJ7O6tvIkVen03uWKYbY0AlXd7sU0yfr8bHUJDRUf4Bi9qsZT2JTPIUDgnb4qzdj4b69L2BT/JX+Q=="],
+    "i18next": ["i18next@25.3.4", "", { "dependencies": { "@babel/runtime": "^7.27.6" }, "peerDependencies": { "typescript": "^5" }, "optionalPeers": ["typescript"] }, "sha512-AHklEYFLiRRxW1Cb6zE9lfnEtYvsydRC8nRS3RSKGX3zCqZ8nLZwMaUsrb80YuccPNv2RNokDL8LkTNnp+6mDw=="],
 
     "iconify-icon": ["iconify-icon@3.0.0", "", { "dependencies": { "@iconify/types": "^2.0.0" } }, "sha512-yPcnpkn8HUEUckrxxJBOer3jbGv3bqozHsLMLBRxhk3As1X76BgV2mS2a1HTNOIagR8nUs30H3qAd9GLe8Mnlg=="],
 

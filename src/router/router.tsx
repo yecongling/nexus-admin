@@ -1,38 +1,39 @@
-import React, { useMemo, type ReactNode } from 'react';
-import { Navigate, useRoutes } from 'react-router';
-import { useMenuStore } from '@/stores/store';
-import type { RouteObject } from '@/types/route';
-import { handleRouter } from '@/utils/utils';
-import { LazyLoad } from './lazyLoad';
+import React, { useMemo, type ReactNode } from "react";
+import { Navigate, redirect, useLocation, useRoutes } from "react-router";
+import { useMenuStore } from "@/stores/store";
+import type { RouteObject } from "@/types/route";
+import { handleRouter } from "@/utils/utils";
+import { LazyLoad } from "./lazyLoad";
+import { useUserStore } from "@/stores/userStore";
 
 // 默认的错误路由
 const errorRoutes: RouteObject[] = [
   {
-    path: '/500',
-    component: LazyLoad('error/500.tsx').type,
+    path: "/500",
+    component: LazyLoad("error/500.tsx").type,
     handle: {
-      menuKey: '500',
+      menuKey: "500",
     },
   },
   {
-    path: '/404',
-    component: LazyLoad('error/404.tsx').type,
+    path: "/404",
+    component: LazyLoad("error/404.tsx").type,
     handle: {
-      menuKey: '404',
+      menuKey: "404",
     },
   },
   {
-    path: '/403',
-    component: LazyLoad('error/403.tsx').type,
+    path: "/403",
+    component: LazyLoad("error/403.tsx").type,
     handle: {
-      menuKey: '403',
+      menuKey: "403",
     },
   },
   {
-    path: '*',
+    path: "*",
     component: () => <Navigate replace to="/404" />,
     handle: {
-      menuKey: '404',
+      menuKey: "404",
     },
   },
 ];
@@ -40,18 +41,20 @@ const errorRoutes: RouteObject[] = [
 // 动态路由
 export const dynamicRoutes: RouteObject[] = [
   {
-    path: '/',
-    component: React.lazy(() => import('@/layouts/index.tsx')) as unknown as ReactNode,
+    path: "/",
+    component: React.lazy(
+      () => import("@/layouts/index.tsx")
+    ) as unknown as ReactNode,
     children: [],
     handle: {
-      menuKey: 'home',
+      menuKey: "home",
     },
   },
   {
-    path: '/login',
-    component: LazyLoad('Login').type,
+    path: "/login",
+    component: LazyLoad("Login").type,
     handle: {
-      menuKey: 'login',
+      menuKey: "login",
     },
   },
 ];
@@ -62,12 +65,23 @@ const generateRouter = (routers: RouteObject[]) => {
     if (item.index) {
       return item;
     }
-    /**
-     * 错误边界组件（用于单个页面渲染错误的时候显示，单个模块渲染失败不应该影响整个系统的渲染失败）
-     */
-    item.element = (
-        <item.component />
-    );
+    item.element = <item.component />;
+    item.loader = async () => {
+      const { isLogin, homePath } = useUserStore();
+      const location = useLocation();
+
+      if (!isLogin) {
+        // 未登录，允许访问登录页
+        if (location.pathname !== "/login") {
+          throw redirect("/login");
+        }
+      } else {
+        // 已登录访问 "/"，自动跳转到首页
+        if (location.pathname === "/") {
+          throw redirect(homePath);
+        }
+      }
+    };
     item.handle = {
       menuKey: item?.handle?.menuKey,
     };
