@@ -38,6 +38,9 @@ const GlobalConfigProvider: React.FC = () => {
             indentSize: 12,
             directoryNodeSelectedColor: 'rgba(0, 0, 0, 0.88)',
           },
+          Menu: {
+            itemColor: '#29343D',
+          },
         },
       }}
       locale={locale === 'zh-CN' ? zhCN : enUS}

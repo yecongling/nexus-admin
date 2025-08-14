@@ -1,33 +1,19 @@
-import {
-  Badge,
-  Dropdown,
-  FloatButton,
-  Layout,
-  Skeleton,
-  Space,
-  Tooltip,
-} from "antd";
-import React, { useState, Suspense, memo, useCallback } from "react";
-import { useTranslation } from "react-i18next";
-import {
-  BellOutlined,
-  GithubOutlined,
-  LockOutlined,
-  MailOutlined,
-  SettingOutlined,
-} from "@ant-design/icons";
+import { BellOutlined, GithubOutlined, LockOutlined, MailOutlined, SettingOutlined } from '@ant-design/icons';
+import { Badge, Dropdown, FloatButton, Layout, Skeleton, Space, Tooltip } from 'antd';
+import React, { useState, Suspense, memo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
-import { usePreferencesStore } from "@/stores/store";
-import FullScreen from "./component/FullScreen";
-import MessageBox from "./component/MessageBox";
-import UserDropdown from "./component/UserDropdown";
-import SearchMenuModal from "./component/SearchMenuModal";
-import CollapseSwitch from "./component/CollapseSwitch";
-import LanguageSwitch from "./component/LanguageSwitch";
-import BreadcrumbNavWrapper from "./component/BreadcrumbNavWrapper";
-import HeaderMenu from "./component/HeaderMenu";
+import FullScreen from './component/FullScreen';
+import MessageBox from './component/MessageBox';
+import UserDropdown from './component/UserDropdown';
+import SearchMenuModal from './component/SearchMenuModal';
+import CollapseSwitch from './component/CollapseSwitch';
+import LanguageSwitch from './component/LanguageSwitch';
+import BreadcrumbNavWrapper from './component/BreadcrumbNavWrapper';
+import HeaderMenu from './component/HeaderMenu';
+import { usePreferencesStore } from '@/stores/store';
 
-const Setting = React.lazy(() => import("./component/Setting"));
+const Setting = React.lazy(() => import('./component/Setting'));
 
 /**
  * 顶部布局内容
@@ -36,30 +22,26 @@ const Header = () => {
   const [openSetting, setOpenSetting] = useState<boolean>(false);
   // 只获取更新配置的函数
   // 这样可以避免在组件中使用usePreferencesStore时，导致组件重新
-  const updatePreferences = usePreferencesStore(
-    (state) => state.updatePreferences
-  );
+  const updatePreferences = usePreferencesStore((state) => state.updatePreferences);
   // 获取配置是否开启头部
   // 这样可以避免在组件中使用usePreferencesStore时，导致组件重新
-  const headerEnable = usePreferencesStore(
-    (state) => state.preferences.header.enable
-  );
+  const headerEnable = usePreferencesStore((state) => state.preferences.header.enable);
   const { t } = useTranslation();
 
   /**
    * 跳转到github
    */
   const routeGitHub = useCallback(() => {
-    window.open("https://github.com/yecongling/nexus-web", "_blank");
+    window.open('https://github.com/yecongling/nexus-admin', '_blank');
   }, []);
 
   return (
     <>
       {headerEnable ? (
         <Layout.Header
-          className="ant-layout-header flex items-center"
+          className="ant-layout-header flex items-center h-[60px]!"
           style={{
-            borderBottom: " 1px solid #e9edf0",
+            borderBottom: ' 1px solid #e9edf0',
           }}
         >
           {/* 侧边栏切换按钮 */}
@@ -71,33 +53,27 @@ const Header = () => {
           <Space size="large" className="flex justify-end items-center toolbox">
             <SearchMenuModal />
             <Tooltip placement="bottom" title="github">
-              <GithubOutlined
-                style={{ cursor: "pointer", fontSize: "18px" }}
-                onClick={routeGitHub}
-              />
+              <GithubOutlined style={{ cursor: 'pointer', fontSize: '18px' }} onClick={routeGitHub} />
             </Tooltip>
-            <Tooltip placement="bottom" title={t("layout.header.lock")}>
+            <Tooltip placement="bottom" title={t('layout.header.lock')}>
               <LockOutlined
-                style={{ cursor: "pointer", fontSize: "18px" }}
+                style={{ cursor: 'pointer', fontSize: '18px' }}
                 onClick={() => {
-                  updatePreferences("widget", "lockScreenStatus", true);
+                  updatePreferences('widget', 'lockScreenStatus', true);
                 }}
               />
             </Tooltip>
             {/* 邮件 */}
             <Badge count={5}>
-              <MailOutlined style={{ cursor: "pointer", fontSize: "18px" }} />
+              <MailOutlined style={{ cursor: 'pointer', fontSize: '18px' }} />
             </Badge>
             <Dropdown placement="bottom" popupRender={() => <MessageBox />}>
               <Badge count={5}>
-                <BellOutlined style={{ cursor: "pointer", fontSize: "18px" }} />
+                <BellOutlined style={{ cursor: 'pointer', fontSize: '18px' }} />
               </Badge>
             </Dropdown>
-            <Tooltip placement="bottomRight" title={t("layout.header.setting")}>
-              <SettingOutlined
-                style={{ cursor: "pointer", fontSize: "18px" }}
-                onClick={() => setOpenSetting(true)}
-              />
+            <Tooltip placement="bottomRight" title={t('layout.header.setting')}>
+              <SettingOutlined style={{ cursor: 'pointer', fontSize: '18px' }} onClick={() => setOpenSetting(true)} />
             </Tooltip>
             <LanguageSwitch />
             <FullScreen />
@@ -108,7 +84,7 @@ const Header = () => {
       ) : (
         <FloatButton
           icon={<SettingOutlined />}
-          tooltip={<span>{t("layout.header.setting")}</span>}
+          tooltip={<span>{t('layout.header.setting')}</span>}
           style={{ right: 24, bottom: 24 }}
           onClick={() => setOpenSetting(true)}
         />

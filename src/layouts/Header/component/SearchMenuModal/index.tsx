@@ -1,9 +1,9 @@
-import { usePlatformHotkey } from '@/hooks/usePlatformHotkey';
-import { getShortcutLabel } from '@/utils/utils';
 import { SearchOutlined } from '@ant-design/icons';
 import { Input, Modal } from 'antd';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { usePlatformHotkey } from '@/hooks/usePlatformHotkey';
+import { getShortcutLabel } from '@/utils/utils';
 
 /**
  * 搜索菜单模态框组件
@@ -37,6 +37,7 @@ const SearchMenuModal: React.FC = () => {
       <Input
         variant="filled"
         className="w-34!"
+        readOnly
         placeholder={t('common.operation.search')}
         suffix={<div className="bg-white rounded-sm px-2">{getShortcutLabel(shortcut)}</div>}
         prefix={<SearchOutlined style={{ cursor: 'pointer', fontSize: '18px' }} />}
