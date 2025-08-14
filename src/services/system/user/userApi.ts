@@ -5,52 +5,52 @@ import type { UserSearchParams } from './type';
 /**
  * 用户信息操作枚举
  */
-export enum UserAction {
+const UserAction = {
   /**
    * 创建用户
    */
-  addUser = '/system/user/addUser',
+  addUser: '/system/user/addUser',
 
   /**
    * 批量删除用户（物理删除）
    */
-  deleteUsers = '/system/user/deleteUsers',
+  deleteUsers: '/system/user/deleteUsers',
 
   /**
    * 批量删除用户（逻辑删除）
    */
-  logicDeleteUsers = '/system/user/logicDeleteUsers',
+  logicDeleteUsers: '/system/user/logicDeleteUsers',
 
   /**
    * 更新用户
    */
-  modifyUser = '/system/user/updateUser',
+  modifyUser: '/system/user/updateUser',
 
   /**
    * 查询用户
    */
-  getUserList = '/system/user/queryUserList',
+  getUserList: '/system/user/queryUserList',
 
   /**
    * 批量锁定用户
    */
-  lockBatchUser = '/system/user/lockBatchUser',
+  lockBatchUser: '/system/user/lockBatchUser',
 
   /**
    * 批量解锁用户
    */
-  unlockBatchUser = '/system/user/unlockBatchUser',
+  unlockBatchUser: '/system/user/unlockBatchUser',
 
   /**
    * 重置用户密码
    */
-  resetUserPwd = '/system/user/resetPwd',
+  resetUserPwd: '/system/user/resetPwd',
 
   /**
    * 修改用户密码
    */
-  changeUserPwd = '/system/user/modifyPwd',
-}
+  changeUserPwd: '/system/user/modifyPwd',
+};
 
 /**
  * 用户信息服务接口
@@ -176,9 +176,7 @@ export const userService: IUserService = {
    * @param searchParams 搜索参数
    * @returns 用户列表、分页信息
    */
-  async queryUsers(
-    searchParams: UserSearchParams,
-  ): Promise<Record<string, any>> {
+  async queryUsers(searchParams: UserSearchParams): Promise<Record<string, any>> {
     const response = await HttpRequest.post(
       {
         url: UserAction.getUserList,
@@ -199,8 +197,7 @@ export const userService: IUserService = {
    */
   async updateBatchUserStatus(ids: string[], status: number): Promise<boolean> {
     // 根据status决定是锁定还是解锁用户
-    const url =
-      status === 0 ? UserAction.lockBatchUser : UserAction.unlockBatchUser;
+    const url = status === 0 ? UserAction.lockBatchUser : UserAction.unlockBatchUser;
     return HttpRequest.post(
       {
         url,

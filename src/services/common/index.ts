@@ -3,19 +3,19 @@ import { HttpRequest } from '@/utils/request';
 /**
  * 菜单相关接口枚举
  */
-enum CommonApi {
+const CommonApi = {
   // 根据token获取菜单（多用于框架上根据角色获取菜单那种）
-  getMenuListByRoleId = '/system/menu/getMenusByRole',
+  getMenuListByRoleId: '/system/menu/getMenusByRole',
   /**
    * 退出登录
    */
-  logout = '/logout',
+  logout: '/logout',
 
   /**
    * 刷新token
    */
-  refreshToken = '/refreshToken',
-}
+  refreshToken: '/refreshToken',
+};
 
 /**
  * 菜单管理服务接口

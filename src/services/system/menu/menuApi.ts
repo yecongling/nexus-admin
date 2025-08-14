@@ -4,30 +4,30 @@ import type { MenuDirectoryItem, MenuModel } from './type';
 /**
  * 菜单相关接口枚举
  */
-enum MenuApi {
+const MenuApi = {
   // 根据token获取菜单（多用于框架上根据角色获取菜单那种）
-  getMenuList = '/system/menu/getMenusByRole',
+  getMenuList: '/system/menu/getMenusByRole',
   // 获取所有菜单
-  getAllMenus = '/system/menu/getAllMenus',
+  getAllMenus: '/system/menu/getAllMenus',
   // 获取所有上级菜单
-  getDirectory = '/system/menu/getDirectory',
+  getDirectory: '/system/menu/getDirectory',
   // 添加菜单
-  addMenu = '/system/menu/addMenu',
+  addMenu: '/system/menu/addMenu',
   // 编辑菜单
-  updateMenu = '/system/menu/updateMenu',
+  updateMenu: '/system/menu/updateMenu',
   // 删除菜单
-  deleteMenu = '/system/menu/deleteMenu',
+  deleteMenu: '/system/menu/deleteMenu',
   // 批量删除菜单
-  deleteMenuBatch = '/system/menu/deleteMenuBatch',
+  deleteMenuBatch: '/system/menu/deleteMenuBatch',
   // 切换菜单状态
-  toggleMenuStatus = '/system/menu/toggleMenuStatus',
+  toggleMenuStatus: '/system/menu/toggleMenuStatus',
   // 导出（Excel）
-  exportMenus = '/system/menu/export',
+  exportMenus: '/system/menu/export',
   // 批量导入
-  importMenus = '/system/menu/import',
+  importMenus: '/system/menu/import',
   // 验证菜单权限
-  checkPermission = '/system/menu/checkPermission',
-}
+  checkPermission: '/system/menu/checkPermission',
+};
 
 /**
  * 菜单相关接口查询参数

@@ -1,14 +1,14 @@
-import { createRoot } from "react-dom/client";
-import "@/styles/global.scss"; // 引入 Sass 文件
-import { BrowserRouter } from "react-router";
-import GlobalConfigProvider from "./GlobalConfigProvider";
-import "./index.css";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import "./locales/i18next-config";
-import "@ant-design/v5-patch-for-react-19";
-import { initI18n } from "./locales/i18next-config";
+import { createRoot } from 'react-dom/client';
+import '@/styles/global.scss'; // 引入 Sass 文件
+import { BrowserRouter } from 'react-router';
+import GlobalConfigProvider from './GlobalConfigProvider';
+import './index.css';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import './locales/i18next-config';
+import '@ant-design/v5-patch-for-react-19';
+import { initI18n } from './locales/i18next-config';
 
-const container = document.getElementById("root");
+const container = document.getElementById('root');
 if (container) {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -26,9 +26,9 @@ if (container) {
         <QueryClientProvider client={queryClient}>
           <GlobalConfigProvider />
         </QueryClientProvider>
-      </BrowserRouter>
+      </BrowserRouter>,
     );
   });
 } else {
-  console.error("Root element not found");
+  console.error('Root element not found');
 }

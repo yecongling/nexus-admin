@@ -1,19 +1,19 @@
-import { HttpRequest } from '@/utils/request';
 import type { Response } from '@/types/global';
+import { HttpRequest } from '@/utils/request';
 
 /**
  * 枚举登录需要的接口地址
  */
-export enum LoginApi {
+const LoginApi = {
   /**
    * 登录
    */
-  login = '/login',
+  login: '/login',
   /**
    * 获取验证码
    */
-  getCode = '/getCaptcha',
-}
+  getCode: '/getCaptcha',
+};
 
 /**
  * 登录服务接口
@@ -31,7 +31,6 @@ interface ILoginService {
    * @returns 验证码
    */
   getCaptcha(): Promise<{ key: string; code: any }>;
-
 }
 
 /**
@@ -52,14 +51,14 @@ export const loginService: ILoginService = {
       { isTransformResponse: false },
     );
   },
-  
+
   /**
    * 获取验证码
    * @param checkKey 验证码key
    * @returns 验证码
    */
   async getCaptcha(): Promise<{ key: string; code: any }> {
-    const key = new Date().getTime().toString();
+    const key = Date.now().toString();
     const code = await HttpRequest.get(
       {
         url: `${LoginApi.getCode}/${key}`,

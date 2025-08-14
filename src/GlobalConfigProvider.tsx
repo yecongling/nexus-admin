@@ -1,13 +1,13 @@
-import { ConfigProvider, App as AntdApp } from "antd";
-import React from "react";
-import App from "./App";
-import zhCN from "antd/locale/zh_CN";
-import enUS from "antd/locale/en_US";
-import "dayjs/locale/zh-cn";
-import "dayjs/locale/en";
-import dayjs from "dayjs";
-import { usePreferencesStore } from "./stores/store";
-import { useShallow } from "zustand/shallow";
+import { ConfigProvider, App as AntdApp } from 'antd';
+import type React from 'react';
+import App from './App';
+import zhCN from 'antd/locale/zh_CN';
+import enUS from 'antd/locale/en_US';
+import 'dayjs/locale/zh-cn';
+import 'dayjs/locale/en';
+import dayjs from 'dayjs';
+import { usePreferencesStore } from './stores/store';
+import { useShallow } from 'zustand/shallow';
 /**
  * 全局配置组件（为了将antd的ConfigProvider和App嵌套，不然App中的antdUtil中的组件无法使用全局配置）
  */
@@ -17,10 +17,10 @@ const GlobalConfigProvider: React.FC = () => {
     useShallow((state) => ({
       colorPrimary: state.preferences.theme.colorPrimary,
       locale: state.preferences.app.locale,
-    }))
+    })),
   );
 
-  dayjs.locale(locale === "zh-CN" ? "zh-cn" : "en");
+  dayjs.locale(locale === 'zh-CN' ? 'zh-cn' : 'en');
   return (
     <ConfigProvider
       theme={{
@@ -29,20 +29,20 @@ const GlobalConfigProvider: React.FC = () => {
         },
         components: {
           Layout: {
-            headerPadding: "0 16px 0 0",
-            headerHeight: "50px",
-            headerBg: "#fff",
+            headerPadding: '0 16px 0 0',
+            headerHeight: '50px',
+            headerBg: '#fff',
           },
           Tree: {
-            directoryNodeSelectedBg: "#e6f4ff",
+            directoryNodeSelectedBg: '#e6f4ff',
             indentSize: 12,
-            directoryNodeSelectedColor: "rgba(0, 0, 0, 0.88)",
+            directoryNodeSelectedColor: 'rgba(0, 0, 0, 0.88)',
           },
         },
       }}
-      locale={locale === "zh-CN" ? zhCN : enUS}
+      locale={locale === 'zh-CN' ? zhCN : enUS}
     >
-      <AntdApp style={{ height: "100%" }}>
+      <AntdApp style={{ height: '100%' }}>
         <App />
       </AntdApp>
     </ConfigProvider>

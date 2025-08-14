@@ -1,45 +1,45 @@
-import { HttpRequest } from "@/utils/request";
-import type { DictItemSearchParams, DictModel, DictSearchParams } from "./type";
+import { HttpRequest } from '@/utils/request';
+import type { DictItemSearchParams, DictModel, DictSearchParams } from './type';
 
 /**
  * 字典相关接口
  */
-export enum DictApi {
+const DictApi = {
   /**
    * 查询字典数据
    */
-  getDictList = "/system/dict/getDictList",
+  getDictList: '/system/dict/getDictList',
 
   /**
    * 创建字典
    */
-  addDict = "/system/dict/addDict",
+  addDict: '/system/dict/addDict',
   /**
    * 删除字典
    */
-  deleteDict = "/system/dict/deleteDict",
+  deleteDict: '/system/dict/deleteDict',
   /**
    * 更新字典
    */
-  updateDict = "/system/dict/updateDict",
+  updateDict: '/system/dict/updateDict',
 
   /**
    * 查询字典条目
    */
-  getDictItemList = "/system/dict/getDictItemList",
+  getDictItemList: '/system/dict/getDictItemList',
   /**
    * 创建字典条目
    */
-  addDictItem = "/system/dict/addDictItem",
+  addDictItem: '/system/dict/addDictItem',
   /**
    * 删除字典条目
    */
-  deleteDictItem = "/system/dict/deleteDictItem",
+  deleteDictItem: '/system/dict/deleteDictItem',
   /**
    * 更新字典条目
    */
-  updateDictItem = "/system/dict/updateDictItem",
-}
+  updateDictItem: '/system/dict/updateDictItem',
+};
 
 interface IDictService {
   /**
@@ -71,9 +71,7 @@ interface IDictService {
    * @param dictItems 字典条目查询参数
    * @returns 字典条目
    */
-  getDictItemList(
-    dictItems: DictItemSearchParams
-  ): Promise<Record<string, any>>;
+  getDictItemList(dictItems: DictItemSearchParams): Promise<Record<string, any>>;
   /**
    * 创建字典条目
    * @param dictItem 字典条目信息
@@ -105,10 +103,7 @@ export const dictService: IDictService = {
    * @returns 字典数据
    */
   getDictList(searchParams: DictSearchParams): Promise<Record<string, any>> {
-    return HttpRequest.get(
-      { url: DictApi.getDictList, params: searchParams },
-      { successMessageMode: "none" }
-    );
+    return HttpRequest.get({ url: DictApi.getDictList, params: searchParams }, { successMessageMode: 'none' });
   },
 
   /**
@@ -144,13 +139,8 @@ export const dictService: IDictService = {
    * @param dictItems 字典条目查询参数
    * @returns 字典条目
    */
-  getDictItemList(
-    dictItems: DictItemSearchParams
-  ): Promise<Record<string, any>> {
-    return HttpRequest.get(
-      { url: DictApi.getDictItemList, params: dictItems },
-      { successMessageMode: "none" }
-    );
+  getDictItemList(dictItems: DictItemSearchParams): Promise<Record<string, any>> {
+    return HttpRequest.get({ url: DictApi.getDictItemList, params: dictItems }, { successMessageMode: 'none' });
   },
   /**
    * 创建字典条目
