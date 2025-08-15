@@ -54,8 +54,10 @@ const LeftMenu: React.FC = () => {
       theme={finalMode}
       collapsed={sidebar.collapsed}
     >
-      <SystemLogo />
-      <MenuComponent />
+      <div className="flex flex-col h-full">
+        <SystemLogo />
+        <MenuComponent />
+      </div>
     </Layout.Sider>
   );
 };
