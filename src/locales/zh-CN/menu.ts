@@ -1,5 +1,10 @@
 const menu = {
   home: '首页',
+  dashboard: {
+    main: '仪表盘',
+    workbench: '工作台',
+    monitor: '监控',
+  },
   statics: {
     main: '数据统计',
     messageSearch: '消息查询',

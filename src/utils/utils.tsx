@@ -95,7 +95,7 @@ const customIcons: { [key: string]: any } = Icons;
  * @param name 图表名
  */
 export const getIcon = (name: string | undefined) => {
-  if (name && name.indexOf('fusion') > -1) {
+  if (name && name.indexOf('nexus') > -1) {
     return <MyIcon type={`${name}`} />;
   }
   return addIcon(name);

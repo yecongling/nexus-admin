@@ -37,6 +37,7 @@ const SearchMenuModal: React.FC = () => {
       <Input
         variant="filled"
         className="w-34!"
+        readOnly
         placeholder={t('common.operation.search')}
         suffix={<div className="bg-white rounded-sm px-2">{getShortcutLabel(shortcut)}</div>}
         prefix={<SearchOutlined style={{ cursor: 'pointer', fontSize: '18px' }} />}

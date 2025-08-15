@@ -249,24 +249,30 @@ const MenuInfoModal: React.FC<MenuInfoModalProps> = ({ visible, currentRow, onOk
             >
               <Input allowClear autoComplete="off" />
             </Form.Item>
-            <Form.Item
-              name="component"
-              label="前端组件"
-              rules={[
-                {
-                  required: menuType === MenuType.SUB_MENU,
-                  message: '前端组件配置不能为空!',
-                },
-              ]}
-            >
-              <Input allowClear autoComplete="off" />
-            </Form.Item>
-            <Form.Item name="componentName" label="组件名称">
-              <Input allowClear autoComplete="off" />
-            </Form.Item>
-            <Form.Item name="redirect" label="默认跳转地址">
-              <Input allowClear autoComplete="off" />
-            </Form.Item>
+            {
+              menuType === MenuType.SUB_MENU && (
+                <>
+                  <Form.Item
+                    name="component"
+                    label="前端组件"
+                    rules={[
+                      {
+                        required: menuType === MenuType.SUB_MENU,
+                        message: '前端组件配置不能为空!',
+                      },
+                    ]}
+                  >
+                    <Input allowClear autoComplete="off" />
+                  </Form.Item>
+                  <Form.Item name="componentName" label="组件名称">
+                    <Input allowClear autoComplete="off" />
+                  </Form.Item>
+                  <Form.Item name="redirect" label="默认跳转地址">
+                    <Input allowClear autoComplete="off" />
+                  </Form.Item>
+                </>
+              )
+            }
             <Form.Item name="icon" label="菜单图标">
               <Input
                 allowClear

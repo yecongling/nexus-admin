@@ -50,7 +50,7 @@ const Header = () => {
    * 跳转到github
    */
   const routeGitHub = useCallback(() => {
-    window.open("https://github.com/yecongling/nexus-web", "_blank");
+    window.open("https://github.com/yecongling/nexus-admin", "_blank");
   }, []);
 
   return (

@@ -1,5 +1,10 @@
 const menu = {
   home: 'Home',
+  dashboard: {
+    main: 'Dashboard',
+    workbench: 'Workbench',
+    monitor: 'Monitor',
+  },
   statics: {
     main: 'Statics',
     messageSearch: 'Message Search',

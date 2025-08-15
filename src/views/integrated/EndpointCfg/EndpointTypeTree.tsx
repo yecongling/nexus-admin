@@ -198,7 +198,7 @@ const EndpointTypeTree: React.FC<EndpointTypeTreeProps> = ({ onSelect }) => {
       // 转为树节点需要的key
       item.key = item.id;
       if (item.icon) {
-        item.icon = item.icon.indexOf('fusion') > -1 ? <MyIcon type={item.icon} /> : addIcon(item.icon);
+        item.icon = item.icon.indexOf('nexus') > -1 ? <MyIcon type={item.icon} /> : addIcon(item.icon);
       }
       item.title = item.name;
       if (item.children?.length > 0 || item.endpointConfigs?.length > 0) {
