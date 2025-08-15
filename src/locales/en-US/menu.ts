@@ -1,4 +1,9 @@
 const menu = {
+  dashboard: {
+    main: 'Dashboard',
+    workbench: 'Workbench',
+    monitor: 'Monitor',
+  },
   home: 'Home',
   statics: {
     main: 'Statics',

@@ -1,4 +1,9 @@
 const menu = {
+  dashboard: {
+    main: '仪表盘',
+    workbench: '工作台',
+    monitor: '监控',
+  },
   home: '首页',
   statics: {
     main: '数据统计',

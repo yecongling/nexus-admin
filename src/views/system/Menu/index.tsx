@@ -10,7 +10,7 @@ import { menuService } from '@/services/system/menu/menuApi';
 import MenuInfoModal from './MenuInfoModal';
 import './menu.scss';
 import useParentSize from '@/hooks/useParentSize';
-import { addIcon } from '@/utils/utils';
+import { getIcon } from '@/utils/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import SearchBar from './SearchBar';
 import ActionButtons from './ActionButtons';
@@ -113,7 +113,7 @@ const Menu: React.FC = () => {
       key: 'icon',
       align: 'center',
       render(value) {
-        return addIcon(value);
+        return getIcon(value);
       },
     },
     {
@@ -132,13 +132,13 @@ const Menu: React.FC = () => {
       render(value) {
         switch (value) {
           case 0:
-            return '一级菜单';
+            return <Tooltip title="目录"><Icon icon="flat-color-icons:folder" className="text-xl block" /></Tooltip>;
           case 1:
-            return '子菜单';
+            return <Tooltip title="路由"><Icon icon="ic:round-route" className="text-xl block text-green-400" /></Tooltip>;
           case 2:
-            return '子路由';
+            return <Tooltip title="子路由"><Icon icon="ic:round-route" className="text-xl block text-green-400" /></Tooltip>;
           case 3:
-            return '权限按钮';
+            return <Tooltip title="权限按钮"><Icon icon="emojione-v1:p-button" className="text-xl block" /></Tooltip>;
           default:
             return '';
         }
