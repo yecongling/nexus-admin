@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePlatformHotkey } from '@/hooks/usePlatformHotkey';
 import { getShortcutLabel } from '@/utils/utils';
+import Footer from './footer';
+import Title from './title';
 
 /**
  * 搜索菜单模态框组件
@@ -45,12 +47,23 @@ const SearchMenuModal: React.FC = () => {
       />
       <Modal
         open={openModal}
-        title={t('common.operation.search')}
-        footer={null}
-        width={600}
+        footer={<Footer />}
+        title={<Title />}
+        styles={{
+          footer: {
+            padding: '8px',
+          },
+          body: {
+            height: '160px',
+            textAlign: 'center',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }
+        }}
         onCancel={() => setOpenModal(false)}
       >
-        这里是弹窗检索菜单的区域
+        <span className='text-gray-400'>没有搜索历史</span>
       </Modal>
     </>
   );
