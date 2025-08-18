@@ -35,15 +35,11 @@ const Setting = React.lazy(() => import("./component/Setting"));
 const Header = () => {
   const [openSetting, setOpenSetting] = useState<boolean>(false);
   // 只获取更新配置的函数
-  // 这样可以避免在组件中使用usePreferencesStore时，导致组件重新
-  const updatePreferences = usePreferencesStore(
-    (state) => state.updatePreferences
-  );
+  const updatePreferences = usePreferencesStore((state) => state.updatePreferences);
   // 获取配置是否开启头部
-  // 这样可以避免在组件中使用usePreferencesStore时，导致组件重新
-  const headerEnable = usePreferencesStore(
-    (state) => state.preferences.header.enable
-  );
+  const headerEnable = usePreferencesStore((state) => state.preferences.header.enable);
+  // 订阅部件配置
+  const { globalSearch, lockScreen, languageToggle, fullscreen, sidebarToggle, notification } = usePreferencesStore((state) => state.preferences.widget);
   const { t } = useTranslation();
 
   /**
@@ -63,44 +59,50 @@ const Header = () => {
           }}
         >
           {/* 侧边栏切换按钮 */}
-          <CollapseSwitch />
+          {sidebarToggle && <CollapseSwitch />}
           {/* 面包屑 */}
           <BreadcrumbNavWrapper />
           {/* 显示头部横向的菜单 */}
           <HeaderMenu />
           <Space size="large" className="flex justify-end items-center toolbox">
-            <SearchMenuModal />
+            {/* 全局搜索 */}
+            {globalSearch && <SearchMenuModal />}
             <Tooltip placement="bottom" title="github">
               <GithubOutlined
                 style={{ cursor: "pointer", fontSize: "18px" }}
                 onClick={routeGitHub}
               />
             </Tooltip>
-            <Tooltip placement="bottom" title={t("layout.header.lock")}>
-              <LockOutlined
-                style={{ cursor: "pointer", fontSize: "18px" }}
-                onClick={() => {
-                  updatePreferences("widget", "lockScreenStatus", true);
-                }}
-              />
-            </Tooltip>
+            {/* 锁屏 */}
+            {lockScreen && (
+              <Tooltip placement="bottom" title={t('layout.header.lock')}>
+                <LockOutlined
+                  style={{ cursor: 'pointer', fontSize: '18px' }}
+                  onClick={() => {
+                    updatePreferences('widget', 'lockScreenStatus', true);
+                  }}
+                />
+              </Tooltip>
+            )}
             {/* 邮件 */}
             <Badge count={5}>
               <MailOutlined style={{ cursor: "pointer", fontSize: "18px" }} />
             </Badge>
-            <Dropdown placement="bottom" popupRender={() => <MessageBox />}>
-              <Badge count={5}>
-                <BellOutlined style={{ cursor: "pointer", fontSize: "18px" }} />
-              </Badge>
-            </Dropdown>
-            <Tooltip placement="bottomRight" title={t("layout.header.setting")}>
-              <SettingOutlined
-                style={{ cursor: "pointer", fontSize: "18px" }}
-                onClick={() => setOpenSetting(true)}
-              />
+            {/* 通知 */}
+            {notification && (
+              <Dropdown placement="bottom" popupRender={() => <MessageBox />}>
+                <Badge count={5}>
+                  <BellOutlined style={{ cursor: 'pointer', fontSize: '18px' }} />
+                </Badge>
+              </Dropdown>
+            )}
+            <Tooltip placement="bottomRight" title={t('layout.header.setting')}>
+              <SettingOutlined style={{ cursor: 'pointer', fontSize: '18px' }} onClick={() => setOpenSetting(true)} />
             </Tooltip>
-            <LanguageSwitch />
-            <FullScreen />
+            {/* 语言切换 */}
+            {languageToggle && <LanguageSwitch />}
+            {/* 全屏 */}
+            {fullscreen && <FullScreen />}
             {/* 用户信息 */}
             <UserDropdown />
           </Space>

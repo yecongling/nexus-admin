@@ -3,7 +3,7 @@ import echarts from '@/config/echartsConfig';
 
 const DocumentPieChart: React.FC = () => {
   const chartRef = useRef<HTMLDivElement>(null);
-  const chartInstance = useRef<echarts.ECharts>();
+  const chartInstance = useRef<echarts.ECharts | null>(null);
 
   useEffect(() => {
     chartInstance.current = echarts.init(chartRef.current, null, {
