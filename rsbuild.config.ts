@@ -1,4 +1,5 @@
 import path from 'node:path';
+import CompressionPlugin from 'compression-webpack-plugin';
 import { pluginHtmlMinifierTerser } from 'rsbuild-plugin-html-minifier-terser';
 import { pluginMockServer } from 'rspack-plugin-mock/rsbuild';
 import { defineConfig } from '@rsbuild/core';
@@ -11,6 +12,32 @@ import { pluginSass } from '@rsbuild/plugin-sass';
 const isDev = process.env.NODE_ENV === 'development';
 
 export default defineConfig({
+  tools: {
+    rspack: {
+      plugins: [
+        // 生成.gz文件
+        new CompressionPlugin({
+          test: /\.(js|css|html|txt|svg|json)$/,
+          threshold: 10240,
+          minRatio: 0.8,
+          algorithm: 'gzip',
+          deleteOriginalAssets: false
+        }),
+        // 生成.br压缩文件(暂时不要，如果配置了这个需要生效的话需要nginx安装ngx_brotli模块)
+        // new CompressionPlugin({
+        //   filename: "[path][base].br",
+        //   algorithm: "brotliCompress", // 使用 brotli 压缩
+        //   test: /\.(js|css|html|svg)$/,
+        //   compressionOptions: {
+        //     level: 11, // Brotli 压缩等级（0-11，11 压缩率最高但最慢）
+        //   },
+        //   threshold: 10240,
+        //   minRatio: 0.8,
+        //   deleteOriginalAssets: false
+        // }),
+      ]
+    }
+  },
   plugins: [
     // 表示将react和router相关的包拆分为单独的chunk
     pluginReact({
@@ -72,7 +99,7 @@ export default defineConfig({
     // 启用热更新
     hmr: true,
     // 显示编译进度条
-    // progressBar: true,
+    progressBar: true,
   },
   // 构建产物相关配置
   output: {
