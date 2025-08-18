@@ -92,6 +92,7 @@ const UserDropdown: React.FC = () => {
           icon: <QuestionCircleFilled />,
           onClick: () => {
             // 跳转到问题反馈
+            window.open("https://github.com/yecongling/nexus-admin/issues/new", "_blank");
           },
         },
         {

@@ -99,7 +99,7 @@ export default defineConfig({
     // 启用热更新
     hmr: true,
     // 显示编译进度条
-    progressBar: true,
+    // progressBar: true,
   },
   // 构建产物相关配置
   output: {
