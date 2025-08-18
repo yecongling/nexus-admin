@@ -4,6 +4,7 @@ import ScreenLock from '@/components/ScreenLock';
 import Content from './Content';
 import Header from './Header';
 import LeftMenu from './LeftMenu';
+import Footer from './Footer';
 
 /**
  * 系统整体布局
@@ -19,6 +20,8 @@ const Layouts: React.FC = () => {
           <Header />
           {/* 中间主内容区域 */}
           <Content />
+          {/* 底部区域 */}
+          <Footer />
         </Layout>
       </Layout>
       {/* 锁屏区域 */}

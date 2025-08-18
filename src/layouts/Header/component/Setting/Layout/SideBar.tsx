@@ -24,7 +24,7 @@ const SideBar: React.FC = () => {
         pKey="autoActivateChild"
       />
       {/* 宽度 */}
-      <NumberItem title="宽度" />
+      <NumberItem title="宽度" category="sidebar" pKey="width" />
     </>
   );
 };

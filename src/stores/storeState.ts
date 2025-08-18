@@ -269,7 +269,7 @@ export interface CopyrightPreferences {
   /** 版权公司名链接 */
   companySiteLink: string;
   /** 版权日期 */
-  date: string;
+  date: number;
   /** 版权是否可见 */
   enable: boolean;
   /** 备案号 */

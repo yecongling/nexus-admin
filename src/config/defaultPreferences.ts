@@ -33,14 +33,14 @@ export const defaultPreferences: Preferences = {
   copyright: {
     companyName: "fusion",
     companySiteLink: "http://fusionadmin.cn",
-    date: "2024",
+    date: new Date().getFullYear(),
     enable: true,
-    icp: "",
-    icpLink: "",
+    icp: "蜀ICP备2023022276号-2",
+    icpLink: "https://beian.miit.gov.cn/",
     settingShow: true,
   },
   footer: {
-    enable: false,
+    enable: true,
     fixed: false,
   },
   header: {
