@@ -56,6 +56,10 @@ export default defineConfig({
               name: 'antd-icons',
               test: /node_modules[\\/]@ant-design\/icons/,
             },
+            {
+              name: 'axios',
+              test: /node_modules[\\/]axios/,
+            }
           ],
         },
       },
