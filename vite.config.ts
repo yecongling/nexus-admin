@@ -25,8 +25,8 @@ export default defineConfig({
   build: {
     // 压缩css代码
     cssCodeSplit: true,
-    // js代码压缩
-    minify: 'terser',
+    // js代码压缩，这里开启会出现打包失败（原因是装饰器语法不支持）
+    // minify: 'terser',
     terserOptions: {
       compress: {
         drop_console: true,
