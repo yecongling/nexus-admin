@@ -1,3 +1,4 @@
+import { Card } from 'antd';
 import type React from 'react';
 
 /**
@@ -5,7 +6,11 @@ import type React from 'react';
  * @returns 菜单详情表格
  */
 const MenuDetailTable: React.FC = () => {
-  return <div>MenuDetailTable</div>;
+  return (
+    <Card className='min-h-1/3 max-h-1/2'>
+      MenuDetailTable
+    </Card>
+  );
 };
 
 export default MenuDetailTable;

@@ -31,10 +31,6 @@
         "useKeyWithClickEvents": "off",
         "noSvgWithoutTitle": "off",
         "noStaticElementInteractions": "off"
-      },
-      "nursery": {
-        "useUniqueElementIds": "off",
-        "noNestedComponentDefinitions": "off"
       }
     }
   },

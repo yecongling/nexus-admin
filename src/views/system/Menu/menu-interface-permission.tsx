@@ -1,3 +1,4 @@
+import { Card } from "antd";
 import type React from "react";
 
 /**
@@ -5,6 +6,10 @@ import type React from "react";
  * @returns 菜单接口权限
  */
 const MenuInterfacePermission: React.FC = () => {
-  return <div>MenuInterfacePermission</div>;
+  return (
+    <Card className="flex-1 max-h-full">
+      MenuInterfacePermission
+    </Card>
+  );
 };
 export default MenuInterfacePermission;
