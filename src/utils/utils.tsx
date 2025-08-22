@@ -158,3 +158,27 @@ export function getShortcutLabel(shortcut: string): string {
     .replace('alt', isMac ? '⌥' : 'Alt')
     .replace('meta', isMac ? '⌘' : 'Meta'); // 可选;
 }
+
+/**
+ * 转换树组件的数据
+ * @param data 树组件的数据
+ * @param expanded 展开的节点
+ * @param t 国际化函数
+ * @returns 转换后的数据
+ */
+export function transformData(data: any[], expanded: string[], t: (key: string) => string) {
+  return data.map((item: any) => {
+      if (item.icon) {
+        item.icon = getIcon(item.icon);
+      }
+      if (item.children?.length > 0) {
+        expanded.push(item.id);
+      }
+      if (item.children) {
+        transformData(item.children, expanded, t);
+      }
+      // 国际化翻译菜单名
+      item.name = t(item.name);
+      return item;
+    });
+}
