@@ -1,12 +1,13 @@
-import { CaretDownOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { CaretDownOutlined, ExportOutlined, ImportOutlined, PlusOutlined } from '@ant-design/icons';
 import { Icon } from '@iconify-icon/react';
 import { useQuery } from '@tanstack/react-query';
-import { Button, Card, Input, Space, Spin, Tooltip, Tree } from 'antd';
+import { Button, Card, Input, Space, Spin, Tooltip, Tree, Upload } from 'antd';
 import type React from 'react';
 import { useCallback, useEffect, useState, type Key } from 'react';
 import { useTranslation } from 'react-i18next';
 import { menuService } from '@/services/system/menu/menuApi';
 import { transformData } from '@/utils/utils';
+import { usePermission } from '@/hooks/usePermission';
 
 /**
  * 菜单树
@@ -20,6 +21,14 @@ const MenuTree: React.FC<MenuTreeProps> = ({ onSelectMenu, onOpenDrawer }) => {
   const [treeData, setTreeData] = useState<any[]>([]);
   // 选中的树节点
   const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
+
+  // 新增菜单权限
+  const hasAddPermission = usePermission(['system:menu:add']);
+  // 批量导入权限
+  const hasImportPermission = usePermission(['system:menu:import']);
+  // 导出权限
+  const hasExportPermission = usePermission(['system:menu:export']);
+
   // 查询菜单数据
   const { isLoading, data, refetch, isSuccess } = useQuery({
     // 依赖searchText, 当searchText变化时，会重新执行queryFn
@@ -48,6 +57,21 @@ const MenuTree: React.FC<MenuTreeProps> = ({ onSelectMenu, onOpenDrawer }) => {
     }
   }, [isSuccess, data]);
 
+  /**
+   * 导入菜单
+   * @param file 导入文件
+   */
+  const importMenu = useCallback((file: File) => {
+
+  }, []);
+
+  /**
+   * 导出菜单，我可以配置导出所有菜单，或者某个角色的菜单，或者指定一些菜单
+   */
+  const exportMenu = useCallback(() => {
+
+  }, []);
+
   // 检索菜单数据
   return (
     <Card
@@ -57,12 +81,24 @@ const MenuTree: React.FC<MenuTreeProps> = ({ onSelectMenu, onOpenDrawer }) => {
         <div className="flex justify-between">
           <div>菜单列表</div>
           <Space>
-            <Tooltip title="新增子菜单">
-              <Button type="text" icon={<PlusOutlined />} onClick={() => onOpenDrawer(true, 'add')} />
-            </Tooltip>
-            <Tooltip title="刷新">
-              <Button type="text" icon={<ReloadOutlined />} onClick={() => refetch()} />
-            </Tooltip>
+            {hasAddPermission && (
+              <Tooltip title="新增子菜单">
+                <Button type="text" icon={<PlusOutlined />} onClick={() => onOpenDrawer(true, 'add')} />
+              </Tooltip>
+            )}
+
+            {hasImportPermission && (
+              <Tooltip title="导入菜单">
+                <Upload accept=".xlsx">
+                  <Button type="text" icon={<ImportOutlined className="text-blue-500!" />} />
+                </Upload>
+              </Tooltip>
+            )}
+            {hasExportPermission && (
+              <Tooltip title="导出菜单">
+                <Button type="text" icon={<ExportOutlined className="text-orange-500!" />} />
+              </Tooltip>
+            )}
           </Space>
         </div>
       }

@@ -1,7 +1,7 @@
 import { Layout } from 'antd';
 import type React from 'react';
 import { useCallback, useReducer } from 'react';
-import MenuDetailTable from './menu-detail-table';
+import MenuDetail from './menu-detail';
 import MenuInfoDrawer from './menu-info-drawer';
 import MenuInterfacePermission from './menu-interface-permission';
 import MenuTree from './menu-tree';
@@ -65,9 +65,9 @@ const Menu: React.FC = () => {
         </Layout.Sider>
         <Layout.Content className="flex flex-col ml-2 gap-2">
           {/* 菜单详情 */}
-          <MenuDetailTable />
+          <MenuDetail menu={state.currentMenu} onOpenDrawer={onOpenDrawer} />
           {/* 菜单接口权限列表 */}
-          <MenuInterfacePermission />
+          <MenuInterfacePermission menu={state.currentMenu} />
         </Layout.Content>
       </Layout>
       <MenuInfoDrawer
