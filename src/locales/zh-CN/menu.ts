@@ -75,5 +75,8 @@ const menu = {
     main: '编辑器',
     docWriter: '文档编辑器',
   },
+  apps: {
+    add: "新增应用"
+  }
 };
 export default menu;

@@ -146,11 +146,11 @@ export const menuService: IMenuService = {
    * @returns 菜单列表
    */
   async getAllMenus({ queryKey }: any): Promise<MenuModel[]> {
-    const [, params] = queryKey;
+    const [, name] = queryKey;
     const data = await HttpRequest.post(
       {
         url: MenuApi.getAllMenus,
-        params,
+        params: { name },
       },
       { successMessageMode: 'none' },
     );

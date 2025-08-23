@@ -168,17 +168,17 @@ export function getShortcutLabel(shortcut: string): string {
  */
 export function transformData(data: any[], expanded: string[], t: (key: string) => string) {
   return data.map((item: any) => {
-      if (item.icon) {
-        item.icon = getIcon(item.icon);
-      }
-      if (item.children?.length > 0) {
-        expanded.push(item.id);
-      }
-      if (item.children) {
-        transformData(item.children, expanded, t);
-      }
-      // 国际化翻译菜单名
-      item.name = t(item.name);
-      return item;
-    });
+    const newItem = {
+      ...item, // 先拷贝一份，避免修改原对象
+      icon: item.icon ? getIcon(item.icon) : undefined,
+      name: t(item.name),
+    };
+
+    if (item.children?.length > 0) {
+      expanded.push(item.id);
+      newItem.children = transformData(item.children, expanded, t);
+    }
+
+    return newItem;
+  });
 }

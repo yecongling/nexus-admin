@@ -17,20 +17,25 @@ const Menu: React.FC = () => {
     openDrawer: false,
     // 当前选中的菜单
     currentMenu: null,
+    // 当前的操作
+    operation: 'view',
   });
 
   /**
    * 选择菜单
    * @param menu 菜单
    */
-  const onSelectMenu = useCallback((menu: any) => {}, []);
+  const onSelectMenu = useCallback((menu: any) => {
+    console.log('选中节点', menu);
+    dispatch({ currentMenu: menu });
+  }, []);
 
   /**
    * 打开抽屉
    * @param open 是否打开
    */
-  const onOpenDrawer = useCallback((open: boolean) => {
-    dispatch({ openDrawer: open });
+  const onOpenDrawer = useCallback((open: boolean, operation: string) => {
+    dispatch({ openDrawer: open, operation });
   }, []);
 
   // 新增菜单的mutation
@@ -65,7 +70,13 @@ const Menu: React.FC = () => {
           <MenuInterfacePermission />
         </Layout.Content>
       </Layout>
-      <MenuInfoDrawer menu={state.currentMenu} open={state.openDrawer} onOk={handleDrawerOk} onClose={onOpenDrawer} />
+      <MenuInfoDrawer
+        menu={state.currentMenu}
+        operation={state.operation}
+        open={state.openDrawer}
+        onOk={handleDrawerOk}
+        onClose={onOpenDrawer}
+      />
     </>
   );
 };

@@ -5,6 +5,7 @@ import {
   QuestionCircleFilled,
   SettingOutlined,
 } from '@ant-design/icons';
+import { useQuery } from '@tanstack/react-query';
 import {
   Button,
   Drawer,
@@ -21,11 +22,10 @@ import {
 } from 'antd';
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import IconPanel from '@/components/IconPanel';
 import { menuService } from '@/services/system/menu/menuApi';
 import { addIcon } from '@/utils/utils';
-import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 
 // 菜单类型枚举
 const MenuType = {
@@ -35,15 +35,6 @@ const MenuType = {
   PERMISSION_BUTTON: 3,
 } as const;
 type MenuType = (typeof MenuType)[keyof typeof MenuType];
-
-// 表单初始值
-const initialFormValues = {
-  menuType: MenuType.TOP_LEVEL,
-  route: false,
-  hidden: false,
-  internalOrExternal: false,
-  status: true,
-};
 
 // 菜单数据类型
 export interface MenuData {
@@ -67,12 +58,17 @@ export interface MenuData {
 
 /**
  * 菜单信息抽屉
+ * @param open 是否打开
+ * @param operation 操作
+ * @param onClose 关闭抽屉
+ * @param menu 当前选中的菜单
+ * @param onOk 点击确定
  * @returns 菜单信息抽屉
  */
-const MenuInfoDrawer: React.FC<MenuInfoDrawerProps> = ({ open, onClose, menu, onOk }) => {
+const MenuInfoDrawer: React.FC<MenuInfoDrawerProps> = ({ open, operation, onClose, menu, onOk }) => {
   const [form] = Form.useForm();
   const nameRef = useRef<InputRef>(null);
-  const [menuType, setMenuType] = useState<MenuType>(MenuType.TOP_LEVEL);
+  const [menuType, setMenuType] = useState<MenuType>(MenuType.SUB_MENU);
   const { t } = useTranslation();
 
   // 初始化表单数据
@@ -80,13 +76,13 @@ const MenuInfoDrawer: React.FC<MenuInfoDrawerProps> = ({ open, onClose, menu, on
     if (!open) {
       return;
     }
-    const newMenuType = menu?.menuType ?? MenuType.TOP_LEVEL;
-    setMenuType(newMenuType);
 
-    if (menu) {
+    if (menu && operation !== 'add') {
       form.setFieldsValue(menu);
+      setMenuType(menu.menuType);
     } else {
       form.resetFields();
+      setMenuType(MenuType.SUB_MENU);
     }
   }, [menu, form, open]);
 
@@ -151,15 +147,9 @@ const MenuInfoDrawer: React.FC<MenuInfoDrawerProps> = ({ open, onClose, menu, on
   const onSubmit = useCallback(async () => {
     try {
       const values = await form.validateFields();
-      // 获取的路由参数，需要处理成key=value&key=value的形式,需要过滤掉空的key和value
-      const routeQuery = values.routeQuery
-        ?.filter((item: { key: string; value: string }) => !!item.key)
-        .map((item: { key: string; value: string }) => `${item.key}=${item.value}`)
-        .join('&');
       const formData: MenuData = {
         ...values,
         status: Boolean(values.status),
-        routeQuery,
       };
       onOk(formData);
     } catch (errorInfo: any) {
@@ -202,19 +192,31 @@ const MenuInfoDrawer: React.FC<MenuInfoDrawerProps> = ({ open, onClose, menu, on
   // 根据菜单类型判断是否显示路由相关字段
   const showRouteFields = useMemo(() => menuType !== MenuType.PERMISSION_BUTTON, [menuType]);
 
+  // 表单初始值
+  const initialFormValues = useMemo(() => {
+    return {
+      menuType: MenuType.SUB_MENU,
+      route: false,
+      hidden: false,
+      internalOrExternal: false,
+      status: true,
+      parentId: menu?.id,
+    };
+  }, [menu]);
+
   return (
     <Drawer
       title={`${menu ? '编辑' : '新增'}菜单`}
       open={open}
       width={800}
-      onClose={() => onClose(false)}
+      onClose={() => onClose(false, 'view')}
       classNames={{ footer: 'flex justify-end' }}
       closeIcon={false}
-      extra={<Button type="text" icon={<CloseOutlined />} onClick={() => onClose(false)} />}
+      extra={<Button type="text" icon={<CloseOutlined />} onClick={() => onClose(false, 'view')} />}
       afterOpenChange={handleAfterOpenChange}
       footer={
         <Space>
-          <Button type="default" onClick={() => onClose(false)}>
+          <Button type="default" onClick={() => onClose(false, 'view')}>
             取消
           </Button>
           <Button type="primary" onClick={onSubmit}>
@@ -229,10 +231,10 @@ const MenuInfoDrawer: React.FC<MenuInfoDrawerProps> = ({ open, onClose, menu, on
         </Form.Item>
         <Form.Item name="menuType" label="菜单类型" rules={[{ required: true, message: '请选择菜单类型!' }]}>
           <Radio.Group buttonStyle="solid" onChange={(e) => handleMenuTypeChange(e.target.value)}>
-            <Radio.Button value={MenuType.TOP_LEVEL}>目录</Radio.Button>
             <Radio.Button value={MenuType.SUB_MENU}>子菜单</Radio.Button>
             <Radio.Button value={MenuType.SUB_ROUTE}>子路由</Radio.Button>
             <Radio.Button value={MenuType.PERMISSION_BUTTON}>权限按钮</Radio.Button>
+            <Radio.Button value={MenuType.TOP_LEVEL}>目录</Radio.Button>
           </Radio.Group>
         </Form.Item>
         <Form.Item
@@ -255,7 +257,6 @@ const MenuInfoDrawer: React.FC<MenuInfoDrawerProps> = ({ open, onClose, menu, on
               style={{ width: '100%' }}
               styles={{ popup: { root: { maxHeight: 400, overflow: 'auto' } } }}
               placeholder="请选择上级目录"
-              defaultValue={menu?.id}
               treeData={directoryData}
             />
           </Form.Item>
@@ -334,7 +335,7 @@ const MenuInfoDrawer: React.FC<MenuInfoDrawerProps> = ({ open, onClose, menu, on
                   <>
                     {fields.map(({ key, name, ...restField }) => (
                       <Space key={key} style={{ display: 'flex' }} align="baseline">
-                        <Form.Item {...restField} name={[name, 'key']} label colon={false}>
+                        <Form.Item {...restField} name={[name, 'key']} colon={false}>
                           <Input placeholder="key" />
                         </Form.Item>
                         <Form.Item {...restField} name={[name, 'value']}>
@@ -343,7 +344,7 @@ const MenuInfoDrawer: React.FC<MenuInfoDrawerProps> = ({ open, onClose, menu, on
                         <MinusCircleOutlined onClick={() => remove(key)} />
                       </Space>
                     ))}
-                    <Form.Item label colon={false}>
+                    <Form.Item colon={false}>
                       <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
                         添加路由参数
                       </Button>
@@ -394,7 +395,9 @@ export default MenuInfoDrawer;
 
 export type MenuInfoDrawerProps = {
   open: boolean;
-  onClose: (open: boolean) => void;
+  // 操作
+  operation: string;
+  onClose: (open: boolean, operation: string) => void;
   /**
    * 当前选中的菜单
    */

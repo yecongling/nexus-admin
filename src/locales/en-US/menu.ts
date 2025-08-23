@@ -75,5 +75,8 @@ const menu = {
     main: 'Editor',
     docWriter: 'Doc Writer',
   },
+  apps: {
+    add: "add app"
+  }
 };
 export default menu;
