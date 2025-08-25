@@ -171,6 +171,7 @@ export function transformData(data: any[], expanded: string[], t: (key: string) 
     const newItem = {
       ...item, // 先拷贝一份，避免修改原对象
       icon: item.icon ? getIcon(item.icon) : undefined,
+      originalIcon: item.icon,
       name: t(item.name),
     };
 

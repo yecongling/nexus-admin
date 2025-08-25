@@ -150,6 +150,7 @@ const MenuInfoDrawer: React.FC<MenuInfoDrawerProps> = ({ open, operation, onClos
       const formData: MenuData = {
         ...values,
         status: Boolean(values.status),
+        icon: values.originalIcon,
       };
       onOk(formData);
     } catch (errorInfo: any) {
@@ -304,7 +305,7 @@ const MenuInfoDrawer: React.FC<MenuInfoDrawerProps> = ({ open, operation, onClos
                 </Form.Item>
               </>
             )}
-            <Form.Item name="icon" label="菜单图标">
+            <Form.Item name="originalIcon" label="菜单图标">
               <Input
                 allowClear
                 autoComplete="off"

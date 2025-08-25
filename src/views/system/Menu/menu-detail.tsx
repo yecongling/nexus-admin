@@ -1,4 +1,4 @@
-import { PlusOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, EditOutlined, CopyOutlined } from '@ant-design/icons';
 import { App, Button, Card, Descriptions, Popconfirm, Space, Switch, Tag, type DescriptionsProps } from 'antd';
 import type React from 'react';
 import { usePermission } from '@/hooks/usePermission';
@@ -12,7 +12,7 @@ import { menuService } from '@/services/system/menu/menuApi';
  * @returns 菜单详情
  */
 const MenuDetail: React.FC<MenuDetailProps> = ({ menu, onOpenDrawer }) => {
-  const { modal } = App.useApp();
+  const { modal, message } = App.useApp();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
 
@@ -22,6 +22,8 @@ const MenuDetail: React.FC<MenuDetailProps> = ({ menu, onOpenDrawer }) => {
   const hasEditPermission = usePermission(['system:menu:edit']);
   // 删除菜单权限
   const hasDeletePermission = usePermission(['system:menu:delete']);
+  // 复制菜单权限
+  const hasCopyPermission = usePermission(['system:menu:copy']);
 
   // 切换菜单状态mutation
   const toggleMenuStatusMutation = useMutation({
@@ -120,6 +122,7 @@ const MenuDetail: React.FC<MenuDetailProps> = ({ menu, onOpenDrawer }) => {
    * 删除菜单
    */
   const handleDelete = () => {
+    // 需要做级联删除的判定
     modal.confirm({
       title: '删除菜单',
       content: '确定删除菜单吗？数据删除后将无法恢复！',
@@ -127,6 +130,14 @@ const MenuDetail: React.FC<MenuDetailProps> = ({ menu, onOpenDrawer }) => {
         deleteMenuMutation.mutate(menu.id);
       },
     });
+  };
+
+  /**
+   * 复制菜单
+   */
+  const handleCopy = () => {
+    // 复制菜单
+    message.warning('复制菜单功能暂未实现');
   };
 
   return (
@@ -152,6 +163,11 @@ const MenuDetail: React.FC<MenuDetailProps> = ({ menu, onOpenDrawer }) => {
                 onClick={() => onOpenDrawer(true, 'edit')}
               >
                 {t('common.operation.edit')}
+              </Button>
+            )}
+            {hasCopyPermission && (
+              <Button color="cyan" variant="outlined" icon={<CopyOutlined />} onClick={handleCopy}>
+                {t('common.operation.copy')}
               </Button>
             )}
             {hasDeletePermission && (

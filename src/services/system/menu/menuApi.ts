@@ -55,7 +55,7 @@ interface IMenuService {
    * @param params 查询参数
    * @returns 菜单列表
    */
-  getAllMenus(params: any): Promise<MenuModel[]>;
+  getAllMenus(name?: string): Promise<MenuModel[]>;
 
   /**
    * 获取所有的菜单目录（如果选中的是按钮，就不止以及菜单）
@@ -145,8 +145,7 @@ export const menuService: IMenuService = {
    * @param params 查询参数
    * @returns 菜单列表
    */
-  async getAllMenus({ queryKey }: any): Promise<MenuModel[]> {
-    const [, name] = queryKey;
+  async getAllMenus(name?: string): Promise<MenuModel[]> {
     const data = await HttpRequest.post(
       {
         url: MenuApi.getAllMenus,

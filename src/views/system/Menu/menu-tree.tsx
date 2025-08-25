@@ -3,7 +3,7 @@ import { Icon } from '@iconify-icon/react';
 import { useQuery } from '@tanstack/react-query';
 import { Button, Card, Input, Space, Spin, Tooltip, Tree, Upload } from 'antd';
 import type React from 'react';
-import { useCallback, useEffect, useState, type Key } from 'react';
+import { useCallback, useState, type Key } from 'react';
 import { useTranslation } from 'react-i18next';
 import { menuService } from '@/services/system/menu/menuApi';
 import { transformData } from '@/utils/utils';
@@ -11,14 +11,13 @@ import { usePermission } from '@/hooks/usePermission';
 
 /**
  * 菜单树
+ * @TODO 要不要支持拖拽排序？？？？？
  * @returns 菜单树
  */
 const MenuTree: React.FC<MenuTreeProps> = ({ onSelectMenu, onOpenDrawer }) => {
   // 菜单名称检索（需要按回车的时候才能触发）
   const { t } = useTranslation();
   const [searchText, setSearchText] = useState('');
-  // 树组件的数据
-  const [treeData, setTreeData] = useState<any[]>([]);
   // 选中的树节点
   const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
 
@@ -30,10 +29,19 @@ const MenuTree: React.FC<MenuTreeProps> = ({ onSelectMenu, onOpenDrawer }) => {
   const hasExportPermission = usePermission(['system:menu:export']);
 
   // 查询菜单数据
-  const { isLoading, data, refetch, isSuccess } = useQuery({
+  const { isLoading, data, refetch } = useQuery({
     // 依赖searchText, 当searchText变化时，会重新执行queryFn
     queryKey: ['sys_menu', searchText],
-    queryFn: menuService.getAllMenus,
+    queryFn: async () => {
+      const res = await menuService.getAllMenus(searchText);
+      const expanded: string[] = [];
+      const result = transformData(res || [], expanded, t);
+      if (result.length > 0) {
+        setSelectedKeys([result[0].id]);
+        onSelectMenu(result[0]);
+      }
+      return result;
+    },
   });
 
   // 选中菜单树节点
@@ -45,32 +53,16 @@ const MenuTree: React.FC<MenuTreeProps> = ({ onSelectMenu, onOpenDrawer }) => {
     [onSelectMenu],
   );
 
-  useEffect(() => {
-    if (isSuccess) {
-      const expanded: string[] = [];
-      const result = transformData(data || [], expanded, t);
-      if (result.length > 0) {
-        setSelectedKeys([result[0].id]);
-        onSelectMenu(result[0]);
-      }
-      setTreeData(result);
-    }
-  }, [isSuccess, data]);
-
   /**
    * 导入菜单
    * @param file 导入文件
    */
-  const importMenu = useCallback((file: File) => {
-
-  }, []);
+  const importMenu = useCallback((file: File) => {}, []);
 
   /**
    * 导出菜单，我可以配置导出所有菜单，或者某个角色的菜单，或者指定一些菜单
    */
-  const exportMenu = useCallback(() => {
-
-  }, []);
+  const exportMenu = useCallback(() => {}, []);
 
   // 检索菜单数据
   return (
@@ -119,7 +111,7 @@ const MenuTree: React.FC<MenuTreeProps> = ({ onSelectMenu, onOpenDrawer }) => {
           blockNode
           showIcon
           rootClassName="flex-1 overflow-auto my-2!"
-          treeData={treeData}
+          treeData={data}
           defaultExpandAll
           selectedKeys={selectedKeys}
           switcherIcon={<CaretDownOutlined style={{ fontSize: '14px' }} />}
