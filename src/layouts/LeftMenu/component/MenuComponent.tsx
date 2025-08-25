@@ -102,7 +102,8 @@ const MenuComponent = () => {
         const title = route.meta?.title;
         if (title) document.title = `Nexus - ${t(title)}`;
       }
-      setOpenKeys(openKey);
+      // 非折叠状态下，设置打开的 key
+      !collapsed && setOpenKeys(openKey);
     }
   }, [pathname, collapsed, menus, dynamicTitle, t]);
 
