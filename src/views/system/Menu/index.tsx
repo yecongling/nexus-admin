@@ -1,4 +1,4 @@
-import { Layout } from 'antd';
+import { Layout, theme } from 'antd';
 import type React from 'react';
 import { useCallback, useReducer } from 'react';
 import MenuDetail from './menu-detail';
@@ -11,6 +11,7 @@ import MenuTree from './menu-tree';
  * @returns 菜单
  */
 const Menu: React.FC = () => {
+  const { token } = theme.useToken();
   // 合并的状态
   const [state, dispatch] = useReducer((prev: any, action: any) => ({ ...prev, ...action }), {
     // 抽屉是否打开
@@ -59,7 +60,7 @@ const Menu: React.FC = () => {
   return (
     <>
       <Layout>
-        <Layout.Sider width={320} theme="light">
+        <Layout.Sider width={320} theme="light" style={{ borderRadius: token.borderRadius }}>
           {/* 左边菜单列表 */}
           <MenuTree onSelectMenu={onSelectMenu} onOpenDrawer={onOpenDrawer} />
         </Layout.Sider>
