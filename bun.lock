@@ -21,7 +21,7 @@
         "crypto-js": "^4.2.0",
         "dayjs": "^1.11.13",
         "echarts": "^6.0.0",
-        "i18next": "^25.4.0",
+        "i18next": "^25.4.2",
         "jsencrypt": "^3.5.4",
         "lodash-es": "^4.17.21",
         "react": "^19.1.1",
@@ -29,7 +29,7 @@
         "react-draggable": "^4.5.0",
         "react-error-boundary": "^6.0.0",
         "react-hotkeys-hook": "^5.1.0",
-        "react-i18next": "^15.7.1",
+        "react-i18next": "^15.7.2",
         "react-is": "^19.1.1",
         "react-router": "^7.8.2",
         "screenfull": "^6.0.2",
@@ -37,7 +37,7 @@
         "zustand": "^5.0.8",
       },
       "devDependencies": {
-        "@biomejs/biome": "^2.2.0",
+        "@biomejs/biome": "^2.2.2",
         "@iconify-icon/react": "^3.0.0",
         "@tailwindcss/vite": "^4.1.12",
         "@types/crypto-js": "^4.2.2",
@@ -607,7 +607,7 @@
 
     "i18n-js": ["i18n-js@4.5.1", "", { "dependencies": { "bignumber.js": "*", "lodash": "*", "make-plural": "*" } }, "sha512-n7jojFj1WC0tztgr0I8jqTXuIlY1xNzXnC3mjKX/YjJhimdM+jXM8vOmn9d3xQFNC6qDHJ4ovhdrGXrRXLIGkA=="],
 
-    "i18next": ["i18next@25.4.1", "https://registry.npmmirror.com/i18next/-/i18next-25.4.1.tgz", { "dependencies": { "@babel/runtime": "^7.27.6" }, "peerDependencies": { "typescript": "^5" }, "optionalPeers": ["typescript"] }, "sha512-sYJX4Ap0SSho1JZppKvc9BeacbpNCdNvKuXMYPUGjDH0XTTdVXmm7UU3l4bvF8nqh70lZNBeLboRYwItBf9jOw=="],
+    "i18next": ["i18next@25.4.2", "", { "dependencies": { "@babel/runtime": "^7.27.6" }, "peerDependencies": { "typescript": "^5" }, "optionalPeers": ["typescript"] }, "sha512-gD4T25a6ovNXsfXY1TwHXXXLnD/K2t99jyYMCSimSCBnBRJVQr5j+VAaU83RJCPzrTGhVQ6dqIga66xO2rtd5g=="],
 
     "iconify-icon": ["iconify-icon@3.0.0", "", { "dependencies": { "@iconify/types": "^2.0.0" } }, "sha512-yPcnpkn8HUEUckrxxJBOer3jbGv3bqozHsLMLBRxhk3As1X76BgV2mS2a1HTNOIagR8nUs30H3qAd9GLe8Mnlg=="],
 
