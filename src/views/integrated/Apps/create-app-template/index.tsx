@@ -138,7 +138,7 @@ const AppTemplates: React.FC<AppsTemplateModelProps> = ({
         />
         
         {/* 右侧模板展示 */}
-        <div className="h-full flex-1 shrink-0 grow overflow-auto border-l p-6 pt-2 border-[#1018280a]">
+        <div className="h-full flex-1 shrink-0 grow overflow-auto px-6">
           <TemplateGrid
             templates={currentTemplates}
             loading={isLoading}

@@ -1,5 +1,5 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, theme } from 'antd';
+import { Button, Card, theme } from 'antd';
 import type React from 'react';
 import { memo } from 'react';
 import type { TemplateCategory } from '../types';
@@ -24,7 +24,7 @@ const CategorySidebar: React.FC<CategorySidebarProps> = ({
 }) => {
   const { token } = useToken();
   return (
-    <div className="h-full w-[200px] p-4 bg-gray-50 overflow-y-auto">
+    <Card className="h-full w-[300px] p-4 overflow-y-auto">
       {/* 分类列表 */}
       <div className="space-y-2">
         {categories.map((category) => (
@@ -52,7 +52,7 @@ const CategorySidebar: React.FC<CategorySidebarProps> = ({
           创建空白应用
         </Button>
       </div>
-    </div>
+    </Card>
   );
 };
 

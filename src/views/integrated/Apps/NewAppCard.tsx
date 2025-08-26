@@ -82,7 +82,9 @@ const CreateAppCard: React.FC<CreateAppCardProps> = ({ refresh }) => {
    * 关闭模版中心
    */
   const closeTemplate = () => {
-    closeAllModals(dispatch);
+    dispatch({
+      openTemplateModal: false,
+    });
   };
 
   /**
