@@ -53,6 +53,7 @@ export interface RecentVisit {
   title: string;
   description: string;
   link: string;
+  visitTime?: string;
 }
 
 export interface TodoReminder {
@@ -242,19 +243,22 @@ export const mockWorkbenchData = async (): Promise<WorkbenchData> => {
         icon: React.createElement(MonitorOutlined, { className: "text-blue-500" }),
         title: '流程监控',
         description: '实时监控页面',
-        link: '/workflow/monitor'
+        link: '/workflow/monitor',
+        visitTime: '2分钟前'
       },
       {
         icon: React.createElement(BookOutlined, { className: "text-green-500" }),
         title: '流程模板库',
         description: '模板管理页面',
-        link: '/workflow/templates'
+        link: '/workflow/templates',
+        visitTime: '15分钟前'
       },
       {
         icon: React.createElement(SettingOutlined, { className: "text-orange-500" }),
         title: '节点管理',
         description: '节点配置页面',
-        link: '/workflow/nodes'
+        link: '/workflow/nodes',
+        visitTime: '1小时前'
       }
     ],
     todoReminders: [
