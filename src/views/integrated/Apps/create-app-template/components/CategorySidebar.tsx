@@ -1,5 +1,5 @@
-import { Button, theme } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import { Button, theme } from 'antd';
 import type React from 'react';
 import { memo } from 'react';
 import type { TemplateCategory } from '../types';
@@ -30,11 +30,11 @@ const CategorySidebar: React.FC<CategorySidebarProps> = ({
         {categories.map((category) => (
           <div
             key={category.id}
-            className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all hover:bg-blue-50 ${
-              selectedCategory === category.id
-                ? ` bg-[${token.colorPrimary}] border border-[${token.colorPrimary}]`
-                : 'hover:bg-gray-100'
-            }`}
+            style={{
+              backgroundColor: selectedCategory === category.id ? token.colorPrimaryBg : 'transparent',
+              border: selectedCategory === category.id ? `1px solid ${token.colorPrimaryBorder}` : 'none',
+            }}
+            className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all hover:bg-blue-50`}
             onClick={() => onCategorySelect(category.id)}
           >
             <div className="flex items-center space-x-2">

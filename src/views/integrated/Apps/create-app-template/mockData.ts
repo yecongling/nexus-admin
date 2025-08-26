@@ -59,12 +59,6 @@ export const mockCategories: TemplateCategory[] = [
     icon: '🔬',
     count: 9,
   },
-  {
-    id: 'visual_design',
-    name: '视觉设计',
-    icon: '🎨',
-    count: 11,
-  },
 ];
 
 /**
@@ -305,34 +299,6 @@ export const mockTemplates: AppTemplate[] = [
     updateTime: '2024-01-18',
     usageCount: 780,
     rating: 4.4,
-  },
-  {
-    id: '17',
-    name: 'SVG Logo 设计',
-    type: 'agent',
-    description: '您好,我是您的创意伙伴,将帮助您将想法生动地实现!我可以协助您利用DALL-E3的能力创造出令人惊叹的设计',
-    icon: '🎨',
-    iconBg: '#eb2f96',
-    category: 'visual_design',
-    tags: ['Logo设计', 'DALL-E3', '创意设计'],
-    createTime: '2024-01-13',
-    updateTime: '2024-01-20',
-    usageCount: 650,
-    rating: 4.3,
-  },
-  {
-    id: '18',
-    name: '扁平风插画生成',
-    type: 'agent',
-    description: '输入相关元素,为你生成扁平插画风格的封面图片',
-    icon: '🖼️',
-    iconBg: '#fa8c16',
-    category: 'visual_design',
-    tags: ['插画生成', '扁平风格', '封面图片'],
-    createTime: '2024-01-11',
-    updateTime: '2024-01-19',
-    usageCount: 890,
-    rating: 4.5,
   },
   {
     id: '19',
