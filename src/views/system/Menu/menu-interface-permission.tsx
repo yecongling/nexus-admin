@@ -1,66 +1,48 @@
-import { useQuery } from '@tanstack/react-query';
-import { Card, Table, Button, Space, Tag, Modal, Tooltip, App, type TableProps, Input, Form } from 'antd';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ReloadOutlined, PlusOutlined, EditOutlined, DeleteOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import { useState, useEffect, useRef } from 'react';
+import { Card, Table, Button, Space, Tag, Modal, Tooltip, type TableProps, Input, Form } from 'antd';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import type React from 'react';
 import type { MenuModel } from '@/services/system/menu/type';
+import {
+  menuService,
+  type InterfacePermission,
+} from '@/services/system/menu/menuApi';
 
-// 接口权限数据类型
-interface InterfacePermission {
-  id: string;
-  code: string;
-  remark: string;
-  createTime: string;
-  updateTime: string;
+
+
+// 组件状态类型 - 合并所有状态
+interface ComponentState {
+  permissionList: InterfacePermission[];
+  editingId: string | null;
+  editForm: {
+    id: string;
+    code: string;
+    remark: string;
+  };
+  nextId: number;
+  errors: {
+    code?: string;
+    remark?: string;
+  };
 }
-
-// 编辑状态类型
-interface EditState {
-  id: string;
-  code: string;
-  remark: string;
-}
-
-// 错误状态类型
-interface ErrorState {
-  code?: string;
-  remark?: string;
-}
-
-// 模拟数据
-const mockData: InterfacePermission[] = [
-  {
-    id: '1',
-    code: 'sys:sse:connect',
-    remark: 'SSE连接',
-    createTime: '2024-01-01 10:00:00',
-    updateTime: '2024-01-01 10:00:00',
-  },
-  {
-    id: '2',
-    code: 'sys:dict:listSelectOptions',
-    remark: '通过字典编码查询表单下拉选择项列表',
-    createTime: '2024-01-01 10:00:00',
-    updateTime: '2024-01-01 10:00:00',
-  },
-];
 
 /**
  * 菜单接口权限
  * @returns 菜单接口权限
  */
 const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu }) => {
-  const { message } = App.useApp();
-  // 接口权限列表
-  const [permissionList, setPermissionList] = useState<InterfacePermission[]>(mockData);
-  // 编辑状态 
-  const [editingId, setEditingId] = useState<string | null>(null);
-  // 编辑表单
-  const [editForm, setEditForm] = useState<EditState>({ id: '', code: '', remark: '' });
-  // 下一个ID
-  const [nextId, setNextId] = useState(3); // 用于生成新的ID
-  // 错误状态
-  const [errors, setErrors] = useState<ErrorState>({});
+  const queryClient = useQueryClient();
+  
+  // 合并所有状态到一个对象中
+  const [state, setState] = useState<ComponentState>({
+    permissionList: [],
+    editingId: null,
+    editForm: { id: '', code: '', remark: '' },
+    nextId: 1,
+    errors: {},
+  });
+
   // 输入框引用
   const codeInputRef = useRef<any>(null);
   const remarkInputRef = useRef<any>(null);
@@ -68,150 +50,220 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
   // 查询菜单接口权限数据
   const {
     isLoading,
-    data: initialData = mockData,
+    data: initialData,
     refetch,
   } = useQuery({
     queryKey: ['menu-interface-permission', menu?.id],
-    queryFn: () => {
-      // 这里应该调用实际的API
-      return mockData;
+    queryFn: async () => {
+      if (!menu?.id) return { list: [], total: 0, pageNum: 1, pageSize: 10 };
+      const response = await menuService.queryInterfacePermissions({
+        menuId: menu.id,
+        pageNum: 1,
+        pageSize: 10,
+      });
+      return response;
     },
-    enabled: menu !== undefined,
+    enabled: !!menu?.id,
+  });
+
+  // 保存接口权限的mutation
+  const savePermissionMutation = useMutation({
+    mutationFn: async (data: { type: 'create' | 'update' | 'delete'; permission: InterfacePermission }) => {
+      switch (data.type) {
+        case 'create':
+          return await menuService.createInterfacePermission({
+            menuId: menu?.id || '',
+            code: data.permission.code,
+            remark: data.permission.remark,
+          });
+        case 'update':
+          return await menuService.updateInterfacePermission({
+            id: data.permission.id,
+            code: data.permission.code,
+            remark: data.permission.remark,
+          });
+        case 'delete':
+          return await menuService.deleteInterfacePermission(data.permission.id);
+        default:
+          throw new Error('未知的操作类型');
+      }
+    },
+    onSuccess: () => {
+      // 重新获取数据
+      queryClient.invalidateQueries({ queryKey: ['menu-interface-permission', menu?.id] });
+    }
   });
 
   // 初始化数据
   useEffect(() => {
-    if (initialData) {
-      setPermissionList(initialData);
-      setNextId(initialData.length + 1);
+    if (initialData?.list) {
+      setState(prev => ({
+        ...prev,
+        permissionList: initialData.list,
+        nextId: initialData.list.length + 1,
+      }));
     }
   }, [initialData]);
 
   // 监听错误状态变化，自动聚焦到第一个错误输入框
   useEffect(() => {
-    if (Object.keys(errors).length > 0) {
-      // 使用 requestAnimationFrame 确保DOM更新完成后再聚焦
+    if (Object.keys(state.errors).length > 0) {
       requestAnimationFrame(() => {
-        if (errors.code) {
+        if (state.errors.code) {
           codeInputRef.current?.focus();
-        } else if (errors.remark) {
+        } else if (state.errors.remark) {
           remarkInputRef.current?.focus();
         }
       });
     }
-  }, [errors]);
+  }, [state.errors]);
+
+  // 更新状态的辅助函数
+  const updateState = useCallback((updates: Partial<ComponentState>) => {
+    setState(prev => ({ ...prev, ...updates }));
+  }, []);
 
   // 清除错误状态
-  const clearErrors = () => {
-    setErrors({});
-  };
+  const clearErrors = useCallback(() => {
+    updateState({ errors: {} });
+  }, [updateState]);
 
   // 刷新数据
-  const handleRefresh = () => {
+  const handleRefresh = useCallback(() => {
     refetch();
-  };
+  }, [refetch]);
 
   // 添加接口权限
-  const handleAdd = () => {
+  const handleAdd = useCallback(() => {
     const newRow: InterfacePermission = {
-      id: `temp_${nextId}`,
+      id: `temp_${state.nextId}`,
       code: '',
       remark: '',
       createTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
       updateTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
     };
     
-    setPermissionList(prev => [...prev, newRow]);
-    setEditingId(newRow.id);
-    setEditForm({ id: newRow.id, code: '', remark: '' });
-    setNextId(prev => prev + 1);
-    clearErrors();
-  };
+    updateState({
+      permissionList: [...state.permissionList, newRow],
+      editingId: newRow.id,
+      editForm: { id: newRow.id, code: '', remark: '' },
+      nextId: state.nextId + 1,
+      errors: {},
+    });
+  }, [state.permissionList, state.nextId, updateState]);
 
   // 开始编辑
-  const handleEdit = (record: InterfacePermission) => {
-    setEditingId(record.id);
-    setEditForm({ id: record.id, code: record.code, remark: record.remark });
-    clearErrors();
-  };
+  const handleEdit = useCallback((record: InterfacePermission) => {
+    updateState({
+      editingId: record.id,
+      editForm: { id: record.id, code: record.code, remark: record.remark },
+      errors: {},
+    });
+  }, [updateState]);
 
   // 取消编辑
-  const handleCancelEdit = (id: string) => {
+  const handleCancelEdit = useCallback((id: string) => {
     if (id.startsWith('temp_')) {
       // 如果是临时行，直接删除
-      setPermissionList(prev => prev.filter(item => item.id !== id));
+      updateState({
+        permissionList: state.permissionList.filter(item => item.id !== id),
+        editingId: null,
+        editForm: { id: '', code: '', remark: '' },
+        errors: {},
+      });
+    } else {
+      updateState({
+        editingId: null,
+        editForm: { id: '', code: '', remark: '' },
+        errors: {},
+      });
     }
-    setEditingId(null);
-    setEditForm({ id: '', code: '', remark: '' });
-    clearErrors();
-  };
+  }, [state.permissionList, updateState]);
 
   // 确认编辑
-  const handleConfirmEdit = (id: string) => {
+  const handleConfirmEdit = useCallback(async (id: string) => {
     // 清除之前的错误
     clearErrors();
     
-    const newErrors: ErrorState = {};
+    const newErrors: { code?: string; remark?: string } = {};
     
     // 验证编码
-    if (!editForm.code.trim()) {
+    if (!state.editForm.code.trim()) {
       newErrors.code = '编码不能为空';
     }
     
     // 验证备注
-    if (!editForm.remark.trim()) {
+    if (!state.editForm.remark.trim()) {
       newErrors.remark = '备注不能为空';
     }
     
     // 如果有错误，显示错误并聚焦到第一个错误输入框
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+      updateState({ errors: newErrors });
       return;
     }
 
-    setPermissionList(prev => 
-      prev.map(item => {
-        if (item.id === id) {
-          const updatedItem = {
-            ...item,
-            code: editForm.code,
-            remark: editForm.remark,
-            updateTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
-          };
-          
-          // 如果是临时行，生成正式ID
-          if (id.startsWith('temp_')) {
-            updatedItem.id = nextId.toString();
-            setNextId(prev => prev + 1);
-          }
-          
-          return updatedItem;
-        }
-        return item;
-      })
-    );
+    // 准备保存的数据
+    const updatedItem = {
+      ...state.permissionList.find(item => item.id === id)!,
+      code: state.editForm.code,
+      remark: state.editForm.remark,
+      updateTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
+    };
 
-    setEditingId(null);
-    setEditForm({ id: '', code: '', remark: '' });
-    message.success('保存成功');
-  };
+    // 如果是临时行，生成正式ID
+    if (id.startsWith('temp_')) {
+      updatedItem.id = state.nextId.toString();
+      updateState({ nextId: state.nextId + 1 });
+    }
+
+    // 调用保存接口
+    try {
+      await savePermissionMutation.mutateAsync({
+        type: id.startsWith('temp_') ? 'create' : 'update',
+        permission: updatedItem,
+      });
+
+      // 更新本地状态
+      updateState({
+        permissionList: state.permissionList.map(item => 
+          item.id === id ? updatedItem : item
+        ),
+        editingId: null,
+        editForm: { id: '', code: '', remark: '' },
+      });
+    } catch (error) {
+      // 错误处理已在mutation中处理
+    }
+  }, [state.editForm, state.permissionList, state.nextId, updateState, clearErrors, savePermissionMutation]);
 
   // 删除接口权限
-  const handleDelete = (record: InterfacePermission) => {
+  const handleDelete = useCallback(async (record: InterfacePermission) => {
     Modal.confirm({
       title: '确认删除',
       content: `确定要删除接口权限 "${record.code}" 吗？`,
       okText: '确定',
       cancelText: '取消',
-      onOk: () => {
-        setPermissionList(prev => prev.filter(item => item.id !== record.id));
-        message.success('删除成功');
+      onOk: async () => {
+        try {
+          await savePermissionMutation.mutateAsync({
+            type: 'delete',
+            permission: record,
+          });
+
+          // 更新本地状态
+          updateState({
+            permissionList: state.permissionList.filter(item => item.id !== record.id),
+          });
+        } catch (error) {
+          // 错误处理已在mutation中处理
+        }
       },
     });
-  };
+  }, [state.permissionList, updateState, savePermissionMutation]);
 
-  // 表格列定义
-  const columns: TableProps<InterfacePermission>['columns'] = [
+  // 使用useMemo优化表格列定义，避免每次渲染都重新创建
+  const columns: TableProps<InterfacePermission>['columns'] = useMemo(() => [
     {
       title: (
         <Space>
@@ -231,19 +283,21 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
       dataIndex: 'code',
       key: 'code',
       render: (text: string, record: InterfacePermission) => {
-        if (editingId === record.id) {
+        if (state.editingId === record.id) {
           return (
             <Form.Item
-              validateStatus={errors.code ? 'error' : ''}
-              help={errors.code}
+              validateStatus={state.errors.code ? 'error' : ''}
+              help={state.errors.code}
               style={{ marginBottom: 0 }}
             >
               <Input
                 ref={codeInputRef}
-                value={editForm.code}
-                onChange={(e) => setEditForm(prev => ({ ...prev, code: e.target.value }))}
+                value={state.editForm.code}
+                onChange={(e) => updateState({ 
+                  editForm: { ...state.editForm, code: e.target.value } 
+                })}
                 placeholder="请输入编码"
-                status={errors.code ? 'error' : ''}
+                status={state.errors.code ? 'error' : ''}
               />
             </Form.Item>
           );
@@ -257,19 +311,21 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
       key: 'remark',
       ellipsis: true,
       render: (text: string, record: InterfacePermission) => {
-        if (editingId === record.id) {
+        if (state.editingId === record.id) {
           return (
             <Form.Item
-              validateStatus={errors.remark ? 'error' : ''}
-              help={errors.remark}
+              validateStatus={state.errors.remark ? 'error' : ''}
+              help={state.errors.remark}
               style={{ marginBottom: 0 }}
             >
               <Input
                 ref={remarkInputRef}
-                value={editForm.remark}
-                onChange={(e) => setEditForm(prev => ({ ...prev, remark: e.target.value }))}
+                value={state.editForm.remark}
+                onChange={(e) => updateState({ 
+                  editForm: { ...state.editForm, remark: e.target.value } 
+                })}
                 placeholder="请输入备注"
-                status={errors.remark ? 'error' : ''}
+                status={state.errors.remark ? 'error' : ''}
               />
             </Form.Item>
           );
@@ -283,7 +339,7 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
       width: 120,
       align: 'center',
       render: (_text: string, record: InterfacePermission) => {
-        if (editingId === record.id) {
+        if (state.editingId === record.id) {
           return (
             <Space size="small">
               <Tooltip title="确定">
@@ -293,6 +349,7 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
                   size="small" 
                   onClick={() => handleConfirmEdit(record.id)}
                   style={{ color: '#52c41a' }}
+                  loading={savePermissionMutation.isPending}
                 />
               </Tooltip>
               <Tooltip title="取消">
@@ -314,13 +371,20 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
               <Button type="link" icon={<EditOutlined />} size="small" onClick={() => handleEdit(record)} />
             </Tooltip>
             <Tooltip title="删除">
-              <Button type="link" danger icon={<DeleteOutlined />} size="small" onClick={() => handleDelete(record)} />
+              <Button 
+                type="link" 
+                danger 
+                icon={<DeleteOutlined />} 
+                size="small" 
+                onClick={() => handleDelete(record)}
+                loading={savePermissionMutation.isPending}
+              />
             </Tooltip>
           </Space>
         );
       },
     },
-  ];
+  ], [state.editingId, state.editForm, state.errors, handleAdd, handleEdit, handleConfirmEdit, handleCancelEdit, handleDelete, updateState, savePermissionMutation.isPending]);
 
   return (
     <Card
@@ -341,7 +405,7 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
       <Table
         columns={columns}
         loading={isLoading}
-        dataSource={permissionList}
+        dataSource={state.permissionList}
         rowKey="id"
         pagination={{
           showSizeChanger: true,

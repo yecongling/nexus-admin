@@ -57,7 +57,7 @@
     "@vitejs/plugin-react": "^5.0.1",
     "babel-plugin-react-compiler": "^19.1.0-rc.2",
     "globals": "^16.3.0",
-    "sass-embedded": "^1.90.0",
+    "sass-embedded": "^1.91.0",
     "tailwindcss": "^4.1.12",
     "terser": "^5.43.1",
     "typescript": "~5.9.2",

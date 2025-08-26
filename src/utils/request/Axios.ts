@@ -39,29 +39,19 @@ export class RAxios {
     if (!transform) {
       return;
     }
-    const {
-      requestInterceptors,
-      requestInterceptorsCatch,
-      responseInterceptors,
-      responseInterceptorsCatch,
-    } = transform;
+    const { requestInterceptors, requestInterceptorsCatch, responseInterceptors, responseInterceptorsCatch } =
+      transform;
     // 请求侦听器配置处理
-    this.axiosInstance.interceptors.request.use(
-      (config: InternalAxiosRequestConfig) => {
-        if (requestInterceptors && isFunction(requestInterceptors)) {
-          return requestInterceptors(config, this.options);
-        }
-        return config;
-      },
-      undefined,
-    );
+    this.axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+      if (requestInterceptors && isFunction(requestInterceptors)) {
+        return requestInterceptors(config, this.options);
+      }
+      return config;
+    }, undefined);
     // 请求拦截器错误捕获
     requestInterceptorsCatch &&
       isFunction(requestInterceptorsCatch) &&
-      this.axiosInstance.interceptors.request.use(
-        undefined,
-        requestInterceptorsCatch,
-      );
+      this.axiosInstance.interceptors.request.use(undefined, requestInterceptorsCatch);
     // 响应结果拦截器处理
     this.axiosInstance.interceptors.response.use((res: AxiosResponse<any>) => {
       if (responseInterceptors && isFunction(responseInterceptors)) {
@@ -72,10 +62,7 @@ export class RAxios {
     // 响应结果拦截器错误捕获
     responseInterceptorsCatch &&
       isFunction(responseInterceptorsCatch) &&
-      this.axiosInstance.interceptors.response.use(
-        undefined,
-        responseInterceptorsCatch,
-      );
+      this.axiosInstance.interceptors.response.use(undefined, responseInterceptorsCatch);
   }
 
   /**
@@ -83,17 +70,13 @@ export class RAxios {
    * @param config 请求配置
    * @param options 请求项
    */
-  request<T = any>(
-    config: CreateAxiosOptions,
-    options?: RequestOptions,
-  ): Promise<T> {
+  request<T = any>(config: CreateAxiosOptions, options?: RequestOptions): Promise<T> {
     let conf: CreateAxiosOptions = cloneDeep(config);
     const transform = this.getTransform();
     const { requestOptions } = this.options;
     const opt: RequestOptions = Object.assign({}, requestOptions, options);
     // 请求前的数据处理
-    const { beforeRequestHook, requestCatchHook, transformResponseHook } =
-      transform || {};
+    const { beforeRequestHook, requestCatchHook, transformResponseHook } = transform || {};
     if (beforeRequestHook && isFunction(beforeRequestHook)) {
       conf = beforeRequestHook(conf, opt);
     }
@@ -129,10 +112,7 @@ export class RAxios {
    * @param config
    * @param options
    */
-  get<T = any>(
-    config: AxiosRequestConfig,
-    options?: RequestOptions,
-  ): Promise<T> {
+  get<T = any>(config: AxiosRequestConfig, options?: RequestOptions): Promise<T> {
     return this.request({ ...config, method: 'GET' }, options);
   }
 
@@ -142,11 +122,17 @@ export class RAxios {
    * @param config
    * @param options
    */
-  post<T = any>(
-    config: AxiosRequestConfig,
-    options?: RequestOptions,
-  ): Promise<T> {
+  post<T = any>(config: AxiosRequestConfig, options?: RequestOptions): Promise<T> {
     return this.request({ ...config, method: 'POST' }, options);
+  }
+
+  /**
+   * 封装put请求
+   * @param config
+   * @param options
+   */
+  put<T = any>(config: AxiosRequestConfig, options?: RequestOptions): Promise<T> {
+    return this.request({ ...config, method: 'PUT' }, options);
   }
 
   /**
@@ -154,10 +140,7 @@ export class RAxios {
    * @param config
    * @param options
    */
-  delete<T = any>(
-    config: AxiosRequestConfig,
-    options?: RequestOptions,
-  ): Promise<T> {
+  delete<T = any>(config: AxiosRequestConfig, options?: RequestOptions): Promise<T> {
     return this.request({ ...config, method: 'DELETE' }, options);
   }
 
@@ -166,10 +149,7 @@ export class RAxios {
    * @param config
    * @param options
    */
-  patch<T = any>(
-    config: AxiosRequestConfig,
-    options?: RequestOptions,
-  ): Promise<T> {
+  patch<T = any>(config: AxiosRequestConfig, options?: RequestOptions): Promise<T> {
     return this.request({ ...config, method: 'PATCH' }, options);
   }
 }

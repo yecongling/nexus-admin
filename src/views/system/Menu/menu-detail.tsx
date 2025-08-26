@@ -11,7 +11,7 @@ import { menuService } from '@/services/system/menu/menuApi';
  * 菜单详情
  * @returns 菜单详情
  */
-const MenuDetail: React.FC<MenuDetailProps> = ({ menu, onOpenDrawer }) => {
+const MenuDetail: React.FC<MenuDetailProps> = ({ menu, onOpenDrawer, onDeleteMenu, onCopyMenu }) => {
   const { modal, message } = App.useApp();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -110,14 +110,6 @@ const MenuDetail: React.FC<MenuDetailProps> = ({ menu, onOpenDrawer }) => {
     },
   ];
 
-  // 删除菜单mutation
-  const deleteMenuMutation = useMutation({
-    mutationFn: menuService.deleteMenu,
-    onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['sys_menu'] });
-    },
-  });
-
   /**
    * 删除菜单
    */
@@ -126,8 +118,12 @@ const MenuDetail: React.FC<MenuDetailProps> = ({ menu, onOpenDrawer }) => {
     modal.confirm({
       title: '删除菜单',
       content: '确定删除菜单吗？数据删除后将无法恢复！',
-      onOk: () => {
-        deleteMenuMutation.mutate(menu.id);
+      onOk: async () => {
+        try {
+          await onDeleteMenu(menu.id);
+        } catch (error) {
+          console.error('删除失败:', error);
+        }
       },
     });
   };
@@ -136,8 +132,9 @@ const MenuDetail: React.FC<MenuDetailProps> = ({ menu, onOpenDrawer }) => {
    * 复制菜单
    */
   const handleCopy = () => {
-    // 复制菜单
-    message.warning('复制菜单功能暂未实现');
+    if (menu) {
+      onCopyMenu(menu);
+    }
   };
 
   return (
@@ -192,4 +189,14 @@ export type MenuDetailProps = {
    * @param operation 操作
    */
   onOpenDrawer: (open: boolean, operation: string) => void;
+  /**
+   * 删除菜单
+   * @param menuId 菜单ID
+   */
+  onDeleteMenu: (menuId: string) => Promise<void>;
+  /**
+   * 复制菜单
+   * @param menuData 要复制的菜单数据
+   */
+  onCopyMenu: (menuData: any) => void;
 };

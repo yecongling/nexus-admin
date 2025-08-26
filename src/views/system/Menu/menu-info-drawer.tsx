@@ -65,7 +65,7 @@ export interface MenuData {
  * @param onOk 点击确定
  * @returns 菜单信息抽屉
  */
-const MenuInfoDrawer: React.FC<MenuInfoDrawerProps> = ({ open, operation, onClose, menu, onOk }) => {
+const MenuInfoDrawer: React.FC<MenuInfoDrawerProps> = ({ open, operation, onClose, menu, copiedMenuData, onOk }) => {
   const [form] = Form.useForm();
   const nameRef = useRef<InputRef>(null);
   const [menuType, setMenuType] = useState<MenuType>(MenuType.SUB_MENU);
@@ -77,14 +77,20 @@ const MenuInfoDrawer: React.FC<MenuInfoDrawerProps> = ({ open, operation, onClos
       return;
     }
 
-    if (menu && operation !== 'add') {
+    if (operation === 'add' && copiedMenuData) {
+      // 如果是新增操作且有复制的数据，使用复制的数据
+      form.setFieldsValue(copiedMenuData);
+      setMenuType(copiedMenuData.menuType);
+    } else if (menu && operation !== 'add') {
+      // 如果是编辑操作，使用当前菜单数据
       form.setFieldsValue(menu);
       setMenuType(menu.menuType);
     } else {
+      // 普通新增操作，重置表单
       form.resetFields();
       setMenuType(MenuType.SUB_MENU);
     }
-  }, [menu, form, open]);
+  }, [menu, copiedMenuData, operation, form, open]);
 
   // 递归处理目录数据，对 title 进行国际化
   const translateDirectory = useCallback(
@@ -403,6 +409,10 @@ export type MenuInfoDrawerProps = {
    * 当前选中的菜单
    */
   menu?: MenuData;
+  /**
+   * 复制的菜单数据（用于复制功能）
+   */
+  copiedMenuData?: MenuData;
 
   /**
    * 点击确定

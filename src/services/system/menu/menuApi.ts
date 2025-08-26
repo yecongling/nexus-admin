@@ -1,6 +1,90 @@
 import { HttpRequest } from '@/utils/request';
 import type { MenuDirectoryItem, MenuModel } from './type';
 
+// 接口权限数据类型
+export interface InterfacePermission {
+  id: string;
+  code: string;
+  remark: string;
+  createTime: string;
+  updateTime: string;
+}
+
+// 创建接口权限请求参数
+export interface CreateInterfacePermissionRequest {
+  menuId: string;
+  code: string;
+  remark: string;
+}
+
+// 更新接口权限请求参数
+export interface UpdateInterfacePermissionRequest {
+  id: string;
+  code: string;
+  remark: string;
+}
+
+// 查询接口权限列表请求参数
+export interface QueryInterfacePermissionRequest {
+  menuId: string;
+  pageNum?: number;
+  pageSize?: number;
+  code?: string;
+  remark?: string;
+}
+
+// 查询接口权限列表响应
+export interface QueryInterfacePermissionResponse {
+  list: InterfacePermission[];
+  total: number;
+  pageNum: number;
+  pageSize: number;
+}
+
+// 菜单导入导出相关类型
+export interface MenuExportParams {
+  /**
+   * 菜单名称（可选，用于筛选）
+   */
+  name?: string;
+  /**
+   * 角色ID（可选，用于导出指定角色的菜单）
+   */
+  roleId?: string;
+  /**
+   * 菜单ID列表（可选，用于导出指定菜单）
+   */
+  menuIds?: string[];
+}
+
+export interface MenuImportResult {
+  /**
+   * 导入是否成功
+   */
+  success: boolean;
+  /**
+   * 导入成功的数量
+   */
+  successCount?: number;
+  /**
+   * 导入失败的数量
+   */
+  failCount?: number;
+  /**
+   * 错误信息列表
+   */
+  errors?: string[];
+  /**
+   * 导入结果详情
+   */
+  details?: Array<{
+    row: number;
+    name: string;
+    status: 'success' | 'fail';
+    message?: string;
+  }>;
+}
+
 /**
  * 菜单相关接口枚举
  */
@@ -27,6 +111,16 @@ const MenuApi = {
   importMenus: '/system/menu/import',
   // 验证菜单权限
   checkPermission: '/system/menu/checkPermission',
+  // 查询菜单接口权限列表
+  queryInterfacePermissions: '/api/menu/interface-permissions',
+  // 创建菜单接口权限
+  createInterfacePermission: '/api/menu/interface-permissions',
+  // 更新菜单接口权限
+  updateInterfacePermission: '/api/menu/interface-permissions',
+  // 删除菜单接口权限
+  deleteInterfacePermission: '/api/menu/interface-permissions',
+  // 批量删除菜单接口权限
+  batchDeleteInterfacePermissions: '/api/menu/interface-permissions/batch',
 };
 
 /**
@@ -55,7 +149,7 @@ interface IMenuService {
    * @param params 查询参数
    * @returns 菜单列表
    */
-  getAllMenus(name?: string): Promise<MenuModel[]>;
+  getAllMenus(params: MenuSearchParams): Promise<MenuModel[]>;
 
   /**
    * 获取所有的菜单目录（如果选中的是按钮，就不止以及菜单）
@@ -100,18 +194,18 @@ interface IMenuService {
   toggleMenuStatus(id: string, status: boolean): Promise<boolean>;
 
   /**
-   * 导出菜单
-   * @param params 查询参数
-   * @returns 菜单数据
+   * 导出菜单（Excel格式）
+   * @param params 导出参数
+   * @returns Excel文件Blob
    */
-  exportMenus(params: MenuSearchParams): Promise<Blob>;
+  exportMenus(params: MenuExportParams): Promise<Blob>;
 
   /**
-   * 导入菜单
-   * @param file 文件
+   * 导入菜单（Excel格式）
+   * @param file Excel文件
    * @returns 导入结果
    */
-  importMenus(file: File): Promise<boolean>;
+  importMenus(file: File): Promise<MenuImportResult>;
 
   /**
    * 验证菜单权限
@@ -119,6 +213,45 @@ interface IMenuService {
    * @returns 验证结果
    */
   checkPermission(menuId: string): Promise<boolean>;
+
+  /**
+   * 查询菜单接口权限列表
+   * @param params 查询参数
+   * @returns 接口权限列表
+   */
+  queryInterfacePermissions(params: QueryInterfacePermissionRequest): Promise<QueryInterfacePermissionResponse>;
+
+  /**
+   * 创建菜单接口权限
+   * @param data 创建参数
+   * @returns 创建结果
+   */
+  createInterfacePermission(
+    data: CreateInterfacePermissionRequest,
+  ): Promise<{ success: boolean; data?: InterfacePermission }>;
+
+  /**
+   * 更新菜单接口权限
+   * @param data 更新参数
+   * @returns 更新结果
+   */
+  updateInterfacePermission(
+    data: UpdateInterfacePermissionRequest,
+  ): Promise<{ success: boolean; data?: InterfacePermission }>;
+
+  /**
+   * 删除菜单接口权限
+   * @param id 权限ID
+   * @returns 删除结果
+   */
+  deleteInterfacePermission(id: string): Promise<{ success: boolean }>;
+
+  /**
+   * 批量删除菜单接口权限
+   * @param ids 权限ID数组
+   * @returns 删除结果
+   */
+  batchDeleteInterfacePermissions(ids: string[]): Promise<{ success: boolean }>;
 }
 
 /**
@@ -145,11 +278,11 @@ export const menuService: IMenuService = {
    * @param params 查询参数
    * @returns 菜单列表
    */
-  async getAllMenus(name?: string): Promise<MenuModel[]> {
+  async getAllMenus(params: MenuSearchParams): Promise<MenuModel[]> {
     const data = await HttpRequest.post(
       {
         url: MenuApi.getAllMenus,
-        params: { name },
+        params,
       },
       { successMessageMode: 'none' },
     );
@@ -173,10 +306,13 @@ export const menuService: IMenuService = {
    * @returns 新增结果
    */
   addMenu(params: Partial<MenuModel>): Promise<boolean> {
-    return HttpRequest.post({
-      url: MenuApi.addMenu,
-      data: params,
-    });
+    return HttpRequest.post(
+      {
+        url: MenuApi.addMenu,
+        data: params,
+      },
+      { errorMessageMode: 'none' },
+    );
   },
   /**
    * 修改菜单
@@ -184,10 +320,13 @@ export const menuService: IMenuService = {
    * @returns 修改结果
    */
   updateMenu(params: Partial<MenuModel>): Promise<boolean> {
-    return HttpRequest.post({
-      url: MenuApi.updateMenu,
-      data: params,
-    });
+    return HttpRequest.post(
+      {
+        url: MenuApi.updateMenu,
+        data: params,
+      },
+      { errorMessageMode: 'none' },
+    );
   },
   /**
    * 删除菜单
@@ -195,10 +334,13 @@ export const menuService: IMenuService = {
    * @returns 删除结果
    */
   deleteMenu(menuId: string): Promise<boolean> {
-    return HttpRequest.delete({
-      url: MenuApi.deleteMenu,
-      params: { menuId },
-    });
+    return HttpRequest.delete(
+      {
+        url: MenuApi.deleteMenu,
+        params: { menuId },
+      },
+      { errorMessageMode: 'none', successMessageMode: 'none' },
+    );
   },
   /**
    * 批量删除菜单
@@ -226,29 +368,35 @@ export const menuService: IMenuService = {
   },
 
   /**
-   * 导出菜单
-   * @param params 查询参数
-   * @returns 菜单数据
+   * 导出菜单（Excel格式）
+   * @param params 导出参数
+   * @returns Excel文件Blob
    */
-  exportMenus(params: MenuSearchParams): Promise<Blob> {
-    return HttpRequest.post({
-      url: MenuApi.exportMenus,
-      data: params,
-      responseType: 'blob',
-    });
+  exportMenus(params: MenuExportParams): Promise<Blob> {
+    return HttpRequest.post(
+      {
+        url: MenuApi.exportMenus,
+        data: params,
+        responseType: 'blob',
+      },
+      { successMessageMode: 'none', errorMessageMode: 'none' },
+    );
   },
   /**
-   * 导入菜单
-   * @param file 文件
+   * 导入菜单（Excel格式）
+   * @param file Excel文件
    * @returns 导入结果
    */
-  importMenus(file: File): Promise<boolean> {
+  importMenus(file: File): Promise<MenuImportResult> {
     const formData = new FormData();
     formData.append('file', file);
-    return HttpRequest.post({
-      url: MenuApi.importMenus,
-      data: formData,
-    });
+    return HttpRequest.post(
+      {
+        url: MenuApi.importMenus,
+        data: formData,
+      },
+      { successMessageMode: 'none', errorMessageMode: 'none' },
+    );
   },
   /**
    * 验证菜单权限
@@ -259,6 +407,69 @@ export const menuService: IMenuService = {
     return HttpRequest.post({
       url: MenuApi.checkPermission,
       data: { menuId },
+    });
+  },
+
+  /**
+   * 查询菜单接口权限列表
+   * @param params 查询参数
+   * @returns 接口权限列表
+   */
+  queryInterfacePermissions(params: QueryInterfacePermissionRequest): Promise<QueryInterfacePermissionResponse> {
+    return HttpRequest.get<QueryInterfacePermissionResponse>({
+      url: MenuApi.queryInterfacePermissions,
+      params,
+    });
+  },
+
+  /**
+   * 创建菜单接口权限
+   * @param data 创建参数
+   * @returns 创建结果
+   */
+  createInterfacePermission(
+    data: CreateInterfacePermissionRequest,
+  ): Promise<{ success: boolean; data?: InterfacePermission }> {
+    return HttpRequest.post<{ success: boolean; data?: InterfacePermission }>({
+      url: MenuApi.createInterfacePermission,
+      data,
+    });
+  },
+
+  /**
+   * 更新菜单接口权限
+   * @param data 更新参数
+   * @returns 更新结果
+   */
+  updateInterfacePermission(
+    data: UpdateInterfacePermissionRequest,
+  ): Promise<{ success: boolean; data?: InterfacePermission }> {
+    return HttpRequest.put<{ success: boolean; data?: InterfacePermission }>({
+      url: `${MenuApi.updateInterfacePermission}/${data.id}`,
+      data,
+    });
+  },
+
+  /**
+   * 删除菜单接口权限
+   * @param id 权限ID
+   * @returns 删除结果
+   */
+  deleteInterfacePermission(id: string): Promise<{ success: boolean }> {
+    return HttpRequest.delete<{ success: boolean }>({
+      url: `${MenuApi.deleteInterfacePermission}/${id}`,
+    });
+  },
+
+  /**
+   * 批量删除菜单接口权限
+   * @param ids 权限ID数组
+   * @returns 删除结果
+   */
+  batchDeleteInterfacePermissions(ids: string[]): Promise<{ success: boolean }> {
+    return HttpRequest.delete<{ success: boolean }>({
+      url: MenuApi.batchDeleteInterfacePermissions,
+      data: { ids },
     });
   },
 };
