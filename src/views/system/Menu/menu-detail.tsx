@@ -12,7 +12,7 @@ import { menuService } from '@/services/system/menu/menuApi';
  * @returns 菜单详情
  */
 const MenuDetail: React.FC<MenuDetailProps> = ({ menu, onOpenDrawer, onDeleteMenu, onCopyMenu }) => {
-  const { modal, message } = App.useApp();
+  const { modal } = App.useApp();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
 
