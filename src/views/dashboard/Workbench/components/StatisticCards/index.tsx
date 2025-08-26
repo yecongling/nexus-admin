@@ -61,7 +61,7 @@ export const StatisticCards: React.FC = () => {
 
   if (isLoading) {
     return (
-      <Row gutter={[16, 16]}>
+      <Row gutter={[8, 16]}>
         {[1, 2, 3, 4].map((index) => (
           <Col xs={24} sm={12} lg={6} key={index}>
             <Card className="h-full">
@@ -86,15 +86,16 @@ export const StatisticCards: React.FC = () => {
   }
 
   return (
-    <Row gutter={[16, 16]}>
+    <Row gutter={[8, 16]}>
       {statistics.map((item, index) => (
         <Col xs={24} sm={12} lg={6} key={`stat-${item.title}-${index}`}>
           <div className={styles.statisticCard}>
             <Card 
+              variant="outlined"
               className="h-full border-0 shadow-sm hover:shadow-xl transition-all duration-500 relative overflow-hidden"
               styles={{
                 body: {
-                  padding: '24px'
+                  padding: '16px'
                 }
               }}
             >

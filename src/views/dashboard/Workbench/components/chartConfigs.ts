@@ -119,6 +119,108 @@ export const getFlowTrendChartOption = (data: any): echarts.EChartsCoreOption =>
   ]
 });
 
+// 流程类别占比柱状图配置
+export const getFlowCategoryBarChartOption = (data: any): echarts.EChartsCoreOption => ({
+  title: {
+    text: '流程类别分布',
+    left: 'center',
+    top: 10,
+    textStyle: {
+      fontSize: 14,
+      fontWeight: 'normal',
+      color: '#333'
+    }
+  },
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'shadow'
+    },
+    formatter: (params: any) => {
+      const param = params[0];
+      return `${param.name}<br/>
+              <span style="color: ${param.color};">●</span> 数量: ${param.value.toLocaleString()}`;
+    }
+  },
+  grid: {
+    left: '3%',
+    right: '4%',
+    bottom: '15%',
+    top: '15%',
+    containLabel: true
+  },
+  xAxis: {
+    type: 'category',
+    data: data.categories,
+    axisLine: {
+      lineStyle: {
+        color: '#ddd'
+      }
+    },
+    axisTick: {
+      show: false
+    },
+    axisLabel: {
+      color: '#666',
+      fontSize: 11,
+      rotate: 45,
+      interval: 0
+    }
+  },
+  yAxis: {
+    type: 'value',
+    name: '流程数量',
+    nameTextStyle: {
+      color: '#666',
+      fontSize: 12
+    },
+    axisLine: {
+      show: false
+    },
+    axisTick: {
+      show: false
+    },
+    splitLine: {
+      lineStyle: {
+        color: '#f0f0f0',
+        type: 'dashed'
+      }
+    },
+    axisLabel: {
+      color: '#666',
+      fontSize: 12
+    }
+  },
+  series: [
+    {
+      name: '流程数量',
+      type: 'bar',
+      data: data.categories.map((category: string, index: number) => ({
+        value: data.values[index],
+        itemStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: data.colors[index] + '80' }, // 浅色
+            { offset: 1, color: data.colors[index] } // 深色
+          ])
+        }
+      })),
+      barWidth: '60%',
+      barGap: '10%',
+      itemStyle: {
+        borderRadius: [4, 4, 0, 0]
+      },
+      emphasis: {
+        itemStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: '#1890ff80' },
+            { offset: 1, color: '#1890ff' }
+          ])
+        }
+      }
+    }
+  ]
+});
+
 // 流程类别占比饼图配置
 export const getFlowCategoryChartOption = (data: any): echarts.EChartsCoreOption => ({
   title: {

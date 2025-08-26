@@ -9,6 +9,63 @@
     }
   }
 
+  // 主内容区域卡片样式
+  .mainCard {
+    margin-bottom: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    // 为流程类别占比图表优化
+    .ant-card-body {
+      padding: 20px;
+    }
+    
+    // 为帮助文档优化
+    .ant-descriptions {
+      .ant-descriptions-item-label {
+        font-weight: 500;
+        color: #666;
+      }
+      
+      .ant-descriptions-item-content {
+        color: #333;
+      }
+    }
+  }
+
+  // 侧边栏卡片样式
+  .sidebarCard {
+    margin-bottom: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+    
+    // 为侧边栏卡片添加更紧凑的内容间距
+    .ant-card-body {
+      padding: 16px;
+    }
+    
+    // 标题样式优化
+    .ant-card-head {
+      padding: 0 16px;
+      min-height: 48px;
+      
+      .ant-card-head-title {
+        font-size: 14px;
+        font-weight: 600;
+      }
+    }
+  }
+
   .trend-chart {
     .chart-container {
       position: relative;
@@ -93,6 +150,42 @@
     .trend-chart {
       .chart-container {
         height: 200px;
+      }
+    }
+    
+    // 移动端侧边栏卡片样式调整
+    .sidebarCard {
+      .ant-card-body {
+        padding: 12px;
+      }
+      
+      .ant-card-head {
+        padding: 0 12px;
+        min-height: 44px;
+      }
+    }
+    
+    // 移动端主内容区域卡片样式调整
+    .mainCard {
+      .ant-card-body {
+        padding: 16px;
+      }
+    }
+  }
+}
+
+// 大屏幕优化
+@media (min-width: 1200px) {
+  .workbench {
+    .mainCard {
+      .ant-card-body {
+        padding: 24px;
+      }
+    }
+    
+    .sidebarCard {
+      .ant-card-body {
+        padding: 20px;
       }
     }
   }

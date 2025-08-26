@@ -1,7 +1,9 @@
 .statisticCard {
   position: relative;
   overflow: hidden;
-  border-radius: 12px;
+  background: transparent;
+  border: none;
+  // border-radius: 12px;
   
   // 卡片悬停效果
   &:hover {

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Row, Col, Card, Typography } from 'antd';
+import { Row, Col, Card } from 'antd';
 import type React from 'react';
 import {
   StatisticCards,
@@ -12,22 +12,17 @@ import {
   FlowCategoryChart,
   TodoReminders,
   FailedFlowsList,
-  PendingFlowsList
+  PendingFlowsList,
 } from './components';
 import { mockWorkbenchData } from './mockData';
 import styles from './Workbench.module.scss';
-import { useUserStore } from '@/stores/userStore';
-
-const { Title } = Typography;
+import ProjectDescription from './components/ProjectDescription';
 
 /**
  * 工作台
  * @returns 工作台组件
  */
 const Workbench: React.FC = () => {
-
-  const { loginUser } = useUserStore();
-
   const { data: workbenchData, isLoading } = useQuery({
     queryKey: ['workbench'],
     queryFn: mockWorkbenchData,
@@ -45,79 +40,77 @@ const Workbench: React.FC = () => {
   }
 
   return (
-    <div className={`p-6 bg-gray-50 min-h-screen ${styles.workbench}`}>
-      {/* 欢迎信息 */}
-      <div className="mb-6">
-        <Title level={2} className="text-gray-800">
-          欢迎回来, {loginUser}
-        </Title>
-      </div>
-
+    <div className={`p-4 min-h-screen ${styles.workbench}`}>
       {/* 统计卡片 */}
       <StatisticCards />
 
-      <Row gutter={[24, 24]} className="mt-6">
-        {/* 左侧主要内容区域 */}
-        <Col xs={24} lg={16}>
+      <Row gutter={[8, 24]} className="mt-2">
+        {/* 左侧主要内容区域 - 调整为更大的比例 */}
+        <Col xs={24} xl={18} lg={16} className="flex! flex-col gap-2">
           {/* 流程运行时间趋势图 */}
-          <Card 
-            title="流程运行时间趋势图 (近7日)" 
-            className="mb-6"
+          <Card
+            title="流程运行时间趋势图 (近7日)"
+            className={styles.mainCard}
             styles={{
               header: {
                 borderBottom: 'none',
-              }
+              },
             }}
           >
             <FlowTrendChart />
           </Card>
 
           {/* 热门流程 TOP5 */}
-          <Card title="热门流程 TOP5" className="mb-6">
+          <Card title="热门流程 TOP5" className={styles.mainCard}>
             <HotFlowsTable />
           </Card>
 
           {/* 失败流程列表 */}
-          <Card title="失败流程列表" className="mb-6">
+          <Card title="失败流程列表" className={styles.mainCard}>
             <FailedFlowsList />
           </Card>
 
           {/* 等待人工处理的流程 */}
-          <Card title="等待人工处理的流程" className="mb-6">
+          <Card title="等待人工处理的流程" className={styles.mainCard}>
             <PendingFlowsList />
+          </Card>
+
+          {/* 流程类别占比 - 移动到左侧 */}
+          <Card title="流程类别分布" className={styles.mainCard}>
+            <FlowCategoryChart />
+          </Card>
+
+          {/* 项目介绍 */}
+          <Card className={styles.mainCard}>
+            <ProjectDescription />
           </Card>
         </Col>
 
-        {/* 右侧边栏 */}
-        <Col xs={24} lg={8}>
+        {/* 右侧边栏 - 调整比例并增加间距 */}
+        <Col xs={24} xl={6} lg={8} className="flex! flex-col gap-2">
           {/* 快捷入口 */}
-          <Card title="快捷入口" className="mb-6" extra={<a href="/workflow/manage">管理</a>}>
+          <Card title="快捷入口" className={styles.sidebarCard} extra={<a href="/dashboard/workbench">管理</a>}>
             <QuickAccess />
           </Card>
 
           {/* 最近访问 */}
-          <Card title="最近访问" className="mb-6">
+          <Card title="最近访问" className={styles.sidebarCard}>
             <RecentVisits />
           </Card>
 
           {/* 待办提醒 / 异常警报 */}
-          <Card title="待办提醒 / 异常警报" className="mb-6">
+          <Card title="待办提醒 / 异常警报" className={styles.sidebarCard}>
             <TodoReminders />
           </Card>
 
           {/* 公告 */}
-          <Card title="公告" className="mb-6" extra={<a href="/announcements">查看更多</a>}>
+          <Card title="公告" className={styles.sidebarCard} extra={<a href="/announcements">查看更多</a>}>
             <Announcements />
           </Card>
 
           {/* 帮助文档 */}
-          <Card title="帮助文档" className="mb-6" extra={<a href="/help">查看更多</a>}>
+          <Card title="帮助文档" className={styles.mainCard} extra={<a href="/help">查看更多</a>}>
             <HelpDocuments />
-          </Card>
-
-          {/* 流程类别占比 */}
-          <Card title="流程类别占比" className="mb-6">
-            <FlowCategoryChart />
           </Card>
         </Col>
       </Row>

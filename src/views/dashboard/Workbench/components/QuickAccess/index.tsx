@@ -127,7 +127,7 @@ export const QuickAccess: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         {[1, 2, 3, 4, 5, 6].map((index) => (
           <div key={index} className="animate-pulse">
             <div className="h-24 bg-gray-200 rounded-lg"></div>
@@ -146,14 +146,14 @@ export const QuickAccess: React.FC = () => {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-3 gap-4">
       {quickAccess.map((item, index) => {
         const config = getQuickAccessConfig(index);
         
         return (
           <div
             key={`quick-${item.title}-${index}`}
-            className={`${styles.quickAccessCard} group cursor-pointer p-4 rounded-lg border transition-all duration-300 ${config.bgColor} ${config.borderColor} ${config.hoverBorderColor} ${config.hoverBgColor}`}
+            className={`${styles.quickAccessCard} group cursor-pointer p-2 rounded-lg border transition-all duration-300 ${config.bgColor} ${config.borderColor} ${config.hoverBorderColor} ${config.hoverBgColor}`}
           >
             <div className="flex flex-col items-center text-center">
               {/* 图标容器 */}

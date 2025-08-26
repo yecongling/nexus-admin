@@ -1,6 +1,6 @@
 import type React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Table, Tag, Button, Avatar } from 'antd';
+import { Table, Tag, Button, Avatar, type TableProps } from 'antd';
 import { UserOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import type { PendingFlow } from '../../mockData';
 
@@ -67,7 +67,7 @@ export const PendingFlowsList: React.FC = () => {
     }
   };
 
-  const columns = [
+  const columns:TableProps['columns'] = [
     {
       title: '流程名称',
       dataIndex: 'name',
@@ -103,7 +103,7 @@ export const PendingFlowsList: React.FC = () => {
       key: 'assignee',
       render: (assignee?: string) => (
         <div className="flex items-center">
-          <Avatar size="small" icon={<UserOutlined />} className="mr-2" />
+          <Avatar size="small" icon={<UserOutlined />} className="mr-2!" />
           <span className="text-gray-700">{assignee || '未分配'}</span>
         </div>
       ),
@@ -111,7 +111,8 @@ export const PendingFlowsList: React.FC = () => {
     {
       title: '操作',
       key: 'action',
-      render: (_: any, record: PendingFlow) => (
+      align: 'center',
+      render: (_: any, record: any) => (
         <Button 
           type="primary" 
           size="small"

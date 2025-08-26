@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ReloadOutlined, PlusOutlined, EditOutlined, DeleteOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import { ReloadOutlined, EditOutlined, DeleteOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { Card, Table, Button, Space, Tag, Modal, Tooltip, type TableProps, Input, Form } from 'antd';
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import type React from 'react';
@@ -135,6 +135,17 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
 
   // 添加接口权限
   const handleAdd = useCallback(() => {
+    // 检查是否有未保存的编辑数据
+    if (state.editingId) {
+      Modal.warning({
+        title: '请先完成当前编辑',
+        content: '您有未保存的编辑数据，请先完成保存或取消编辑后再添加新行。',
+        okText: '知道了',
+        centered: true,
+      });
+      return;
+    }
+
     const newRow: InterfacePermission = {
       id: `temp_${state.nextId}`,
       code: '',
@@ -150,7 +161,7 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
       nextId: state.nextId + 1,
       errors: {},
     });
-  }, [state.permissionList, state.nextId, updateState]);
+  }, [state.editingId, state.permissionList, state.nextId, updateState]);
 
   // 开始编辑
   const handleEdit = useCallback((record: InterfacePermission) => {
@@ -265,13 +276,7 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
   // 使用useMemo优化表格列定义，避免每次渲染都重新创建
   const columns: TableProps<InterfacePermission>['columns'] = useMemo(() => [
     {
-      title: (
-        <Space>
-          <Tooltip title="添加接口">
-            <Button type="primary" shape="circle" icon={<PlusOutlined />} size="small" onClick={handleAdd} />
-          </Tooltip>
-        </Space>
-      ),
+      title: '序号',
       dataIndex: 'id',
       key: 'id',
       width: 80,
@@ -417,6 +422,56 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
         scroll={{ x: 'max-content' }}
         size="middle"
         bordered
+        footer={() => {
+          // 检查是否有菜单数据
+          const hasMenuData = !!menu?.id;
+          // 检查是否有未保存的编辑数据
+          const hasUnsavedData = !!state.editingId;
+          
+          // 根据状态决定按钮的样式和文本
+          let buttonText = '添加一行';
+          let buttonType: 'dashed' | 'default' = 'dashed';
+          let buttonDisabled = false;
+          let tooltipText = '点击添加新行';
+          
+          if (!hasMenuData) {
+            buttonText = '请先选择菜单';
+            buttonType = 'default';
+            buttonDisabled = true;
+            tooltipText = '请先选择菜单后再添加接口权限';
+          } else if (hasUnsavedData) {
+            buttonText = '请先完成当前编辑';
+            buttonType = 'default';
+            buttonDisabled = true;
+            tooltipText = '您有未保存的编辑数据，请先完成保存或取消编辑';
+          }
+          
+          return (
+            <div className="flex flex-col items-center">
+              <div className="text-xs text-gray-500">
+                {hasUnsavedData && (
+                  <span className="text-orange-500">
+                    ⚠️ 有未保存的编辑数据，请先完成保存后继续添加
+                  </span>
+                )}
+                {!hasMenuData && (
+                  <span className="text-gray-400">
+                    📋 请先选择菜单
+                  </span>
+                )}
+              </div>
+              <Button 
+                type={buttonType}
+                style={{ width: '100%'}} 
+                onClick={handleAdd}
+                disabled={buttonDisabled}
+                title={tooltipText}
+              >
+                {buttonText}
+              </Button>
+            </div>
+          );
+        }}
       />
     </Card>
   );

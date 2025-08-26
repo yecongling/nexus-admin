@@ -1,5 +1,6 @@
 import type React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Descriptions, Divider } from 'antd';
 import type { HelpDocument } from '../../mockData';
 
 // 模拟获取帮助文档数据的API
@@ -40,12 +41,21 @@ export const HelpDocuments: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="space-y-2">
-        {[1, 2, 3, 4].map((index) => (
-          <div key={index} className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded"></div>
-          </div>
-        ))}
+      <div className="space-y-4">
+        <div className="animate-pulse">
+          <div className="h-4 bg-gray-200 rounded mb-2"></div>
+          <div className="h-3 bg-gray-200 rounded mb-1"></div>
+          <div className="h-3 bg-gray-200 rounded mb-1"></div>
+          <div className="h-3 bg-gray-200 rounded"></div>
+        </div>
+        <Divider />
+        <div className="space-y-2">
+          {[1, 2, 3, 4].map((index) => (
+            <div key={index} className="animate-pulse">
+              <div className="h-8 bg-gray-200 rounded"></div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -59,18 +69,22 @@ export const HelpDocuments: React.FC = () => {
   }
 
   return (
-    <div className="space-y-2">
-      {helpDocuments.map((item) => (
-        <div
-          key={item.id}
-          className="flex items-center p-2 rounded-lg hover:bg-blue-50 cursor-pointer transition-colors duration-200"
-        >
-          <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
-          <span className="text-sm text-blue-600 hover:text-blue-800">
-            {item.title}
-          </span>
+    <div className="space-y-4">
+      {/* 帮助文档列表 */}
+        <h4 className="text-base font-semibold text-gray-800 mb-3">帮助文档</h4>
+        <div className="space-y-2">
+          {helpDocuments.map((item) => (
+            <div
+              key={item.id}
+              className="flex items-center p-2 rounded-lg hover:bg-blue-50 cursor-pointer transition-colors duration-200"
+            >
+              <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+              <span className="text-sm text-blue-600 hover:text-blue-800">
+                {item.title}
+              </span>
+            </div>
+          ))}
         </div>
-      ))}
     </div>
   );
 };

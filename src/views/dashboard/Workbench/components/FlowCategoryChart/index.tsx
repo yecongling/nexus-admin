@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import echarts from '@/config/echartsConfig';
 import type { CategoryData } from '../../mockData';
-import { getFlowCategoryChartOption, getResponsiveChartOption } from '../chartConfigs';
+import { getFlowCategoryBarChartOption, getResponsiveChartOption } from '../chartConfigs';
 
 // 模拟获取类别数据的API
 const fetchCategoryData = async (): Promise<CategoryData> => {
@@ -11,10 +11,19 @@ const fetchCategoryData = async (): Promise<CategoryData> => {
   await new Promise(resolve => setTimeout(resolve, 300));
   
   return {
-    categories: ['成功流程', '失败流程', '等待中流程'],
-    values: [48, 36, 16],
-    total: 928531,
-    colors: ['#52c41a', '#ff4d4f', '#faad14']
+    categories: [
+      '财务审批流程', 
+      '人事变动申请', 
+      '设备采购申请', 
+      '项目立项流程', 
+      '合同审批流程',
+      '报销申请流程',
+      '请假申请流程',
+      '培训申请流程'
+    ],
+    values: [156, 89, 234, 67, 189, 312, 145, 78],
+    total: 1320,
+    colors: ['#1890ff', '#52c41a', '#faad14', '#f5222d', '#722ed1', '#13c2c2', '#eb2f96', '#fa8c16']
   };
 };
 
@@ -44,7 +53,7 @@ export const FlowCategoryChart: React.FC = () => {
     }
 
     // 使用配置工具生成图表选项
-    const baseOption = getFlowCategoryChartOption(chartData);
+    const baseOption = getFlowCategoryBarChartOption(chartData);
     const isMobile = window.innerWidth < 768;
     const option = getResponsiveChartOption(baseOption, isMobile);
 
@@ -69,7 +78,7 @@ export const FlowCategoryChart: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-48">
+      <div className="flex items-center justify-center h-64">
         <div className="text-gray-500">加载中...</div>
       </div>
     );
@@ -77,7 +86,7 @@ export const FlowCategoryChart: React.FC = () => {
 
   if (!chartData) {
     return (
-      <div className="flex items-center justify-center h-48">
+      <div className="flex items-center justify-center h-64">
         <div className="text-gray-500">暂无数据</div>
       </div>
     );
@@ -92,20 +101,22 @@ export const FlowCategoryChart: React.FC = () => {
         <div className="text-sm text-gray-500">总流程量</div>
       </div>
       
-      <div ref={chartRef} className="w-full h-48" />
+      <div ref={chartRef} className="w-full h-64" />
       
       {/* 图例 */}
-      <div className="mt-4 space-y-2">
+      <div className="mt-4 grid grid-cols-2 gap-2">
         {chartData.categories.map((category, index) => (
-          <div key={`legend-${category}`} className="flex items-center justify-between">
+          <div key={`legend-${category}`} className="flex items-center justify-between text-xs">
             <div className="flex items-center">
               <div 
-                className="w-3 h-3 rounded-full mr-2"
-                style={{ backgroundColor: chartData.colors[index] }}
+                className="w-3 h-3 rounded mr-2"
+                style={{ 
+                  background: `linear-gradient(to bottom, ${chartData.colors[index]}40, ${chartData.colors[index]})`
+                }}
               ></div>
-              <span className="text-sm text-gray-700">{category}</span>
+              <span className="text-gray-700 truncate">{category}</span>
             </div>
-            <span className="text-sm font-medium text-gray-800">
+            <span className="text-gray-800 font-medium">
               {chartData.values[index].toLocaleString()}
             </span>
           </div>
