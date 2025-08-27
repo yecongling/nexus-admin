@@ -386,11 +386,12 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
       <div className="tab-bar-content">
         <Tabs
           type="editable-card"
-          tabBarGutter={4}
+          tabBarGutter={0}
           activeKey={activeKey}
           onChange={handleTabChange}
           onEdit={handleTabEdit}
           items={tabItems}
+          size="small"
           hideAdd
           className="tab-bar-tabs"
           style={{ margin: 0, flex: 1 }}

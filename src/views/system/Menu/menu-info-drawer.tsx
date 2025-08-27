@@ -51,6 +51,8 @@ export interface MenuData {
   sortNo?: number;
   route?: boolean;
   hidden?: boolean;
+  // 路由缓存
+  keepAlive?: boolean;
   internalOrExternal?: boolean;
   status: boolean;
   perms?: string;
@@ -301,7 +303,7 @@ const MenuInfoDrawer: React.FC<MenuInfoDrawerProps> = ({ open, operation, onClos
                     },
                   ]}
                 >
-                  <Input allowClear addonBefore="views/" addonAfter="/index.tsx" autoComplete="off" />
+                  <Input allowClear placeholder="请输入前端组件" addonBefore="views/" addonAfter="/index.tsx" autoComplete="off" />
                 </Form.Item>
                 <Form.Item name="componentName" label="组件名称">
                   <Input allowClear autoComplete="off" />
@@ -314,6 +316,7 @@ const MenuInfoDrawer: React.FC<MenuInfoDrawerProps> = ({ open, operation, onClos
             <Form.Item name="originalIcon" label="菜单图标">
               <Input
                 allowClear
+                placeholder="请选择菜单图标"
                 autoComplete="off"
                 addonAfter={
                   <Dropdown
@@ -376,19 +379,24 @@ const MenuInfoDrawer: React.FC<MenuInfoDrawerProps> = ({ open, operation, onClos
           </Form.Item>
         )}
         {menuType === MenuType.SUB_MENU && (
-          <Form.Item
-            name="internalOrExternal"
-            label={
-              <>
-                <Tooltip className="mr-1" title="选择是外链，则路由地址需要以`http(s)://开头`">
-                  <QuestionCircleFilled />
-                </Tooltip>
-                打开方式
-              </>
-            }
-          >
-            <Switch checkedChildren="外部" unCheckedChildren="内部" />
-          </Form.Item>
+          <>
+            <Form.Item name="keepAlive" label="路由缓存">
+              <Switch checkedChildren="是" unCheckedChildren="否" />
+            </Form.Item>
+            <Form.Item
+              name="internalOrExternal"
+              label={
+                <>
+                  <Tooltip className="mr-1" title="选择是外链，则路由地址需要以`http(s)://开头`">
+                    <QuestionCircleFilled />
+                  </Tooltip>
+                  打开方式
+                </>
+              }
+            >
+              <Switch checkedChildren="外部" unCheckedChildren="内部" />
+            </Form.Item>
+          </>
         )}
         <Form.Item name="status" label="状态">
           <Switch checkedChildren="正常" unCheckedChildren="停用" />
