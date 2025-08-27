@@ -11,7 +11,9 @@ import CollapseSwitch from './component/CollapseSwitch';
 import LanguageSwitch from './component/LanguageSwitch';
 import BreadcrumbNavWrapper from './component/BreadcrumbNavWrapper';
 import HeaderMenu from './component/HeaderMenu';
+import TabBar from '@/components/TabBar';
 import { usePreferencesStore } from '@/stores/store';
+import './header.scss';
 
 const Setting = React.lazy(() => import('./component/Setting'));
 
@@ -39,18 +41,21 @@ const Header = () => {
     <>
       {headerEnable ? (
         <Layout.Header
-          className="ant-layout-header flex items-center h-[60px]!"
+          className="ant-layout-header header-container h-auto!"
           style={{
             borderBottom: ' 1px solid #e9edf0',
+            padding: 0,
           }}
         >
-          {/* 侧边栏切换按钮 */}
-          {sidebarToggle && <CollapseSwitch />}
-          {/* 面包屑 */}
-          <BreadcrumbNavWrapper />
-          {/* 显示头部横向的菜单 */}
-          <HeaderMenu />
-          <Space size="large" className="flex justify-end items-center toolbox">
+          {/* 第一行：主要功能区域 */}
+          <div className="header-main-row">
+            {/* 侧边栏切换按钮 */}
+            {sidebarToggle && <CollapseSwitch />}
+            {/* 面包屑 */}
+            <BreadcrumbNavWrapper />
+            {/* 显示头部横向的菜单 */}
+            <HeaderMenu />
+            <Space size="large" className="flex justify-end items-center toolbox">
             {/* 全局搜索 */}
             {globalSearch && <SearchMenuModal />}
             <Tooltip placement="bottom" title="github">
@@ -88,7 +93,13 @@ const Header = () => {
             {fullscreen && <FullScreen />}
             {/* 用户信息 */}
             <UserDropdown />
-          </Space>
+            </Space>
+          </div>
+          
+          {/* 第二行：TabBar区域 */}
+          <div className="header-tab-row">
+            <TabBar />
+          </div>
         </Layout.Header>
       ) : (
         <FloatButton

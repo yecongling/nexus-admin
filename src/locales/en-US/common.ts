@@ -56,5 +56,16 @@ const translation = {
     created: 'Tag created successfully',
     failed: 'Tag creation failed',
   },
+  // Tab related
+  close: 'Close',
+  pin: 'Pin',
+  unpin: 'Unpin',
+  maximize: 'Maximize',
+  reload: 'Reload',
+  openInNewWindow: 'Open in new window',
+  closeLeftTabs: 'Close left tabs',
+  closeRightTabs: 'Close right tabs',
+  closeOtherTabs: 'Close other tabs',
+  closeAllTabs: 'Close all tabs',
 };
 export default translation;

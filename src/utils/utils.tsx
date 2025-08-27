@@ -94,7 +94,7 @@ const customIcons: { [key: string]: any } = Icons;
  * 图标库
  * @param name 图表名
  */
-export const getIcon = (name: string | undefined) => {
+export const getIcon = (name: string | undefined | null) => {
   if (name && name.indexOf('nexus') > -1) {
     return <MyIcon type={`${name}`} />;
   }
@@ -106,7 +106,7 @@ export const getIcon = (name: string | undefined) => {
  * @param name 图标名
  * @returns
  */
-export const addIcon = (name: string | undefined) => {
+export const addIcon = (name: string | undefined | null) => {
   if (!name || !customIcons[name]) {
     return null;
   }
