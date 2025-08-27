@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import { Tabs, Dropdown, Button, type TabsProps, type MenuProps } from 'antd';
 import { useNavigate, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +17,9 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  
+  // 使用ref来跟踪是否正在关闭tab，避免useEffect重复执行
+  const isClosingTabRef = useRef(false);
 
   const {
     tabs,
@@ -56,9 +59,17 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
 
   // 当路径变化时，自动添加或激活tab
   React.useEffect(() => {
+    // 如果正在关闭tab，跳过执行
+    if (isClosingTabRef.current) {
+      isClosingTabRef.current = false;
+      return;
+    }
+    
     if (!pathname || pathname === '/login') return;
+    
     const route = findRouteByPath(pathname);
     if (!route) return;
+    
     const tabItem: TabItem = {
       key: pathname,
       label: route.meta?.title || pathname,
@@ -77,7 +88,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
       // tab已存在，只激活它
       setActiveKey(pathname);
     }
-  }, [pathname, findRouteByPath, tabs, setActiveKey]);
+  }, [pathname, findRouteByPath, setActiveKey]);
 
   // 处理tab切换
   const handleTabChange = useCallback(
@@ -92,6 +103,8 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
   const handleTabEdit = useCallback(
     (e: React.Key | React.MouseEvent<Element, MouseEvent> | React.KeyboardEvent<Element>, action: 'add' | 'remove') => {
       if (action === 'remove' && typeof e === 'string') {
+        // 标记正在关闭tab
+        isClosingTabRef.current = true;
         const newActiveKey = removeTab(e);
         // 如果关闭的是当前激活的tab，需要跳转到新的激活tab
         if (e === activeKey && newActiveKey) {
@@ -111,6 +124,8 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
           label: t('common.close'),
           icon: <span>✕</span>,
           onClick: () => {
+            // 标记正在关闭tab
+            isClosingTabRef.current = true;
             const newActiveKey = removeTab(tab.key);
             // 如果关闭的是当前激活的tab，需要跳转到新的激活tab
             if (tab.key === activeKey && newActiveKey) {
@@ -157,25 +172,55 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
           key: 'closeLeft',
           label: t('common.closeLeftTabs'),
           icon: <span>◀</span>,
-          onClick: () => closeLeftTabs(tab.key),
+          onClick: () => {
+            // 标记正在关闭tab
+            isClosingTabRef.current = true;
+            const newActiveKey = closeLeftTabs(tab.key);
+            // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
+            if (newActiveKey && newActiveKey !== activeKey) {
+              navigate(newActiveKey);
+            }
+          },
         },
         {
           key: 'closeRight',
           label: t('common.closeRightTabs'),
           icon: <span>▶</span>,
-          onClick: () => closeRightTabs(tab.key),
+          onClick: () => {
+            // 标记正在关闭tab
+            isClosingTabRef.current = true;
+            const newActiveKey = closeRightTabs(tab.key);
+            // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
+            if (newActiveKey && newActiveKey !== activeKey) {
+              navigate(newActiveKey);
+            }
+          },
         },
         {
           key: 'closeOthers',
           label: t('common.closeOtherTabs'),
           icon: <span>❌</span>,
-          onClick: () => closeOtherTabs(tab.key),
+          onClick: () => {
+            // 标记正在关闭tab
+            isClosingTabRef.current = true;
+            const newActiveKey = closeOtherTabs(tab.key);
+            // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
+            if (newActiveKey && newActiveKey !== activeKey) {
+              navigate(newActiveKey);
+            }
+          },
         },
         {
           key: 'closeAll',
           label: t('common.closeAllTabs'),
           icon: <span>⫷</span>,
-          onClick: () => closeAllTabs(),
+          onClick: () => {
+            // 标记正在关闭tab
+            isClosingTabRef.current = true;
+            closeAllTabs();
+            // 关闭所有tab后跳转到首页或登录页
+            navigate('/');
+          },
         },
       ];
     },
@@ -191,6 +236,8 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
         icon: <span>✕</span>,
         onClick: () => {
           if (activeKey) {
+            // 标记正在关闭tab
+            isClosingTabRef.current = true;
             const newActiveKey = removeTab(activeKey);
             // 如果关闭的是当前激活的tab，需要跳转到新的激活tab
             if (newActiveKey) {
@@ -244,7 +291,13 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
         icon: <span>◀</span>,
         onClick: () => {
           if (activeKey) {
-            closeLeftTabs(activeKey);
+            // 标记正在关闭tab
+            isClosingTabRef.current = true;
+            const newActiveKey = closeLeftTabs(activeKey);
+            // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
+            if (newActiveKey && newActiveKey !== activeKey) {
+              navigate(newActiveKey);
+            }
           }
         },
       },
@@ -254,7 +307,13 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
         icon: <span>▶</span>,
         onClick: () => {
           if (activeKey) {
-            closeRightTabs(activeKey);
+            // 标记正在关闭tab
+            isClosingTabRef.current = true;
+            const newActiveKey = closeRightTabs(activeKey);
+            // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
+            if (newActiveKey && newActiveKey !== activeKey) {
+              navigate(newActiveKey);
+            }
           }
         },
       },
@@ -264,7 +323,13 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
         icon: <span>❌</span>,
         onClick: () => {
           if (activeKey) {
-            closeOtherTabs(activeKey);
+            // 标记正在关闭tab
+            isClosingTabRef.current = true;
+            const newActiveKey = closeOtherTabs(activeKey);
+            // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
+            if (newActiveKey && newActiveKey !== activeKey) {
+              navigate(newActiveKey);
+            }
           }
         },
       },
@@ -272,7 +337,13 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
         key: 'closeAll',
         label: t('common.closeAllTabs'),
         icon: <span>⫷</span>,
-        onClick: () => closeAllTabs(),
+        onClick: () => {
+          // 标记正在关闭tab
+          isClosingTabRef.current = true;
+          closeAllTabs();
+          // 关闭所有tab后跳转到首页或登录页
+          navigate('/');
+        },
       },
     ];
   }, [

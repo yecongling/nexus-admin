@@ -24,13 +24,13 @@ interface TabStore {
   // 设置激活的tab
   setActiveKey: (key: string) => void;
   // 关闭其他tabs
-  closeOtherTabs: (targetKey: string) => void;
+  closeOtherTabs: (targetKey: string) => string;
   // 关闭左侧tabs
-  closeLeftTabs: (targetKey: string) => void;
+  closeLeftTabs: (targetKey: string) => string;
   // 关闭右侧tabs
-  closeRightTabs: (targetKey: string) => void;
+  closeRightTabs: (targetKey: string) => string;
   // 关闭所有tabs
-  closeAllTabs: () => void;
+  closeAllTabs: () => string;
   // 重新加载tab
   reloadTab: (targetKey: string) => void;
   // 固定tab
@@ -100,36 +100,55 @@ export const useTabStore = create<TabStore>()(
       },
 
       closeOtherTabs: (targetKey: string) => {
-        const { tabs } = get();
+        const { tabs, activeKey } = get();
         const targetTab = tabs.find((tab) => tab.key === targetKey);
         if (targetTab) {
+          // 如果当前激活的tab不在保留的tab中，需要激活目标tab
+          const newActiveKey = tabs.some(tab => tab.key === activeKey) ? activeKey : targetKey;
           set({
             tabs: [targetTab],
-            activeKey: targetKey,
+            activeKey: newActiveKey,
           });
+          return newActiveKey;
         }
+        return activeKey;
       },
 
       closeLeftTabs: (targetKey: string) => {
-        const { tabs } = get();
+        const { tabs, activeKey } = get();
         const targetIndex = tabs.findIndex((tab) => tab.key === targetKey);
         if (targetIndex > 0) {
           const newTabs = tabs.slice(targetIndex);
-          set({ tabs: newTabs });
+          // 如果当前激活的tab不在保留的tab中，需要激活目标tab
+          const newActiveKey = newTabs.some(tab => tab.key === activeKey) ? activeKey : targetKey;
+          set({ 
+            tabs: newTabs,
+            activeKey: newActiveKey
+          });
+          return newActiveKey;
         }
+        return activeKey;
       },
 
       closeRightTabs: (targetKey: string) => {
-        const { tabs } = get();
+        const { tabs, activeKey } = get();
         const targetIndex = tabs.findIndex((tab) => tab.key === targetKey);
         if (targetIndex >= 0 && targetIndex < tabs.length - 1) {
           const newTabs = tabs.slice(0, targetIndex + 1);
-          set({ tabs: newTabs });
+          // 如果当前激活的tab不在保留的tab中，需要激活目标tab
+          const newActiveKey = newTabs.some(tab => tab.key === activeKey) ? activeKey : targetKey;
+          set({ 
+            tabs: newTabs,
+            activeKey: newActiveKey
+          });
+          return newActiveKey;
         }
+        return activeKey;
       },
 
       closeAllTabs: () => {
         set({ tabs: [], activeKey: '' });
+        return '';
       },
 
       reloadTab: (targetKey: string) => {
