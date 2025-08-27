@@ -56,5 +56,16 @@ const translation = {
     created: '标签创建成功',
     failed: '标签创建失败',
   },
+  // Tab相关
+  close: '关闭',
+  pin: '固定',
+  unpin: '取消固定',
+  maximize: '最大化',
+  reload: '重新加载',
+  openInNewWindow: '在新窗口打开',
+  closeLeftTabs: '关闭左侧标签页',
+  closeRightTabs: '关闭右侧标签页',
+  closeOtherTabs: '关闭其它标签页',
+  closeAllTabs: '关闭全部标签页',
 };
 export default translation;
