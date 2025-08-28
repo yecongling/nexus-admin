@@ -50,9 +50,9 @@ export const getColumns = (
     align: 'center',
     render: (text: number) => {
       if (text === 1) {
-        return <ManOutlined className="text-blue-500" />;
+        return <ManOutlined className="text-blue-500!" />;
       } else if (text === 2) {
-        return <WomanOutlined className="text-pink-500" />;
+        return <WomanOutlined className="text-pink-500!" />;
       }
       return <span className="text-gray-400">-</span>;
     },
