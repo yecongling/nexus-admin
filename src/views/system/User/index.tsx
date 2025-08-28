@@ -4,9 +4,8 @@ import {
   UserOutlined,
   LockOutlined,
   CheckCircleOutlined,
-  ExclamationCircleOutlined,
 } from '@ant-design/icons';
-import { Card, Table, App, Row, Col, Statistic, Progress, Divider, Space, Typography, Badge } from 'antd';
+import { Card, Table, App, Statistic, Progress, Typography } from 'antd';
 import type React from 'react';
 import { useMemo, useReducer, useState } from 'react';
 import useParentSize from '@/hooks/useParentSize';
@@ -33,7 +32,7 @@ const User: React.FC = () => {
   const { modal, message } = App.useApp();
   const colorPrimary = usePreferencesStore((state) => state.preferences.theme.colorPrimary);
   const { t } = useTranslation();
-  const { Title: AntTitle, Text: AntText } = Typography;
+  const { Text: AntText } = Typography;
 
   // 权限检查
   const canUpdatePassword = usePermission(['sys:user:updatePassword']);
@@ -163,14 +162,6 @@ const User: React.FC = () => {
       },
     });
   };
-
-  // 处理用户更新状态
-  const handleUpdateStatusMutation = useMutation({
-    mutationFn: (record: UserModel) => userService.updateBatchUserStatus([record.id], record.status === 1 ? 0 : 1),
-    onSuccess: () => {
-      refetch();
-    },
-  });
 
   // 更新用户mutation
   const updateUserMutation = useMutation({
@@ -315,69 +306,64 @@ const User: React.FC = () => {
 
   return (
     <div className="user-management-container">
-             {/* 统计卡片 */}
-       <Row gutter={[8, 8]} className="mb-6">
-         <Col xs={24} sm={12} md={6}>
-           <Card className="text-center hover:shadow-md transition-shadow cursor-pointer h-32 flex flex-col justify-center">
-             <Statistic
-               title="总用户数"
-               value={stats.total}
-               prefix={<UserOutlined className="text-blue-500" />}
-               valueStyle={{ color: '#1890ff' }}
-             />
-             <Progress percent={100} showInfo={false} strokeColor="#1890ff" size="small" className="mt-2" />
-           </Card>
-         </Col>
-         <Col xs={24} sm={12} md={6}>
-           <Card className="text-center hover:shadow-md transition-shadow cursor-pointer h-32 flex flex-col justify-center">
-             <Statistic
-               title="活跃用户"
-               value={stats.active}
-               prefix={<CheckCircleOutlined className="text-green-500" />}
-               valueStyle={{ color: '#52c41a' }}
-             />
-                            <Progress
-                 percent={stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0}
-                 showInfo={false}
-                 strokeColor="#52c41a"
-                 size="small"
-                 className="mt-2"
-               />
-           </Card>
-         </Col>
-         <Col xs={24} sm={12} md={6}>
-           <Card className="text-center hover:shadow-md transition-shadow cursor-pointer h-32 flex flex-col justify-center">
-             <Statistic
-               title="冻结用户"
-               value={stats.inactive}
-               prefix={<LockOutlined className="text-orange-500" />}
-               valueStyle={{ color: '#fa8c16' }}
-             />
-             <Progress
-               percent={stats.total > 0 ? Math.round((stats.inactive / stats.total) * 100) : 0}
-               showInfo={false}
-               strokeColor="#fa8c16"
-               size="small"
-               className="mt-2"
-             />
-           </Card>
-         </Col>
-         <Col xs={24} sm={12} md={6}>
-           <Card className="text-center hover:shadow-md transition-shadow cursor-pointer h-32 flex flex-col justify-center">
-             <Statistic
-               title="性别分布"
-               value={`${stats.male}:${stats.female}`}
-               prefix={<Icon icon="fluent:people-48-regular" className="text-purple-500 text-2xl" />}
-               valueStyle={{ color: '#722ed1' }}
-             />
-             <div className="flex justify-center mt-2">
-               <AntText type="secondary" className="text-xs">
-                 男: {stats.male} | 女: {stats.female}
-               </AntText>
-             </div>
-           </Card>
-         </Col>
-       </Row>
+      {/* 统计卡片 */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 mb-6">
+        <Card className="text-center hover:shadow-md transition-shadow cursor-pointer h-32 flex flex-col justify-center">
+          <Statistic
+            title="总用户数"
+            value={stats.total}
+            prefix={<UserOutlined className="text-blue-500" />}
+            valueStyle={{ color: '#1890ff' }}
+          />
+          <Progress percent={100} showInfo={false} strokeColor="#1890ff" size="small" className="mt-2" />
+        </Card>
+
+        <Card className="text-center hover:shadow-md transition-shadow cursor-pointer h-32 flex flex-col justify-center">
+          <Statistic
+            title="活跃用户"
+            value={stats.active}
+            prefix={<CheckCircleOutlined className="text-green-500" />}
+            valueStyle={{ color: '#52c41a' }}
+          />
+          <Progress
+            percent={stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0}
+            showInfo={false}
+            strokeColor="#52c41a"
+            size="small"
+            className="mt-2"
+          />
+        </Card>
+
+        <Card className="text-center hover:shadow-md transition-shadow cursor-pointer h-32 flex flex-col justify-center">
+          <Statistic
+            title="冻结用户"
+            value={stats.inactive}
+            prefix={<LockOutlined className="text-orange-500" />}
+            valueStyle={{ color: '#fa8c16' }}
+          />
+          <Progress
+            percent={stats.total > 0 ? Math.round((stats.inactive / stats.total) * 100) : 0}
+            showInfo={false}
+            strokeColor="#fa8c16"
+            size="small"
+            className="mt-2"
+          />
+        </Card>
+
+        <Card className="text-center hover:shadow-md transition-shadow cursor-pointer h-32 flex flex-col justify-center">
+          <Statistic
+            title="性别分布"
+            value={`${stats.male}:${stats.female}`}
+            prefix={<Icon icon="fluent:people-48-regular" className="text-purple-500 text-2xl" />}
+            valueStyle={{ color: '#722ed1' }}
+          />
+          <div className="flex justify-center mt-2">
+            <AntText type="secondary" className="text-xs">
+              男: {stats.male} | 女: {stats.female}
+            </AntText>
+          </div>
+        </Card>
+      </div>
 
       {/* 搜索表单 */}
       <SearchForm onSearch={handleSearch} isLoading={isLoading} />

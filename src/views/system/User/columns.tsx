@@ -1,5 +1,5 @@
-import { ManOutlined, WomanOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Space, Image, Dropdown, type TableProps, type MenuProps, Tooltip, Avatar, Switch } from 'antd';
+import { ManOutlined, WomanOutlined } from '@ant-design/icons';
+import { Button, Space, Image, Dropdown, type TableProps, type MenuProps, Tooltip, Switch } from 'antd';
 import type { UserModel } from '@/services/system/user/type';
 import { Icon } from '@iconify-icon/react';
 
@@ -33,15 +33,6 @@ export const getColumns = (
     key: 'username',
     width: 140,
     align: 'left',
-    render: (text: string, record: UserModel) => (
-      <div className="flex items-center space-x-2">
-        <Avatar size="small" src={record.avatar} icon={<UserOutlined />} className="bg-blue-500" />
-        <div>
-          <div className="font-medium text-gray-900">{text}</div>
-          {record.realName && <div className="text-xs text-gray-500">{record.realName}</div>}
-        </div>
-      </div>
-    ),
   },
   {
     dataIndex: 'realName',
