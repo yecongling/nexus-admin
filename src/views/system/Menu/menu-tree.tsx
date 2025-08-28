@@ -15,7 +15,7 @@ import { usePermission } from '@/hooks/usePermission';
  */
 const MenuTree: React.FC<MenuTreeProps> = ({ onSelectMenu, onOpenDrawer }) => {
   const { t } = useTranslation();
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
   const queryClient = useQueryClient();
   const exportMenuNameId = useId();
   
@@ -63,7 +63,10 @@ const MenuTree: React.FC<MenuTreeProps> = ({ onSelectMenu, onOpenDrawer }) => {
         queryClient.invalidateQueries({ queryKey: ['sys_menu'] });
         setImportModalVisible(false);
       } else {
-        message.error(`导入失败！失败 ${result.failCount} 条菜单`);
+        modal.error({
+          title: '菜单导入失败',
+          content: `导入失败！失败 ${result.failCount} 条菜单。请检查导入文件格式或联系技术支持。`,
+        });
       }
       
       // 显示详细结果
@@ -76,12 +79,18 @@ const MenuTree: React.FC<MenuTreeProps> = ({ onSelectMenu, onOpenDrawer }) => {
         }
         
         if (failDetails.length > 0) {
-          message.warning(`导入失败: ${failDetails.map(item => `${item.name}(${item.message})`).join(', ')}`);
+          modal.error({
+            title: '部分菜单导入失败',
+            content: `以下菜单导入失败: ${failDetails.map(item => `${item.name}(${item.message})`).join(', ')}。请检查失败原因后重试。`,
+          });
         }
       }
     },
     onError: (error) => {
-      message.error(`导入失败：${error.message || '未知错误'}`);
+      modal.error({
+        title: '菜单导入失败',
+        content: `导入菜单时发生错误：${error.message || '未知错误'}。请检查网络连接或联系技术支持。`,
+      });
     }
   });
 
@@ -105,7 +114,10 @@ const MenuTree: React.FC<MenuTreeProps> = ({ onSelectMenu, onOpenDrawer }) => {
       setExportModalVisible(false);
     },
     onError: (error) => {
-      message.error(`导出失败：${error.message || '未知错误'}`);
+      modal.error({
+        title: '菜单导出失败',
+        content: `导出菜单时发生错误：${error.message || '未知错误'}。请检查网络连接或联系技术支持。`,
+      });
     }
   });
 
@@ -130,18 +142,24 @@ const MenuTree: React.FC<MenuTreeProps> = ({ onSelectMenu, onOpenDrawer }) => {
     ];
     
     if (!allowedTypes.includes(file.type)) {
-      message.error('只支持 Excel 文件格式 (.xlsx, .xls)');
+      modal.error({
+        title: '文件格式不支持',
+        content: '只支持 Excel 文件格式 (.xlsx, .xls)。请选择正确的文件格式后重试。',
+      });
       return false;
     }
     
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (file.size > maxSize) {
-      message.error('文件大小不能超过 10MB');
+      modal.error({
+        title: '文件过大',
+        content: '文件大小不能超过 10MB。请选择较小的文件后重试。',
+      });
       return false;
     }
     
     return true;
-  }, [message]);
+  }, [modal]);
 
   /**
    * 处理文件上传

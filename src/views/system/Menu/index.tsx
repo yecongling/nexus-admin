@@ -15,7 +15,7 @@ import { menuService } from '@/services/system/menu/menuApi';
  */
 const Menu: React.FC = () => {
   const { token } = theme.useToken();
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
   const queryClient = useQueryClient();
   
   // 合并的状态
@@ -86,7 +86,10 @@ const Menu: React.FC = () => {
       dispatch({ openDrawer: false });
     },
     onError: (error: any) => {
-      message.error(`菜单新增失败：${error.message || '未知错误'}`);
+      modal.error({
+        title: '菜单新增失败',
+        content: `新增菜单时发生错误：${error.message || '未知错误'}。请检查输入数据或联系技术支持。`,
+      });
     },
   });
 
@@ -102,7 +105,10 @@ const Menu: React.FC = () => {
       dispatch({ openDrawer: false });
     },
     onError: (error: any) => {
-      message.error(`菜单修改失败：${error.message || '未知错误'}`);
+      modal.error({
+        title: '菜单修改失败',
+        content: `修改菜单时发生错误：${error.message || '未知错误'}。请检查输入数据或联系技术支持。`,
+      });
     },
   });
 
@@ -119,7 +125,10 @@ const Menu: React.FC = () => {
       dispatch({ currentMenu: null });
     },
     onError: (error: any) => {
-      message.error(`菜单删除失败：${error.message || '未知错误'}`);
+      modal.error({
+        title: '菜单删除失败',
+        content: `删除菜单时发生错误：${error.message || '未知错误'}。请检查菜单状态或联系技术支持。`,
+      });
     },
   });
 

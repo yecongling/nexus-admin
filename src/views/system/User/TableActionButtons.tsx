@@ -19,7 +19,7 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
   refetch,
   selectedRows,
 }) => {
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
   const { t } = useTranslation();
   // 权限检查
   const canAdd = usePermission(['sys:user:add']);
@@ -30,8 +30,6 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
   const canBatchResetPassword = usePermission(['sys:user:resetPassword']);
   const canBatchAssignRole = usePermission(['sys:user:assignRole']);
   const canBatchUpdateStatus = usePermission(['sys:user:updateStatus']);
-  const canUpdatePassword = usePermission(['sys:user:updatePassword']);
-  const canUpdateStatus = usePermission(['sys:user:updateStatus']);
   // 导出选项
   const exportItems: MenuProps['items'] = [
     {
@@ -39,7 +37,10 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
       label: '导出为CSV',
       icon: <Icon icon="teenyicons:csv-outline" className="text-xl! block text-orange-400" />,
       onClick: () => {
-        message.info('导出CSV功能待实现');
+        modal.error({
+          title: '功能暂未开放',
+          content: '导出CSV功能正在开发中，敬请期待。',
+        });
       },
     },
     {
@@ -47,7 +48,10 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
       label: '导出为Excel',
       icon: <Icon icon="vscode-icons:file-type-excel" className="text-xl! block" />,
       onClick: () => {
-        message.info('导出Excel功能待实现');
+        modal.error({
+          title: '功能暂未开放',
+          content: '导出Excel功能正在开发中，敬请期待。',
+        });
       },
     },
     {
@@ -55,7 +59,10 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
       label: '导出为PDF',
       icon: <Icon icon="material-icon-theme:pdf" className="text-xl! block" />,
       onClick: () => {
-        message.info('导出PDF功能待实现');
+        modal.error({
+          title: '功能暂未开放',
+          content: '导出PDF功能正在开发中，敬请期待。',
+        });
       },
     },
   ];
@@ -69,10 +76,16 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
       disabled: selectedRows.length === 0 || !canBatchAssignRole,
       onClick: () => {
         if (!canBatchAssignRole) {
-          message.warning('您没有分配角色的权限');
+          modal.error({
+            title: '权限不足',
+            content: '您没有批量分配用户角色的权限，请联系管理员获取相应权限。',
+          });
           return;
         }
-        message.warning('批量分配角色功能待实现');
+        modal.error({
+          title: '功能暂未开放',
+          content: '批量分配角色功能正在开发中，敬请期待。',
+        });
       },
     },
     {
@@ -81,10 +94,16 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
       icon: <Icon icon="fluent:status-24-regular" className="text-xl! block" />,
       onClick: () => {
         if (!canBatchUpdateStatus) {
-          message.warning('您没有更新状态的权限');
+          modal.error({
+            title: '权限不足',
+            content: '您没有批量更新用户状态的权限，请联系管理员获取相应权限。',
+          });
           return;
         }
-        message.warning('批量更新状态功能待实现');
+        modal.error({
+          title: '功能暂未开放',
+          content: '批量更新状态功能正在开发中，敬请期待。',
+        });
       },
     },
     {
@@ -94,10 +113,16 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
       disabled: selectedRows.length === 0 || !canBatchResetPassword,
       onClick: () => {
         if (!canBatchResetPassword) {
-          message.warning('您没有重置密码的权限');
+          modal.error({
+            title: '权限不足',
+            content: '您没有批量重置用户密码的权限，请联系管理员获取相应权限。',
+          });
           return;
         }
-        message.warning('批量重置密码功能待实现');
+        modal.error({
+          title: '功能暂未开放',
+          content: '批量重置密码功能正在开发中，敬请期待。',
+        });
       },
     },
     {
@@ -110,66 +135,16 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
       disabled: selectedRows.length === 0 || !canBatchDelete,
       onClick: () => {
         if (!canBatchDelete) {
-          message.warning('您没有删除用户的权限');
+          modal.error({
+            title: '权限不足',
+            content: '您没有批量删除用户的权限，请联系管理员获取相应权限。',
+          });
           return;
         }
         handleBatchDelete();
       },
     },
   ];
-
-  // 表格工具选项
-  const tableToolsItems: MenuProps['items'] = [
-    {
-      key: 'refresh',
-      label: '刷新数据',
-      icon: <ReloadOutlined />,
-      onClick: refetch,
-    },
-    {
-      key: 'columns',
-      label: '列设置',
-      icon: <Icon icon="fluent:column-edit-24-regular" className="text-lg block" />,
-      onClick: () => {
-        message.info('列设置功能待实现');
-      },
-    },
-    {
-      key: 'tableSize',
-      label: '表格大小',
-      icon: <ColumnHeightOutlined />,
-      onClick: () => {
-        message.info('表格大小设置功能待实现');
-      },
-    },
-    {
-      key: 'density',
-      label: '表格密度',
-      icon: <UnorderedListOutlined />,
-      onClick: () => {
-        message.info('表格密度设置功能待实现');
-      },
-    },
-    {
-      type: 'divider',
-    },
-    {
-      key: 'settings',
-      label: '表格设置',
-      icon: <SettingOutlined />,
-      onClick: () => {
-        message.info('表格设置功能待实现');
-      },
-    },
-  ];
-
-  /**
-   * 批量重置密码
-   * @param newPwd 新密码
-   */
-  const handleBatchResetPassword = (newPwd: string) => {
-    message.info('批量重置密码功能待实现');
-  };
 
   return (
     <div className="flex items-center justify-between mb-4">
@@ -191,7 +166,10 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
                 message.success('导入成功');
                 refetch();
               } else if (info.file.status === 'error') {
-                message.error('导入失败');
+                modal.error({
+                  title: '导入失败',
+                  content: '用户数据导入失败，请检查文件格式或联系技术支持。',
+                });
               }
             }}
           >
@@ -231,7 +209,10 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
           <Button
             icon={<Icon icon="fa:recycle" className="text-xl! block text-green-500" />}
             onClick={() => {
-              message.warning('回收站功能待实现');
+              modal.error({
+                title: '功能暂未开放',
+                content: '回收站功能正在开发中，敬请期待。',
+              });
             }}
             className="shadow-sm"
           >
@@ -255,7 +236,10 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
           <Button
             icon={<Icon icon="fluent:column-edit-24-regular" className="text-lg block" />}
             type="text"
-            onClick={() => message.info('列设置功能待实现')}
+            onClick={() => modal.error({
+              title: '功能暂未开放',
+              content: '表格列设置功能正在开发中，敬请期待。',
+            })}
             className="text-gray-500 hover:text-blue-500"
           />
         </Tooltip>
@@ -264,7 +248,10 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
           <Button
             icon={<ColumnHeightOutlined />}
             type="text"
-            onClick={() => message.info('表格大小设置功能待实现')}
+            onClick={() => modal.error({
+              title: '功能暂未开放',
+              content: '表格大小调整功能正在开发中，敬请期待。',
+            })}
             className="text-gray-500 hover:text-blue-500"
           />
         </Tooltip>
@@ -273,7 +260,10 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
           <Button
             icon={<UnorderedListOutlined />}
             type="text"
-            onClick={() => message.info('表格密度设置功能待实现')}
+            onClick={() => modal.error({
+              title: '功能暂未开放',
+              content: '表格密度调整功能正在开发中，敬请期待。',
+            })}
             className="text-gray-500 hover:text-blue-500"
           />
         </Tooltip>
@@ -282,7 +272,10 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
           <Button
             icon={<SettingOutlined />}
             type="text"
-            onClick={() => message.info('表格设置功能待实现')}
+            onClick={() => modal.error({
+              title: '功能暂未开放',
+              content: '表格设置功能正在开发中，敬请期待。',
+            })}
             className="text-gray-500 hover:text-blue-500"
           />
         </Tooltip>

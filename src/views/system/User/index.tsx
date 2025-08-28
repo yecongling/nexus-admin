@@ -81,37 +81,58 @@ const User: React.FC = () => {
 
   // 处理导入
   const handleImport = () => {
-    message.info('导入功能待实现');
+    modal.error({
+      title: '功能暂未开放',
+      content: '用户数据导入功能正在开发中，敬请期待。',
+    });
   };
 
   // 处理导出
   const handleExport = () => {
-    message.info('导出功能待实现');
+    modal.error({
+      title: '功能暂未开放',
+      content: '用户数据导出功能正在开发中，敬请期待。',
+    });
   };
 
   // 处理回收站
   const handleRecycleBin = () => {
-    message.info('回收站功能待实现');
+    modal.error({
+      title: '功能暂未开放',
+      content: '回收站功能正在开发中，敬请期待。',
+    });
   };
 
   // 处理列设置
   const handleColumns = () => {
-    message.info('列设置功能待实现');
+    modal.error({
+      title: '功能暂未开放',
+      content: '表格列设置功能正在开发中，敬请期待。',
+    });
   };
 
   // 处理表格大小
   const handleTableSize = () => {
-    message.info('表格大小功能待实现');
+    modal.error({
+      title: '功能暂未开放',
+      content: '表格大小调整功能正在开发中，敬请期待。',
+    });
   };
 
   // 处理表格密度
   const handleTableDensity = () => {
-    message.info('表格密度功能待实现');
+    modal.error({
+      title: '功能暂未开放',
+      content: '表格密度调整功能正在开发中，敬请期待。',
+    });
   };
 
   // 处理表格设置
   const handleTableSettings = () => {
-    message.info('表格设置功能待实现');
+    modal.error({
+      title: '功能暂未开放',
+      content: '表格设置功能正在开发中，敬请期待。',
+    });
   };
 
   // 处理删除数据
@@ -224,7 +245,10 @@ const User: React.FC = () => {
   // 处理状态变更
   const handleStatusChange = (record: UserModel, checked: boolean) => {
     if (!canUpdateStatus) {
-      message.warning('您没有更新状态的权限');
+      modal.error({
+        title: '权限不足',
+        content: '您没有更新用户状态的权限，请联系管理员获取相应权限。',
+      });
       return;
     }
 
@@ -236,7 +260,10 @@ const User: React.FC = () => {
         refetch();
       })
       .catch(() => {
-        message.error('状态更新失败');
+        modal.error({
+          title: '状态更新失败',
+          content: '用户状态更新失败，请检查网络连接或联系技术支持。',
+        });
       });
   };
 
@@ -255,7 +282,10 @@ const User: React.FC = () => {
             disabled: !canUpdatePassword,
             onClick: () => {
               if (!canUpdatePassword) {
-                message.warning('您没有修改密码的权限');
+                modal.error({
+                  title: '权限不足',
+                  content: '您没有修改用户密码的权限，请联系管理员获取相应权限。',
+                });
                 return;
               }
               /* 打开密码编辑弹窗 */
@@ -272,10 +302,16 @@ const User: React.FC = () => {
             disabled: !canAssignRole,
             onClick: () => {
               if (!canAssignRole) {
-                message.warning('您没有分配角色的权限');
+                modal.error({
+                  title: '权限不足',
+                  content: '您没有分配用户角色的权限，请联系管理员获取相应权限。',
+                });
                 return;
               }
-              message.warning('分配角色功能待实现');
+              modal.error({
+                title: '功能暂未开放',
+                content: '分配角色功能正在开发中，敬请期待。',
+              });
             },
           },
 
@@ -286,7 +322,10 @@ const User: React.FC = () => {
             disabled: !canViewOperationLog,
             onClick: () => {
               if (!canViewOperationLog) {
-                message.warning('您没有查看操作记录的权限');
+                modal.error({
+                  title: '权限不足',
+                  content: '您没有查看用户操作记录的权限，请联系管理员获取相应权限。',
+                });
                 return;
               }
               // 打开操作记录弹窗
@@ -303,7 +342,10 @@ const User: React.FC = () => {
             disabled: !canDeleteUser,
             onClick: () => {
               if (!canDeleteUser) {
-                message.warning('您没有删除用户的权限');
+                modal.error({
+                  title: '权限不足',
+                  content: '您没有删除用户的权限，请联系管理员获取相应权限。',
+                });
                 return;
               }
               modal.confirm({
@@ -346,16 +388,15 @@ const User: React.FC = () => {
           },
         }}
       >
-        <div className="flex-shrink-0 mb-4">
-          <TableActionButtons
-            handleAdd={handleAdd}
-            handleBatchDelete={handleBatchDelete}
-            refetch={refetch}
-            selectedRows={selectedRows}
-          />
-        </div>
+        <TableActionButtons
+          handleAdd={handleAdd}
+          handleBatchDelete={handleBatchDelete}
+          refetch={refetch}
+          selectedRows={selectedRows}
+        />
         <div className="flex-1 min-h-0">
           <Table
+            bordered
             columns={columns}
             dataSource={data}
             rowKey="id"
