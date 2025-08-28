@@ -40,7 +40,7 @@ const Workbench: React.FC = () => {
   }
 
   return (
-    <div className={`p-4 min-h-screen ${styles.workbench}`}>
+    <div className={`p-2 min-h-screen ${styles.workbench}`}>
       {/* 统计卡片 */}
       <StatisticCards />
 

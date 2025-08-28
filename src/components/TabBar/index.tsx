@@ -146,14 +146,6 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
           },
         },
         {
-          key: 'maximize',
-          label: t('common.maximize'),
-          icon: <span>⛶</span>,
-          onClick: () => {
-            // 这里可以实现最大化功能
-          },
-        },
-        {
           key: 'reload',
           label: t('common.reload'),
           icon: <span>🔄</span>,
@@ -213,7 +205,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
         {
           key: 'closeAll',
           label: t('common.closeAllTabs'),
-          icon: <span>⫷</span>,
+          icon: <span>❌</span>,
           onClick: () => {
             // 标记正在关闭tab
             isClosingTabRef.current = true;
@@ -254,14 +246,6 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
           if (activeKey) {
             pinTab(activeKey);
           }
-        },
-      },
-      {
-        key: 'maximize',
-        label: t('common.maximize'),
-        icon: <span>⛶</span>,
-        onClick: () => {
-          // 这里可以实现最大化功能
         },
       },
       {
@@ -336,7 +320,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
       {
         key: 'closeAll',
         label: t('common.closeAllTabs'),
-        icon: <span>⫷</span>,
+        icon: <span>❌</span>,
         onClick: () => {
           // 标记正在关闭tab
           isClosingTabRef.current = true;
@@ -391,7 +375,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
           onChange={handleTabChange}
           onEdit={handleTabEdit}
           items={tabItems}
-          size="small"
+          size="middle"
           hideAdd
           className="tab-bar-tabs"
           style={{ margin: 0, flex: 1 }}

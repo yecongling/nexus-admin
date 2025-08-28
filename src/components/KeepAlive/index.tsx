@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { useTabStore } from '@/stores/tabStore';
 
 interface KeepAliveProps {
@@ -46,6 +46,18 @@ const KeepAlive: React.FC<KeepAliveProps> = ({ children }) => {
     }
   };
 
+  // 清除指定key的缓存
+  const clearCache = useCallback((key: string) => {
+    if (cacheRef.current.has(key)) {
+      cacheRef.current.delete(key);
+    }
+  }, []);
+
+  // 清除所有缓存
+  const clearAllCache = useCallback(() => {
+    cacheRef.current.clear();
+  }, []);
+
   useEffect(() => {
     if (!activeKey) return;
 
@@ -76,6 +88,33 @@ const KeepAlive: React.FC<KeepAliveProps> = ({ children }) => {
 
   }, [activeKey, children]);
 
+  // 监听系统刷新事件
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      clearAllCache();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        // 页面即将被隐藏时清除缓存
+        clearAllCache();
+      }
+    };
+
+    // 监听页面刷新/关闭
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    // 监听页面可见性变化
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    // 监听页面焦点变化
+    window.addEventListener('blur', clearAllCache);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', clearAllCache);
+    };
+  }, [clearAllCache]);
+
   // 清理不存在的tab对应的缓存
   useEffect(() => {
     const tabKeys = tabs.map(tab => tab.key);
@@ -83,10 +122,23 @@ const KeepAlive: React.FC<KeepAliveProps> = ({ children }) => {
     
     cacheKeys.forEach(key => {
       if (!tabKeys.includes(key)) {
-        cacheRef.current.delete(key);
+        // 当tab被关闭时，清除对应的缓存
+        clearCache(key);
       }
     });
-  }, [tabs]);
+  }, [tabs, clearCache]);
+
+  // 暴露清除缓存的方法给外部使用
+  useEffect(() => {
+    // 将清除缓存的方法挂载到 window 对象上，方便调试和外部调用
+    (window as any).__keepAliveClearCache = clearCache;
+    (window as any).__keepAliveClearAllCache = clearAllCache;
+    
+    return () => {
+      delete (window as any).__keepAliveClearCache;
+      delete (window as any).__keepAliveClearAllCache;
+    };
+  }, [clearCache, clearAllCache]);
 
   if (!currentComponent) {
     return null;
