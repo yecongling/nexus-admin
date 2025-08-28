@@ -1,4 +1,4 @@
-import { SearchOutlined, RedoOutlined, FilterOutlined } from '@ant-design/icons';
+import { SearchOutlined, RedoOutlined, UpOutlined, DownOutlined } from '@ant-design/icons';
 import { Button, Card, Form, Input, Select, DatePicker, Divider, Typography, ConfigProvider } from 'antd';
 import type { UserSearchParams } from './types';
 import { useTranslation } from 'react-i18next';
@@ -50,21 +50,8 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch, isLoading }) => {
         },
       }}
     >
-      <Card
-        className="mb-4"
-        title={
-          <div className="flex items-center">
-            <FilterOutlined className="mr-2 text-blue-500" />
-            <span>搜索条件</span>
-          </div>
-        }
-        extra={
-          <Button type="link" onClick={toggleAdvanced} className="text-blue-500">
-            {showAdvanced ? '收起' : '展开'}高级搜索
-          </Button>
-        }
-      >
-        <Form form={form} onFinish={onSearch} layout="vertical">
+      <Card className="mb-4">
+        <Form form={form} onFinish={onSearch}>
           {/* 基础搜索 */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
             <Form.Item name="username" label="用户名" colon={false}>
@@ -136,21 +123,23 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch, isLoading }) => {
           )}
 
           {/* 操作按钮 */}
-          <div className="flex justify-end">
-            <div className="flex gap-3">
-              <Button type="default" icon={<RedoOutlined />} onClick={handleReset} className="rounded-md">
-                {t('common.operation.reset')}
-              </Button>
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={isLoading}
-                icon={<SearchOutlined />}
-                className="rounded-md shadow-sm"
-              >
-                {t('common.operation.search')}
-              </Button>
-            </div>
+          <div className="flex gap-3 justify-end">
+            <Button type="link" onClick={toggleAdvanced} className="text-blue-500 flex items-center gap-1">
+              {showAdvanced ? <UpOutlined /> : <DownOutlined />}
+              {showAdvanced ? '收起' : '展开'}高级搜索
+            </Button>
+            <Button type="default" icon={<RedoOutlined />} onClick={handleReset} className="rounded-md">
+              {t('common.operation.reset')}
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={isLoading}
+              icon={<SearchOutlined />}
+              className="rounded-md shadow-sm"
+            >
+              {t('common.operation.search')}
+            </Button>
           </div>
         </Form>
       </Card>

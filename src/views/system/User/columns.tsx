@@ -48,21 +48,11 @@ export const getColumns = (
     key: 'sex',
     width: 80,
     align: 'center',
-    render: (text: string) => {
-      if (text === '1') {
-        return (
-          <div className="flex items-center justify-center">
-            <ManOutlined className="text-blue-500 mr-1" />
-            <span className="text-blue-600">男</span>
-          </div>
-        );
-      } else if (text === '2') {
-        return (
-          <div className="flex items-center justify-center">
-            <WomanOutlined className="text-pink-500 mr-1" />
-            <span className="text-pink-600">女</span>
-          </div>
-        );
+    render: (text: number) => {
+      if (text === 1) {
+        return <ManOutlined className="text-blue-500" />;
+      } else if (text === 2) {
+        return <WomanOutlined className="text-pink-500" />;
       }
       return <span className="text-gray-400">-</span>;
     },

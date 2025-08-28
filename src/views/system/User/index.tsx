@@ -1,14 +1,8 @@
 import { isEqual } from 'lodash-es';
-import {
-  ExclamationCircleFilled,
-  UserOutlined,
-  LockOutlined,
-  CheckCircleOutlined,
-} from '@ant-design/icons';
-import { Card, Table, App, Statistic, Progress, Typography } from 'antd';
+import { ExclamationCircleFilled } from '@ant-design/icons';
+import { Card, Table, App } from 'antd';
 import type React from 'react';
 import { useMemo, useReducer, useState } from 'react';
-import useParentSize from '@/hooks/useParentSize';
 import { userService } from '@/services/system/user/userApi';
 import type { UserSearchParams } from './types';
 import { getColumns } from './columns';
@@ -32,7 +26,6 @@ const User: React.FC = () => {
   const { modal, message } = App.useApp();
   const colorPrimary = usePreferencesStore((state) => state.preferences.theme.colorPrimary);
   const { t } = useTranslation();
-  const { Text: AntText } = Typography;
 
   // 权限检查
   const canUpdatePassword = usePermission(['sys:user:updatePassword']);
@@ -62,9 +55,6 @@ const User: React.FC = () => {
     },
   );
 
-  // 容器高度计算（表格）
-  const { parentRef, height } = useParentSize();
-
   // 查询参数（包含分页参数）
   const [searchParams, setSearchParams] = useState<UserSearchParams>({
     pageNum: 1,
@@ -81,19 +71,48 @@ const User: React.FC = () => {
     queryFn: () => userService.queryUsers({ ...searchParams }),
   });
 
-  // 计算统计数据
-  const stats = useMemo(() => {
-    if (!result?.data) return { total: 0, active: 0, inactive: 0, male: 0, female: 0 };
+  // 选中的行
+  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
+  const [selectedRows, setSelectedRows] = useState<UserModel[]>([]);
 
-    const data = result.data;
-    return {
-      total: result.total || 0,
-      active: data.filter((user: UserModel) => user.status === 1).length,
-      inactive: data.filter((user: UserModel) => user.status === 0).length,
-      male: data.filter((user: UserModel) => user.sex === '1').length,
-      female: data.filter((user: UserModel) => user.sex === '2').length,
-    };
-  }, [result]);
+  // 表格数据
+  const data = result?.data || [];
+  const total = result?.total || 0;
+
+  // 处理导入
+  const handleImport = () => {
+    message.info('导入功能待实现');
+  };
+
+  // 处理导出
+  const handleExport = () => {
+    message.info('导出功能待实现');
+  };
+
+  // 处理回收站
+  const handleRecycleBin = () => {
+    message.info('回收站功能待实现');
+  };
+
+  // 处理列设置
+  const handleColumns = () => {
+    message.info('列设置功能待实现');
+  };
+
+  // 处理表格大小
+  const handleTableSize = () => {
+    message.info('表格大小功能待实现');
+  };
+
+  // 处理表格密度
+  const handleTableDensity = () => {
+    message.info('表格密度功能待实现');
+  };
+
+  // 处理表格设置
+  const handleTableSettings = () => {
+    message.info('表格设置功能待实现');
+  };
 
   // 处理删除数据
   const logicDeleteUserMutation = useMutation({
@@ -305,136 +324,71 @@ const User: React.FC = () => {
   );
 
   return (
-    <div className="user-management-container">
-      {/* 统计卡片 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 mb-6">
-        <Card className="text-center hover:shadow-md transition-shadow cursor-pointer h-32 flex flex-col justify-center">
-          <Statistic
-            title="总用户数"
-            value={stats.total}
-            prefix={<UserOutlined className="text-blue-500" />}
-            valueStyle={{ color: '#1890ff' }}
-          />
-          <Progress percent={100} showInfo={false} strokeColor="#1890ff" size="small" className="mt-2" />
-        </Card>
-
-        <Card className="text-center hover:shadow-md transition-shadow cursor-pointer h-32 flex flex-col justify-center">
-          <Statistic
-            title="活跃用户"
-            value={stats.active}
-            prefix={<CheckCircleOutlined className="text-green-500" />}
-            valueStyle={{ color: '#52c41a' }}
-          />
-          <Progress
-            percent={stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0}
-            showInfo={false}
-            strokeColor="#52c41a"
-            size="small"
-            className="mt-2"
-          />
-        </Card>
-
-        <Card className="text-center hover:shadow-md transition-shadow cursor-pointer h-32 flex flex-col justify-center">
-          <Statistic
-            title="冻结用户"
-            value={stats.inactive}
-            prefix={<LockOutlined className="text-orange-500" />}
-            valueStyle={{ color: '#fa8c16' }}
-          />
-          <Progress
-            percent={stats.total > 0 ? Math.round((stats.inactive / stats.total) * 100) : 0}
-            showInfo={false}
-            strokeColor="#fa8c16"
-            size="small"
-            className="mt-2"
-          />
-        </Card>
-
-        <Card className="text-center hover:shadow-md transition-shadow cursor-pointer h-32 flex flex-col justify-center">
-          <Statistic
-            title="性别分布"
-            value={`${stats.male}:${stats.female}`}
-            prefix={<Icon icon="fluent:people-48-regular" className="text-purple-500 text-2xl" />}
-            valueStyle={{ color: '#722ed1' }}
-          />
-          <div className="flex justify-center mt-2">
-            <AntText type="secondary" className="text-xs">
-              男: {stats.male} | 女: {stats.female}
-            </AntText>
-          </div>
-        </Card>
-      </div>
-
+    <div className="user-management-container h-full flex flex-col gap-2">
       {/* 搜索表单 */}
       <SearchForm onSearch={handleSearch} isLoading={isLoading} />
 
-      {/* 查询表格 */}
+      {/* 用户列表 */}
       <Card
-        style={{ flex: 1, marginTop: '16px', minHeight: 0 }}
-        styles={{ body: { height: '100%' } }}
-        ref={parentRef}
+        className="flex-1 min-h-0 flex flex-col"
         title={
           <div className="flex items-center justify-between">
             <span>用户列表</span>
-            <div className="flex items-center space-x-2">
-              <AntText type="secondary" className="text-sm">
-                已选择 <span className="text-blue-500 font-medium">{state.selectedRows.length}</span> 项
-              </AntText>
-              {state.selectedRows.length > 0 && (
-                <AntText type="secondary" className="text-sm">
-                  | 共 {result?.total || 0} 条记录
-                </AntText>
-              )}
-            </div>
+            <span className="text-sm text-gray-500">已选择 {selectedRowKeys.length} 项</span>
           </div>
         }
+        styles={{
+          body: {
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '16px',
+          },
+        }}
       >
-        {/* 操作按钮 */}
-        <div className="mb-4">
+        <div className="flex-shrink-0 mb-4">
           <TableActionButtons
             handleAdd={handleAdd}
             handleBatchDelete={handleBatchDelete}
             refetch={refetch}
-            selectedRows={state.selectedRows}
+            selectedRows={selectedRows}
           />
         </div>
-
-        {/* 表格数据 */}
-        <Table
-          size="middle"
-          bordered
-          pagination={{
-            pageSize: searchParams.pageSize,
-            current: searchParams.pageNum,
-            showQuickJumper: true,
-            hideOnSinglePage: false,
-            showSizeChanger: true,
-            showTotal: (total) => `共 ${total} 条记录`,
-            total: result?.total || 0,
-            onChange(page, pageSize) {
-              setSearchParams({
-                ...searchParams,
-                pageNum: page,
-                pageSize: pageSize,
-              });
-            },
-          }}
-          dataSource={result?.data || []}
-          columns={columns}
-          loading={isLoading}
-          rowKey="id"
-          scroll={{ y: height - 200, x: 'max-content' }}
-          rowSelection={{
-            onChange: (_selectedRowKeys, selectedRows) => {
-              dispatch({
-                selectedRows: selectedRows,
-              });
-            },
-            columnWidth: 32,
-            fixed: true,
-          }}
-          rowClassName={(record) => (record.status === 0 ? 'opacity-60 bg-gray-50' : '')}
-        />
+        <div className="flex-1 min-h-0">
+          <Table
+            columns={columns}
+            dataSource={data}
+            rowKey="id"
+            rowSelection={{
+              type: 'checkbox',
+              selectedRowKeys,
+              onChange: (keys, rows) => {
+                setSelectedRowKeys(keys as string[]);
+                setSelectedRows(rows);
+              },
+            }}
+            pagination={{
+              current: searchParams.pageNum,
+              pageSize: searchParams.pageSize,
+              total: total,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`,
+              onChange: (page, pageSize) => {
+                setSearchParams((prev) => ({
+                  ...prev,
+                  pageNum: page,
+                  pageSize: pageSize || prev.pageSize,
+                }));
+              },
+            }}
+            loading={isLoading}
+            size="middle"
+            scroll={{ y: 'calc(100vh - 400px)' }}
+            rowClassName={(record) => (record.status === 0 ? 'opacity-60 bg-gray-50' : '')}
+            className="h-full"
+          />
+        </div>
       </Card>
 
       {/* 编辑弹窗 */}
