@@ -417,10 +417,13 @@ export const menuService: IMenuService = {
    * @returns 接口权限列表
    */
   queryInterfacePermissions(params: QueryInterfacePermissionRequest): Promise<QueryInterfacePermissionResponse> {
-    return HttpRequest.get<QueryInterfacePermissionResponse>({
-      url: MenuApi.queryInterfacePermissions,
-      params,
-    }, { successMessageMode: 'none' });
+    return HttpRequest.get<QueryInterfacePermissionResponse>(
+      {
+        url: MenuApi.queryInterfacePermissions,
+        params,
+      },
+      { successMessageMode: 'none' },
+    );
   },
 
   /**
@@ -445,8 +448,8 @@ export const menuService: IMenuService = {
   updateInterfacePermission(
     data: UpdateInterfacePermissionRequest,
   ): Promise<{ success: boolean; data?: InterfacePermission }> {
-    return HttpRequest.put<{ success: boolean; data?: InterfacePermission }>({
-      url: `${MenuApi.updateInterfacePermission}/${data.id}`,
+    return HttpRequest.post<{ success: boolean; data?: InterfacePermission }>({
+      url: MenuApi.updateInterfacePermission,
       data,
     });
   },
@@ -458,7 +461,8 @@ export const menuService: IMenuService = {
    */
   deleteInterfacePermission(id: string): Promise<boolean> {
     return HttpRequest.delete<boolean>({
-      url: `${MenuApi.deleteInterfacePermission}/${id}`,
+      url: MenuApi.deleteInterfacePermission,
+      params: { id },
     });
   },
 

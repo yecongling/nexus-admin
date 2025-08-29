@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ReloadOutlined, EditOutlined, DeleteOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import { Card, Table, Button, Space, Tag, Modal, Tooltip, type TableProps, Input, Form } from 'antd';
+import { Card, Table, Button, Space, Tag, Modal, Tooltip, type TableProps, Input, Form, App } from 'antd';
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import type React from 'react';
 import type { MenuModel } from '@/services/system/menu/type';
@@ -34,6 +34,7 @@ interface ComponentState {
  * @returns 菜单接口权限
  */
 const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu }) => {
+  const { modal } = App.useApp();
   const queryClient = useQueryClient();
 
   // 合并所有状态到一个对象中
@@ -167,7 +168,7 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
   const handleAdd = useCallback(() => {
     // 检查是否有未保存的编辑数据
     if (state.editingId) {
-      Modal.warning({
+      modal.warning({
         title: '请先完成当前编辑',
         content: '您有未保存的编辑数据，请先完成保存或取消编辑后再添加新行。',
         okText: '知道了',
@@ -284,7 +285,7 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
   // 删除接口权限
   const handleDelete = useCallback(
     async (record: InterfacePermission) => {
-      Modal.confirm({
+      modal.confirm({
         title: '确认删除',
         content: `确定要删除接口权限 "${record.code}" 吗？`,
         okText: '确定',
