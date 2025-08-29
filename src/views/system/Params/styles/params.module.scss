@@ -1,0 +1,202 @@
+// 系统参数模块样式
+.params-container {
+  .search-form {
+    .ant-form-item {
+      margin-bottom: 16px;
+      
+      .ant-form-item-label {
+        font-weight: 500;
+        color: #374151;
+      }
+    }
+  }
+
+  .table-actions {
+    .ant-btn {
+      border-radius: 6px;
+      font-weight: 500;
+      
+      &.ant-btn-primary {
+        box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+      }
+    }
+  }
+
+  .param-table {
+    .ant-table {
+      border-radius: 8px;
+      overflow: hidden;
+      
+      .ant-table-thead > tr > th {
+        background-color: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
+        font-weight: 600;
+        color: #374151;
+      }
+      
+      .ant-table-tbody > tr > td {
+        border-bottom: 1px solid #f3f4f6;
+      }
+      
+      .ant-table-tbody > tr:hover > td {
+        background-color: #f8fafc;
+      }
+    }
+    
+    .ant-tag {
+      border-radius: 4px;
+      font-weight: 500;
+    }
+  }
+
+  .pagination {
+    .ant-pagination {
+      .ant-pagination-item {
+        border-radius: 6px;
+        
+        &.ant-pagination-item-active {
+          background-color: #ef4444;
+          border-color: #ef4444;
+          
+          a {
+            color: white;
+          }
+        }
+      }
+      
+      .ant-pagination-prev,
+      .ant-pagination-next {
+        border-radius: 6px;
+      }
+    }
+  }
+}
+
+// 弹窗样式
+.param-modal {
+  .ant-modal-header {
+    border-bottom: 1px solid #e5e7eb;
+    padding: 20px 24px;
+    
+    .ant-modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #111827;
+    }
+  }
+  
+  .ant-modal-body {
+    padding: 24px;
+  }
+  
+  .ant-form-item {
+    margin-bottom: 20px;
+    
+    .ant-form-item-label {
+      font-weight: 500;
+      color: #374151;
+      
+      > label {
+        font-size: 14px;
+      }
+    }
+  }
+  
+  .ant-input,
+  .ant-select-selector,
+  .ant-input-number {
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    
+    &:hover {
+      border-color: #9ca3af;
+    }
+    
+    &:focus,
+    &.ant-input-focused,
+    &.ant-select-focused .ant-select-selector {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.1);
+    }
+  }
+  
+  .ant-switch {
+    &.ant-switch-checked {
+      background-color: #ef4444;
+    }
+  }
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .params-container {
+    .search-form {
+      .ant-form {
+        .ant-form-item {
+          width: 100%;
+          margin-right: 0;
+        }
+      }
+    }
+    
+    .table-actions {
+      flex-direction: column;
+      gap: 12px;
+      
+      .ant-space {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+  }
+}
+
+// 动画效果
+.search-form,
+.table-actions,
+.param-table,
+.pagination {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// 加载状态
+.ant-spin-container {
+  .ant-table-loading {
+    .ant-spin {
+      .ant-spin-dot {
+        .ant-spin-dot-item {
+          background-color: #ef4444;
+        }
+      }
+    }
+  }
+}
+
+// 空状态
+.ant-empty {
+  .ant-empty-description {
+    color: #6b7280;
+  }
+}
+
+// 选择框样式
+.ant-table-selection {
+  .ant-checkbox-wrapper {
+    .ant-checkbox {
+      .ant-checkbox-inner {
+        border-radius: 4px;
+      }
+    }
+  }
+}
