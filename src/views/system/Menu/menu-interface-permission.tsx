@@ -266,21 +266,17 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
       }
 
       // 调用保存接口
-      try {
-        await savePermissionMutation.mutateAsync({
-          type: id.startsWith('temp_') ? 'create' : 'update',
-          permission: updatedItem,
-        });
+      await savePermissionMutation.mutateAsync({
+        type: id.startsWith('temp_') ? 'create' : 'update',
+        permission: updatedItem,
+      });
 
-        // 更新本地状态
-        updateState({
-          permissionList: state.permissionList.map((item) => (item.id === id ? updatedItem : item)),
-          editingId: null,
-          editForm: { id: '', code: '', remark: '' },
-        });
-      } catch (error) {
-        // 错误处理已在mutation中处理
-      }
+      // 更新本地状态
+      updateState({
+        permissionList: state.permissionList.map((item) => (item.id === id ? updatedItem : item)),
+        editingId: null,
+        editForm: { id: '', code: '', remark: '' },
+      });
     },
     [state.editForm, state.permissionList, state.nextId, updateState, clearErrors, savePermissionMutation],
   );
@@ -294,19 +290,15 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
         okText: '确定',
         cancelText: '取消',
         onOk: async () => {
-          try {
-            await savePermissionMutation.mutateAsync({
-              type: 'delete',
-              permission: record,
-            });
+          await savePermissionMutation.mutateAsync({
+            type: 'delete',
+            permission: record,
+          });
 
-            // 更新本地状态
-            updateState({
-              permissionList: state.permissionList.filter((item) => item.id !== record.id),
-            });
-          } catch (error) {
-            // 错误处理已在mutation中处理
-          }
+          // 更新本地状态
+          updateState({
+            permissionList: state.permissionList.filter((item) => item.id !== record.id),
+          });
         },
       });
     },
