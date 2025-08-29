@@ -1,7 +1,30 @@
 .side-menu {
   flex: 1;
   overflow-y: auto;
+
+  // 左侧菜单滚动条隐藏样式
+  // 隐藏滚动条但保持滚动功能
+  &::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  &::-webkit-scrollbar-track {
+    display: none !important;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    display: none !important;
+  }
+
+  // Firefox 隐藏滚动条
+  scrollbar-width: none !important;
+
+  // IE 隐藏滚动条
+  -ms-overflow-style: none !important;
 }
+
+
 
 .system-logo {
   height: 56px;

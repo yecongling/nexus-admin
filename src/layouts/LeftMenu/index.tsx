@@ -51,7 +51,7 @@ const LeftMenu: React.FC = () => {
       theme={finalMode}
       collapsed={sidebar.collapsed}
     >
-      <div className="flex flex-col h-full" style={{scrollbarWidth: 'inherit'}}>
+      <div className="flex flex-col h-full" style={{ overflow: 'hidden' }}>
         <SystemLogo />
         <MenuComponent />
       </div>

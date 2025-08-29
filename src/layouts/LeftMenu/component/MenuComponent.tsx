@@ -169,7 +169,11 @@ const MenuComponent = () => {
     >
       {menuList.length > 0 ? (
         <Menu
-          style={{ borderRight: 0 }}
+          style={{ 
+            borderRight: 0,
+            height: '100%',
+            overflowY: 'auto'
+          }}
           mode="inline"
           theme={mode}
           selectedKeys={currentSelectedKeys}
