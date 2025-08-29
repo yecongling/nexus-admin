@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { Table, Button, Space, Tooltip, Tag, Switch } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { SysParam } from '../types';
@@ -16,6 +16,18 @@ interface ParamTableProps {
   pagination?: TableProps<SysParam>['pagination'];
 }
 
+/**
+ * 参数表格
+ * @param data 数据
+ * @param loading 加载状态
+ * @param selectedRowKeys 选中行
+ * @param onSelectionChange 选择行
+ * @param onEdit 编辑
+ * @param onDelete 删除
+ * @param onStatusChange 状态改变
+ * @param pagination 分页
+ * @returns
+ */
 const ParamTable: React.FC<ParamTableProps> = ({
   data,
   loading,
@@ -26,26 +38,31 @@ const ParamTable: React.FC<ParamTableProps> = ({
   onStatusChange,
   pagination,
 }) => {
+  // 获取数据类型标签
   const getDataTypeLabel = (value: string) => {
-    const option = DATA_TYPE_OPTIONS.find(item => item.value === value);
+    const option = DATA_TYPE_OPTIONS.find((item) => item.value === value);
     return option?.label || value;
   };
 
+  // 获取状态标签
   const getStatusLabel = (value: number) => {
-    const option = STATUS_OPTIONS.find(item => item.value === value);
+    const option = STATUS_OPTIONS.find((item) => item.value === value);
     return option?.label || value;
   };
 
+  // 获取分类标签
   const getCategoryLabel = (value: string) => {
-    const option = CATEGORY_OPTIONS.find(item => item.value === value);
+    const option = CATEGORY_OPTIONS.find((item) => item.value === value);
     return option?.label || value;
   };
 
+  // 表格列配置
   const columns: TableProps<SysParam>['columns'] = [
     {
       title: '序号',
       dataIndex: 'id',
       key: 'id',
+      fixed: 'left',
       width: 80,
       render: (_: any, __: any, index: number) => index + 1,
     },
@@ -53,7 +70,8 @@ const ParamTable: React.FC<ParamTableProps> = ({
       title: '参数名称',
       dataIndex: 'name',
       key: 'name',
-      width: 200,
+      width: 160,
+      fixed: 'left',
       ellipsis: true,
     },
     {
@@ -76,34 +94,29 @@ const ParamTable: React.FC<ParamTableProps> = ({
       dataIndex: 'category',
       key: 'category',
       width: 120,
-      render: (value: string) => (
-        <Tag color="blue">{getCategoryLabel(value)}</Tag>
-      ),
+      align: 'center',
+      render: (value: string) => <Tag color="blue">{getCategoryLabel(value)}</Tag>,
     },
     {
       title: '数据类型',
       dataIndex: 'dataType',
       key: 'dataType',
       width: 100,
-      render: (value: string) => (
-        <Tag color="green">{getDataTypeLabel(value)}</Tag>
-      ),
+      render: (value: string) => <Tag color="green">{getDataTypeLabel(value)}</Tag>,
     },
     {
-      title: '是否必填',
+      title: '必填',
       dataIndex: 'required',
       key: 'required',
+      align: 'center',
       width: 80,
-      render: (value: boolean) => (
-        <Tag color={value ? 'red' : 'default'}>
-          {value ? '是' : '否'}
-        </Tag>
-      ),
+      render: (value: boolean) => <Tag color={value ? 'red' : 'default'}>{value ? '是' : '否'}</Tag>,
     },
     {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
+      align: 'center',
       width: 100,
       render: (value: number, record: SysParam) => (
         <Switch
@@ -118,6 +131,7 @@ const ParamTable: React.FC<ParamTableProps> = ({
       title: '创建时间',
       dataIndex: 'createTime',
       key: 'createTime',
+      align: 'center',
       width: 180,
       render: (value: string) => {
         if (!value) return '-';
@@ -127,7 +141,8 @@ const ParamTable: React.FC<ParamTableProps> = ({
     {
       title: '操作',
       key: 'action',
-      width: 120,
+      width: 140,
+      align: 'center',
       fixed: 'right',
       render: (_: any, record: SysParam) => (
         <Space size="small">
@@ -152,24 +167,23 @@ const ParamTable: React.FC<ParamTableProps> = ({
     },
   ];
 
+  // 行选择配置
   const rowSelection = {
     selectedRowKeys,
     onChange: onSelectionChange,
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-100">
-      <Table
-        columns={columns}
-        dataSource={data}
-        rowKey="id"
-        loading={loading}
-        rowSelection={rowSelection}
-        pagination={pagination}
-        scroll={{ x: 1200 }}
-        className="ant-table-custom"
-      />
-    </div>
+    <Table
+      bordered
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      loading={loading}
+      rowSelection={rowSelection}
+      pagination={pagination}
+      scroll={{ x: 'max-content' }}
+    />
   );
 };
 

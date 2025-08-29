@@ -22,8 +22,7 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
   const hasSelection = selectedRowKeys.length > 0;
 
   return (
-    <div className="flex items-center justify-between mb-4">
-      <div className="text-lg font-medium text-gray-800">参数列表</div>
+    <div className="flex items-center justify-start mb-4">
       <Space>
         <Button
           type="primary"

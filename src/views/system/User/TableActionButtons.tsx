@@ -151,7 +151,7 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
       {/* 左侧主要操作按钮 */}
       <Space size="middle">
         {canAdd && (
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd} className="shadow-sm">
+          <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
             {t('common.operation.add')}
           </Button>
         )}
@@ -175,7 +175,6 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
           >
             <Button
               icon={<Icon icon="material-icon-theme:folder-import" className="text-xl! block" />}
-              className="shadow-sm"
             >
               {t('common.operation.import')}
             </Button>
@@ -186,7 +185,6 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
           <Dropdown.Button
             menu={{ items: exportItems }}
             icon={<Icon icon="material-icon-theme:folder-export" className="text-xl! block" />}
-            className="shadow-sm"
           >
             {t('common.operation.export')}
           </Dropdown.Button>
@@ -197,7 +195,6 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
           <Button
             icon={<Icon icon="fluent:options-24-regular" className="text-xl! block" />}
             disabled={selectedRows.length === 0}
-            className="shadow-sm"
           >
             批量操作
             {selectedRows.length > 0 && <Badge count={selectedRows.length} size="small" className="ml-1" />}
@@ -214,7 +211,6 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
                 content: '回收站功能正在开发中，敬请期待。',
               });
             }}
-            className="shadow-sm"
           >
             {t('common.operation.recycle')}
           </Button>

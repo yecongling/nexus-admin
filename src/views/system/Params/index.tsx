@@ -1,6 +1,6 @@
 import type React from 'react';
 import { useState, useCallback } from 'react';
-import { App, Modal } from 'antd';
+import { App, Card, Modal } from 'antd';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import SearchForm from './components/SearchForm';
 import TableActionButtons from './components/TableActionButtons';
@@ -229,17 +229,17 @@ const Params: React.FC = () => {
     batchDeleteMutation.isPending;
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen params-container">
-      <div className="max-w-7xl mx-auto">
-        {/* 搜索表单 */}
-        <SearchForm
-          onSearch={handleSearch}
-          onReset={handleReset}
-          loading={isLoading}
-          expanded={searchExpanded}
-          onToggleExpand={handleToggleSearchExpand}
-        />
+    <div className="bg-gray-50 h-full flex flex-col params-container">
+      {/* 搜索表单 */}
+      <SearchForm
+        onSearch={handleSearch}
+        onReset={handleReset}
+        loading={isLoading}
+        expanded={searchExpanded}
+        onToggleExpand={handleToggleSearchExpand}
+      />
 
+      <Card className="flex-1">
         {/* 表格操作按钮 */}
         <TableActionButtons
           onAdd={handleAdd}
@@ -274,17 +274,17 @@ const Params: React.FC = () => {
             },
           }}
         />
+      </Card>
 
-        {/* 新增/编辑弹窗 */}
-        <ParamModal
-          open={modalVisible}
-          title={modalTitle}
-          loading={modalLoading}
-          initialValues={currentRecord}
-          onOk={handleModalOk}
-          onCancel={handleModalCancel}
-        />
-      </div>
+      {/* 新增/编辑弹窗 */}
+      <ParamModal
+        open={modalVisible}
+        title={modalTitle}
+        loading={modalLoading}
+        initialValues={currentRecord}
+        onOk={handleModalOk}
+        onCancel={handleModalCancel}
+      />
     </div>
   );
 };
