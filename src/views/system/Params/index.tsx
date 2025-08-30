@@ -114,7 +114,14 @@ const Params: React.FC = () => {
 
   // 导出参数
   const exportMutation = useMutation({
-    mutationFn: () => sysParamService.exportParams(searchParams),
+    mutationFn: (options: { type: 'all' | 'selected'; selectedIds?: number[]; searchParams?: SysParamSearchParams }) => {
+      const exportOptions = {
+        type: options.type,
+        selectedIds: options.selectedIds,
+        searchParams: options.searchParams,
+      };
+      return sysParamService.exportParams(exportOptions);
+    },
     onSuccess: (blob) => {
       // 创建下载链接
       const url = window.URL.createObjectURL(blob);
@@ -208,9 +215,15 @@ const Params: React.FC = () => {
   }, [importMutation]);
 
   // 处理导出
-  const handleExport = useCallback(() => {
-    exportMutation.mutate();
-  }, [exportMutation]);
+  const handleExport = useCallback((type: 'all' | 'selected') => {
+    const exportOptions = {
+      type,
+      selectedIds: type === 'selected' ? selectedRowKeys as number[] : undefined,
+      searchParams: type === 'all' ? searchParams : undefined,
+    };
+    
+    exportMutation.mutate(exportOptions);
+  }, [exportMutation, selectedRowKeys, searchParams]);
 
   // 处理展开搜索
   const handleToggleSearchExpand = useCallback(() => {

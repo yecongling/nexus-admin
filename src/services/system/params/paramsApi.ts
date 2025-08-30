@@ -1,6 +1,6 @@
 import { HttpRequest } from '@/utils/request';
 import type { PageResult } from '@/types/global';
-import type { SysParam, SysParamSearchParams, SysParamFormData, ParamCategory } from './type';
+import type { SysParam, SysParamSearchParams, SysParamFormData, ParamCategory, ExportOptions } from './type';
 
 /**
  * 系统参数操作枚举
@@ -114,10 +114,10 @@ export interface ISysParamService {
 
   /**
    * 导出系统参数
-   * @param params 导出参数
+   * @param options 导出选项
    * @returns 导出结果
    */
-  exportParams(params?: SysParamSearchParams): Promise<Blob>;
+  exportParams(options: ExportOptions): Promise<Blob>;
 }
 
 /**
@@ -233,10 +233,22 @@ export const sysParamService: ISysParamService = {
 
   /**
    * 导出系统参数
-   * @param params 导出参数
+   * @param options 导出选项
    * @returns 导出结果
    */
-  async exportParams(params?: SysParamSearchParams): Promise<Blob> {
+  async exportParams(options: ExportOptions): Promise<Blob> {
+    const { type, selectedIds, searchParams } = options;
+    
+    let params: any = {};
+    
+    if (type === 'selected' && selectedIds && selectedIds.length > 0) {
+      // 导出选中的参数
+      params = { ids: selectedIds };
+    } else {
+      // 导出全部或按搜索条件导出
+      params = searchParams || {};
+    }
+    
     const response = await HttpRequest.get<Blob>({
       url: SysParamAction.exportParams,
       params,

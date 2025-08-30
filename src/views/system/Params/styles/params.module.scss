@@ -1,18 +1,4 @@
 // 系统参数模块样式
-.params-container {
-  .table-actions {
-    .ant-btn {
-      border-radius: 6px;
-      font-weight: 500;
-
-      &.ant-btn-primary {
-        box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
-      }
-    }
-  }
-
-}
-
 
 // 响应式设计
 @media (max-width: 768px) {
@@ -23,16 +9,6 @@
           width: 100%;
           margin-right: 0;
         }
-      }
-    }
-
-    .table-actions {
-      flex-direction: column;
-      gap: 12px;
-
-      .ant-space {
-        width: 100%;
-        justify-content: space-between;
       }
     }
   }
@@ -55,36 +31,5 @@
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-// 加载状态
-.ant-spin-container {
-  .ant-table-loading {
-    .ant-spin {
-      .ant-spin-dot {
-        .ant-spin-dot-item {
-          background-color: #ef4444;
-        }
-      }
-    }
-  }
-}
-
-// 空状态
-.ant-empty {
-  .ant-empty-description {
-    color: #6b7280;
-  }
-}
-
-// 选择框样式
-.ant-table-selection {
-  .ant-checkbox-wrapper {
-    .ant-checkbox {
-      .ant-checkbox-inner {
-        border-radius: 4px;
-      }
-    }
   }
 }

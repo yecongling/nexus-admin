@@ -1,5 +1,5 @@
 import { PlusOutlined, DeleteOutlined, ReloadOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons';
-import { Button, Space, Upload } from 'antd';
+import { Button, Space, Upload, Dropdown } from 'antd';
 import type React from 'react';
 import { usePermission } from '@/hooks/usePermission';
 
@@ -8,7 +8,7 @@ interface TableActionButtonsProps {
   onBatchDelete: () => void;
   onRefresh: () => void;
   onImport?: (file: File) => void;
-  onExport?: () => void;
+  onExport?: (type: 'all' | 'selected') => void;
   selectedRowKeys: React.Key[];
   loading?: boolean;
 }
@@ -38,12 +38,22 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
     return false; // 阻止自动上传
   };
 
-  // 处理导出
-  const handleExport = () => {
-    if (onExport) {
-      onExport();
-    }
-  };
+  // 导出菜单项
+  const exportMenuItems = [
+    {
+      key: 'all',
+      label: '导出全部',
+      icon: <DownloadOutlined />,
+      onClick: () => onExport?.('all'),
+    },
+    {
+      key: 'selected',
+      label: `导出选中 (${selectedRowKeys.length})`,
+      icon: <DownloadOutlined />,
+      disabled: !hasSelection,
+      onClick: () => onExport?.('selected'),
+    },
+  ];
 
   return (
     <div className="flex items-center justify-start mb-4">
@@ -67,9 +77,11 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
         )}
 
         {canExport && (
-          <Button icon={<DownloadOutlined />} onClick={handleExport}>
-            导出
-          </Button>
+          <Dropdown menu={{ items: exportMenuItems }} placement="bottomLeft">
+            <Button icon={<DownloadOutlined />}>
+              导出
+            </Button>
+          </Dropdown>
         )}
 
         <Button icon={<ReloadOutlined />} onClick={onRefresh} loading={loading}>

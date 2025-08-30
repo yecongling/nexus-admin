@@ -88,3 +88,12 @@ export const CATEGORY_OPTIONS = [
   { label: '安全配置', value: 'SECURITY' },
   { label: '其他配置', value: 'OTHER' },
 ];
+
+/**
+ * 导出选项
+ */
+export interface ExportOptions {
+  type: 'all' | 'selected';
+  selectedIds?: number[];
+  searchParams?: SysParamSearchParams;
+}
