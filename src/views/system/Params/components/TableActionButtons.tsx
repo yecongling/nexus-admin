@@ -1,12 +1,14 @@
+import { PlusOutlined, DeleteOutlined, ReloadOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons';
+import { Button, Space, Upload } from 'antd';
 import type React from 'react';
-import { Button, Space, Tooltip } from 'antd';
-import { PlusOutlined, DeleteOutlined, ReloadOutlined, SettingOutlined } from '@ant-design/icons';
+import { usePermission } from '@/hooks/usePermission';
 
 interface TableActionButtonsProps {
   onAdd: () => void;
   onBatchDelete: () => void;
   onRefresh: () => void;
-  onColumnSettings: () => void;
+  onImport?: (file: File) => void;
+  onExport?: () => void;
   selectedRowKeys: React.Key[];
   loading?: boolean;
 }
@@ -15,49 +17,64 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
   onAdd,
   onBatchDelete,
   onRefresh,
-  onColumnSettings,
+  onImport,
+  onExport,
   selectedRowKeys,
   loading = false,
 }) => {
   const hasSelection = selectedRowKeys.length > 0;
 
+  // 权限判定
+  const canAdd = usePermission(['sys:param:add']);
+  const canDelete = usePermission(['sys:param:delete']);
+  const canImport = usePermission(['sys:param:import']);
+  const canExport = usePermission(['sys:param:export']);
+
+  // 处理文件上传
+  const handleFileUpload = (file: File) => {
+    if (onImport) {
+      onImport(file);
+    }
+    return false; // 阻止自动上传
+  };
+
+  // 处理导出
+  const handleExport = () => {
+    if (onExport) {
+      onExport();
+    }
+  };
+
   return (
     <div className="flex items-center justify-start mb-4">
       <Space>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={onAdd}
-          className="bg-red-500 hover:bg-red-600 border-red-500 hover:border-red-600"
-        >
-          新增
-        </Button>
-        <Button
-          icon={<DeleteOutlined />}
-          onClick={onBatchDelete}
-          disabled={!hasSelection}
-          danger
-          className="border-red-500 text-red-500 hover:border-red-600 hover:text-red-600"
-        >
-          批量删除
-        </Button>
-        <Button
-          icon={<ReloadOutlined />}
-          onClick={onRefresh}
-          loading={loading}
-          className="border-gray-300 text-gray-600 hover:border-gray-400 hover:text-gray-700"
-        >
+        {canAdd && (
+          <Button type="primary" icon={<PlusOutlined />} onClick={onAdd}>
+            新增
+          </Button>
+        )}
+
+        {canDelete && (
+          <Button icon={<DeleteOutlined />} onClick={onBatchDelete} disabled={!hasSelection} danger>
+            批量删除
+          </Button>
+        )}
+
+        {canImport && (
+          <Upload accept=".xlsx,.xls,.csv" showUploadList={false} beforeUpload={handleFileUpload}>
+            <Button icon={<UploadOutlined />}>导入</Button>
+          </Upload>
+        )}
+
+        {canExport && (
+          <Button icon={<DownloadOutlined />} onClick={handleExport}>
+            导出
+          </Button>
+        )}
+
+        <Button icon={<ReloadOutlined />} onClick={onRefresh} loading={loading}>
           刷新
         </Button>
-        <Tooltip title="列设置">
-          <Button
-            icon={<SettingOutlined />}
-            onClick={onColumnSettings}
-            className="border-gray-300 text-gray-600 hover:border-gray-400 hover:text-gray-700"
-          >
-            列设置
-          </Button>
-        </Tooltip>
       </Space>
     </div>
   );

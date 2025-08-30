@@ -53,6 +53,14 @@ export interface SysParamFormData {
 }
 
 /**
+ * 参数分类选项
+ */
+export interface ParamCategory {
+  value: string;
+  label: string;
+}
+
+/**
  * 数据类型选项
  */
 export const DATA_TYPE_OPTIONS = [

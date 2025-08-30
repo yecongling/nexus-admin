@@ -23,7 +23,7 @@ const KeepAlive: React.FC<KeepAliveProps> = ({ children }) => {
     if (containerRef.current) {
       const scrollTop = containerRef.current.scrollTop;
       const scrollLeft = containerRef.current.scrollLeft;
-      
+
       const cached = cacheRef.current.get(key);
       if (cached) {
         cached.scrollTop = scrollTop;
@@ -63,25 +63,25 @@ const KeepAlive: React.FC<KeepAliveProps> = ({ children }) => {
     const maxCacheSize = 10; // 最大缓存数量
     if (cacheRef.current.size > maxCacheSize) {
       const cacheEntries = Array.from(cacheRef.current.entries());
-      
+
       // 只保留配置了keepalive的页面
-      const keepAliveTabs = tabs.filter(tab => tab.route?.meta?.keepAlive === true);
-      const keepAliveKeys = keepAliveTabs.map(tab => tab.key);
-      
+      const keepAliveTabs = tabs.filter((tab) => tab.route?.meta?.keepAlive === true);
+      const keepAliveKeys = keepAliveTabs.map((tab) => tab.key);
+
       // 过滤出需要保留的缓存（当前活跃页面和最近使用的keepalive页面）
       const keysToKeep = [
-        activeKey, 
+        activeKey,
         ...cacheEntries
           .filter(([key]) => keepAliveKeys.includes(key))
           .slice(-5)
-          .map(([key]) => key)
+          .map(([key]) => key),
       ];
-      
+
       const keysToRemove = cacheEntries
         .map(([key]) => key)
-        .filter(key => !keysToKeep.includes(key))
+        .filter((key) => !keysToKeep.includes(key))
         .slice(0, cacheRef.current.size - maxCacheSize);
-      
+
       for (const key of keysToRemove) {
         clearCache(key);
       }
@@ -92,25 +92,25 @@ const KeepAlive: React.FC<KeepAliveProps> = ({ children }) => {
     if (!activeKey) return;
 
     // 保存之前页面的滚动位置
-    const previousActiveKey = Object.keys(cacheRef.current).find(key => key !== activeKey);
+    const previousActiveKey = Object.keys(cacheRef.current).find((key) => key !== activeKey);
     if (previousActiveKey) {
       saveScrollPosition(previousActiveKey);
     }
 
     // 获取当前激活的tab信息
-    const currentTab = tabs.find(tab => tab.key === activeKey);
+    const currentTab = tabs.find((tab) => tab.key === activeKey);
     const shouldCache = currentTab?.route?.meta?.keepAlive === true;
 
     if (shouldCache) {
       // 如果配置了keepalive，检查缓存中是否已有当前页面
       let cached = cacheRef.current.get(activeKey);
-      
+
       if (!cached) {
         // 如果没有缓存，创建新的缓存项
         cached = {
           component: children as React.ReactElement,
           scrollTop: 0,
-          scrollLeft: 0
+          scrollLeft: 0,
         };
         cacheRef.current.set(activeKey, cached);
       }
@@ -123,7 +123,7 @@ const KeepAlive: React.FC<KeepAliveProps> = ({ children }) => {
     } else {
       // 如果没有配置keepalive，直接渲染组件，不进行缓存
       setCurrentComponent(children as React.ReactElement);
-      
+
       // 如果之前有缓存，清除它
       if (cacheRef.current.has(activeKey)) {
         clearCache(activeKey);
@@ -132,7 +132,6 @@ const KeepAlive: React.FC<KeepAliveProps> = ({ children }) => {
 
     // 智能清理缓存
     smartClearCache();
-
   }, [activeKey, children, tabs, clearCache, smartClearCache]);
 
   // 监听系统刷新事件
@@ -167,7 +166,7 @@ const KeepAlive: React.FC<KeepAliveProps> = ({ children }) => {
     };
 
     window.addEventListener('storage', handleStorageChange);
-    
+
     return () => {
       window.removeEventListener('storage', handleStorageChange);
     };
@@ -175,10 +174,10 @@ const KeepAlive: React.FC<KeepAliveProps> = ({ children }) => {
 
   // 清理不存在的tab对应的缓存
   useEffect(() => {
-    const tabKeys = tabs.map(tab => tab.key);
+    const tabKeys = tabs.map((tab) => tab.key);
     const cacheKeys = Array.from(cacheRef.current.keys());
-    
-    cacheKeys.forEach(key => {
+
+    cacheKeys.forEach((key) => {
       if (!tabKeys.includes(key)) {
         // 当tab被关闭时，清除对应的缓存
         clearCache(key);
@@ -192,7 +191,7 @@ const KeepAlive: React.FC<KeepAliveProps> = ({ children }) => {
     (window as any).__keepAliveClearCache = clearCache;
     (window as any).__keepAliveClearAllCache = clearAllCache;
     (window as any).__keepAliveSmartClearCache = smartClearCache;
-    
+
     return () => {
       delete (window as any).__keepAliveClearCache;
       delete (window as any).__keepAliveClearAllCache;
@@ -205,17 +204,7 @@ const KeepAlive: React.FC<KeepAliveProps> = ({ children }) => {
   }
 
   return (
-    <div 
-      ref={containerRef}
-      className="keep-alive-container"
-      style={{ 
-        height: '100%', 
-        overflow: 'auto',
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative'
-      }}
-    >
+    <div ref={containerRef} className="h-full relative flex flex-col overflow-x-hidden overflow-y-auto">
       {currentComponent}
     </div>
   );

@@ -1,8 +1,8 @@
 import type React from 'react';
 import { useEffect } from 'react';
 import { Modal, Form, Input, Select, Switch } from 'antd';
-import type { SysParam, SysParamFormData } from '../types';
-import { DATA_TYPE_OPTIONS, STATUS_OPTIONS, CATEGORY_OPTIONS } from '../types';
+import type { SysParam, SysParamFormData } from '@/services/system/params';
+import { DATA_TYPE_OPTIONS, STATUS_OPTIONS, CATEGORY_OPTIONS } from '@/services/system/params';
 
 const { TextArea } = Input;
 

@@ -1,8 +1,8 @@
 import type React from 'react';
 import { Form, Input, Select, Button, Space } from 'antd';
 import { SearchOutlined, RedoOutlined, DownOutlined, UpOutlined } from '@ant-design/icons';
-import type { SysParamSearchParams } from '../types';
-import { CATEGORY_OPTIONS } from '../types';
+import type { SysParamSearchParams } from '@/services/system/params';
+import { CATEGORY_OPTIONS } from '@/services/system/params';
 
 interface SearchFormProps {
   onSearch: (values: SysParamSearchParams) => void;

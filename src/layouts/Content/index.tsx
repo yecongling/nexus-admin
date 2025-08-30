@@ -16,10 +16,7 @@ const Content: React.FC = () => {
   const location = useLocation();
   return (
     <Layout.Content
-      className="flex flex-col"
       style={{
-        overflowY: "auto",
-        overflowX: "hidden",
         padding: "8px",
       }}
     >

@@ -1,9 +1,10 @@
 import type React from 'react';
 import { Table, Button, Space, Tooltip, Tag, Switch } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import type { SysParam } from '../types';
-import { DATA_TYPE_OPTIONS, STATUS_OPTIONS, CATEGORY_OPTIONS } from '../types';
+import type { SysParam } from '@/services/system/params';
+import { DATA_TYPE_OPTIONS, CATEGORY_OPTIONS } from '@/services/system/params';
 import type { TableProps } from 'antd';
+import { usePermission } from '@/hooks/usePermission';
 
 interface ParamTableProps {
   data: SysParam[];
@@ -38,15 +39,14 @@ const ParamTable: React.FC<ParamTableProps> = ({
   onStatusChange,
   pagination,
 }) => {
+  // 权限判定
+  const canEdit = usePermission(['param:edit']);
+  const canDelete = usePermission(['param:delete']);
+  const canChangeStatus = usePermission(['param:edit']);
+
   // 获取数据类型标签
   const getDataTypeLabel = (value: string) => {
     const option = DATA_TYPE_OPTIONS.find((item) => item.value === value);
-    return option?.label || value;
-  };
-
-  // 获取状态标签
-  const getStatusLabel = (value: number) => {
-    const option = STATUS_OPTIONS.find((item) => item.value === value);
     return option?.label || value;
   };
 
@@ -119,12 +119,16 @@ const ParamTable: React.FC<ParamTableProps> = ({
       align: 'center',
       width: 100,
       render: (value: number, record: SysParam) => (
-        <Switch
-          checked={value === 1}
-          onChange={(checked) => onStatusChange(record, checked)}
-          checkedChildren="启用"
-          unCheckedChildren="禁用"
-        />
+        canChangeStatus ? (
+          <Switch
+            checked={value === 1}
+            onChange={(checked) => onStatusChange(record, checked)}
+            checkedChildren="启用"
+            unCheckedChildren="禁用"
+          />
+        ) : (
+          <Tag color={value === 1 ? 'green' : 'red'}>{value === 1 ? '启用' : '禁用'}</Tag>
+        )
       ),
     },
     {
@@ -146,22 +150,26 @@ const ParamTable: React.FC<ParamTableProps> = ({
       fixed: 'right',
       render: (_: any, record: SysParam) => (
         <Space size="small">
-          <Tooltip title="编辑">
-            <Button
-              type="text"
-              icon={<EditOutlined />}
-              onClick={() => onEdit(record)}
-              className="text-blue-500 hover:text-blue-600"
-            />
-          </Tooltip>
-          <Tooltip title="删除">
-            <Button
-              type="text"
-              icon={<DeleteOutlined />}
-              onClick={() => onDelete(record)}
-              className="text-red-500 hover:text-red-600"
-            />
-          </Tooltip>
+          {canEdit && (
+            <Tooltip title="编辑">
+              <Button
+                type="text"
+                icon={<EditOutlined />}
+                onClick={() => onEdit(record)}
+                className="text-blue-500 hover:text-blue-600"
+              />
+            </Tooltip>
+          )}
+          {canDelete && (
+            <Tooltip title="删除">
+              <Button
+                type="text"
+                icon={<DeleteOutlined />}
+                onClick={() => onDelete(record)}
+                className="text-red-500 hover:text-red-600"
+              />
+            </Tooltip>
+          )}
         </Space>
       ),
     },

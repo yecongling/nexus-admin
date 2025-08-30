@@ -6,8 +6,12 @@ import SearchForm from './components/SearchForm';
 import TableActionButtons from './components/TableActionButtons';
 import ParamTable from './components/ParamTable';
 import ParamModal from './components/ParamModal';
-import { sysParamService } from './api';
-import type { SysParam, SysParamSearchParams, SysParamFormData } from './types';
+import {
+  sysParamService,
+  type SysParam,
+  type SysParamSearchParams,
+  type SysParamFormData,
+} from '@/services/system/params';
 import { PAGINATION_CONFIG } from './config';
 import './styles/params.module.scss';
 
@@ -43,7 +47,7 @@ const Params: React.FC = () => {
   });
 
   // 数据
-  const total = result?.total || 0;
+  const total = result?.totalRow || 0;
 
   // 新增参数
   const createMutation = useMutation({
@@ -93,6 +97,38 @@ const Params: React.FC = () => {
     },
     onError: (error: any) => {
       message.error(`批量删除参数失败: ${error.message || '未知错误'}`);
+    },
+  });
+
+  // 导入参数
+  const importMutation = useMutation({
+    mutationFn: (file: File) => sysParamService.importParams(file),
+    onSuccess: () => {
+      message.success('导入参数成功');
+      queryClient.invalidateQueries({ queryKey: ['sys_params'] });
+    },
+    onError: (error: any) => {
+      message.error(`导入参数失败: ${error.message || '未知错误'}`);
+    },
+  });
+
+  // 导出参数
+  const exportMutation = useMutation({
+    mutationFn: () => sysParamService.exportParams(searchParams),
+    onSuccess: (blob) => {
+      // 创建下载链接
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `系统参数_${new Date().toISOString().split('T')[0]}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      message.success('导出参数成功');
+    },
+    onError: (error: any) => {
+      message.error(`导出参数失败: ${error.message || '未知错误'}`);
     },
   });
 
@@ -166,10 +202,15 @@ const Params: React.FC = () => {
     refetch();
   }, [refetch]);
 
-  // 处理列设置
-  const handleColumnSettings = useCallback(() => {
-    message.info('列设置功能开发中...');
-  }, [message]);
+  // 处理导入
+  const handleImport = useCallback((file: File) => {
+    importMutation.mutate(file);
+  }, [importMutation]);
+
+  // 处理导出
+  const handleExport = useCallback(() => {
+    exportMutation.mutate();
+  }, [exportMutation]);
 
   // 处理展开搜索
   const handleToggleSearchExpand = useCallback(() => {
@@ -226,7 +267,9 @@ const Params: React.FC = () => {
     createMutation.isPending ||
     updateMutation.isPending ||
     deleteMutation.isPending ||
-    batchDeleteMutation.isPending;
+    batchDeleteMutation.isPending ||
+    importMutation.isPending ||
+    exportMutation.isPending;
 
   return (
     <div className="bg-gray-50 h-full flex flex-col params-container">
@@ -245,7 +288,8 @@ const Params: React.FC = () => {
           onAdd={handleAdd}
           onBatchDelete={handleBatchDelete}
           onRefresh={handleRefresh}
-          onColumnSettings={handleColumnSettings}
+          onImport={handleImport}
+          onExport={handleExport}
           selectedRowKeys={selectedRowKeys}
           loading={tableLoading}
         />
