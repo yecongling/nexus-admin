@@ -16,7 +16,7 @@ export interface SysParam {
   validatationRule?: string;
   required: boolean;
   relatedParam?: string;
-  status: number;
+  status: boolean;
   delFlag: boolean;
   createBy: number;
   createTime: string;
@@ -49,7 +49,7 @@ export interface SysParamFormData {
   validatationRule?: string;
   required: boolean;
   relatedParam?: string;
-  status: number;
+  status: boolean;
 }
 
 /**
@@ -64,29 +64,22 @@ export interface ParamCategory {
  * 数据类型选项
  */
 export const DATA_TYPE_OPTIONS = [
-  { label: '字符串', value: 'STRING' },
-  { label: '数字', value: 'NUMBER' },
-  { label: '布尔值', value: 'BOOLEAN' },
-  { label: '日期', value: 'DATE' },
-  { label: 'JSON', value: 'JSON' },
-];
-
-/**
- * 状态选项
- */
-export const STATUS_OPTIONS = [
-  { label: '启用', value: 1 },
-  { label: '禁用', value: 0 },
+  { label: '字符串', value: 'string' },
+  { label: '数字', value: 'number' },
+  { label: '布尔值', value: 'boolean' },
+  { label: '日期', value: 'date' },
+  { label: 'JSON', value: 'json' },
 ];
 
 /**
  * 参数分类选项
  */
 export const CATEGORY_OPTIONS = [
-  { label: '系统配置', value: 'SYSTEM' },
-  { label: '业务配置', value: 'BUSINESS' },
-  { label: '安全配置', value: 'SECURITY' },
-  { label: '其他配置', value: 'OTHER' },
+  { label: '系统参数', value: 'system' },
+  { label: '用户参数', value: 'user' },
+  { label: '业务参数', value: 'business' },
+  { label: '安全参数', value: 'security' },
+  { label: '其他参数', value: 'other' },
 ];
 
 /**

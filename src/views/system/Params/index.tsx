@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import SearchForm from './components/SearchForm';
 import TableActionButtons from './components/TableActionButtons';
 import ParamTable from './components/ParamTable';
-import ParamModal from './components/ParamModal';
+import ParamDrawer from './components/ParamDrawer';
 import {
   sysParamService,
   type SysParam,
@@ -30,10 +30,10 @@ const Params: React.FC = () => {
     pageSize: 10,
   });
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalTitle, setModalTitle] = useState('');
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [drawerTitle, setDrawerTitle] = useState('');
   const [currentRecord, setCurrentRecord] = useState<SysParam | undefined>();
-  const [modalLoading, setModalLoading] = useState(false);
+  const [drawerLoading, setDrawerLoading] = useState(false);
   const [searchExpanded, setSearchExpanded] = useState(false);
 
   // 查询参数列表
@@ -54,7 +54,7 @@ const Params: React.FC = () => {
     mutationFn: (data: SysParamFormData) => sysParamService.createParam(data),
     onSuccess: () => {
       message.success('新增参数成功');
-      setModalVisible(false);
+      setDrawerVisible(false);
       queryClient.invalidateQueries({ queryKey: ['sys_params'] });
     },
     onError: (error: any) => {
@@ -67,7 +67,7 @@ const Params: React.FC = () => {
     mutationFn: ({ id, data }: { id: number; data: SysParamFormData }) => sysParamService.updateParam(id, data),
     onSuccess: () => {
       message.success('更新参数成功');
-      setModalVisible(false);
+      setDrawerVisible(false);
       queryClient.invalidateQueries({ queryKey: ['sys_params'] });
     },
     onError: (error: any) => {
@@ -158,16 +158,16 @@ const Params: React.FC = () => {
 
   // 处理新增
   const handleAdd = useCallback(() => {
-    setModalTitle('新增参数');
+    setDrawerTitle('新增参数');
     setCurrentRecord(undefined);
-    setModalVisible(true);
+    setDrawerVisible(true);
   }, []);
 
   // 处理编辑
   const handleEdit = useCallback((record: SysParam) => {
-    setModalTitle('编辑参数');
+    setDrawerTitle('编辑参数');
     setCurrentRecord(record);
-    setModalVisible(true);
+    setDrawerVisible(true);
   }, []);
 
   // 处理删除
@@ -233,10 +233,9 @@ const Params: React.FC = () => {
   // 处理状态变更
   const handleStatusChange = useCallback(
     (record: SysParam, checked: boolean) => {
-      const newStatus = checked ? 1 : 0;
       updateMutation.mutate({
         id: record.id,
-        data: { ...record, status: newStatus },
+        data: { ...record, status: checked },
       });
     },
     [updateMutation],
@@ -247,10 +246,10 @@ const Params: React.FC = () => {
     setSelectedRowKeys(keys);
   }, []);
 
-  // 处理弹窗确认
-  const handleModalOk = useCallback(
+  // 处理抽屉确认
+  const handleDrawerOk = useCallback(
     (values: SysParamFormData) => {
-      setModalLoading(true);
+      setDrawerLoading(true);
 
       if (currentRecord) {
         // 编辑模式
@@ -263,14 +262,14 @@ const Params: React.FC = () => {
         createMutation.mutate(values);
       }
 
-      setModalLoading(false);
+      setDrawerLoading(false);
     },
     [currentRecord, createMutation, updateMutation],
   );
 
-  // 处理弹窗取消
-  const handleModalCancel = useCallback(() => {
-    setModalVisible(false);
+  // 处理抽屉取消
+  const handleDrawerCancel = useCallback(() => {
+    setDrawerVisible(false);
     setCurrentRecord(undefined);
   }, []);
 
@@ -333,14 +332,14 @@ const Params: React.FC = () => {
         />
       </Card>
 
-      {/* 新增/编辑弹窗 */}
-      <ParamModal
-        open={modalVisible}
-        title={modalTitle}
-        loading={modalLoading}
+      {/* 新增/编辑抽屉 */}
+      <ParamDrawer
+        open={drawerVisible}
+        title={drawerTitle}
+        loading={drawerLoading}
         initialValues={currentRecord}
-        onOk={handleModalOk}
-        onCancel={handleModalCancel}
+        onOk={handleDrawerOk}
+        onCancel={handleDrawerCancel}
       />
     </div>
   );

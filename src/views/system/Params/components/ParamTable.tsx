@@ -118,16 +118,16 @@ const ParamTable: React.FC<ParamTableProps> = ({
       key: 'status',
       align: 'center',
       width: 100,
-      render: (value: number, record: SysParam) => (
+      render: (value: boolean, record: SysParam) => (
         canChangeStatus ? (
           <Switch
-            checked={value === 1}
+            checked={value}
             onChange={(checked) => onStatusChange(record, checked)}
             checkedChildren="启用"
             unCheckedChildren="禁用"
           />
         ) : (
-          <Tag color={value === 1 ? 'green' : 'red'}>{value === 1 ? '启用' : '禁用'}</Tag>
+          <Tag color={value ? 'green' : 'red'}>{value ? '启用' : '禁用'}</Tag>
         )
       ),
     },
