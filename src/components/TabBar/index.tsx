@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useTabStore, type TabItem } from '@/stores/tabStore';
 import { useMenuStore } from '@/stores/store';
+import { useUserStore } from '@/stores/userStore';
 import { getIcon } from '@/utils/utils';
 import type { RouteItem } from '@/types/route';
 import { DownOutlined } from '@ant-design/icons';
@@ -17,7 +18,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  
+
   // 使用ref来跟踪是否正在关闭tab，避免useEffect重复执行
   const isClosingTabRef = useRef(false);
 
@@ -36,6 +37,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
     resetTabs,
   } = useTabStore();
   const { menus } = useMenuStore();
+  const { homePath } = useUserStore();
 
   // 根据当前路径查找路由信息
   const findRouteByPath = useCallback(
@@ -58,6 +60,33 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
     [menus],
   );
 
+  // 确保 homePath 对应的 tab 永远在第一个显示且固定
+  React.useEffect(() => {
+    // 只有在没有tab且有菜单数据且有homePath时才执行
+    if (tabs.length === 0 && menus.length > 0 && homePath) {
+      const homeRoute = findRouteByPath(homePath);
+      if (homeRoute?.path) {
+        // 创建第一个固定的tab
+        const homeTabItem: TabItem = {
+          key: homePath,
+          label: homeRoute.meta?.title || homePath,
+          icon: homeRoute.meta?.icon,
+          path: homePath,
+          closable: false, // 第一个tab不可关闭
+          route: homeRoute,
+        };
+
+        // 添加到store
+        useTabStore.getState().addTab(homeTabItem);
+
+        // 如果当前路径不是homePath，则跳转过去
+        if (pathname !== homePath) {
+          navigate(homePath, { replace: true });
+        }
+      }
+    }
+  }, [menus, tabs.length, homePath, findRouteByPath, navigate, pathname]);
+
   // 当路径变化时，自动添加或激活tab
   React.useEffect(() => {
     // 如果正在关闭tab，跳过执行
@@ -65,12 +94,12 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
       isClosingTabRef.current = false;
       return;
     }
-    
+
     if (!pathname || pathname === '/login') return;
-    
+
     const route = findRouteByPath(pathname);
     if (!route) return;
-    
+
     const tabItem: TabItem = {
       key: pathname,
       label: route.meta?.title || pathname,
@@ -115,7 +144,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     window.addEventListener('storage', handleStorageChange);
-    
+
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       window.removeEventListener('storage', handleStorageChange);
@@ -383,7 +412,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
       label: (
         <Dropdown menu={{ items: getContextMenu(tab) }} trigger={['contextMenu']} placement="bottomLeft">
           <div className="flex items-center gap-1">
-            <span className='mr-0.5'>{tab.icon && getIcon(tab.icon)}</span>
+            <span className="mr-0.5">{tab.icon && getIcon(tab.icon)}</span>
             <span>{t(tab.label)}</span>
           </div>
         </Dropdown>
