@@ -130,9 +130,9 @@ export const sysParamService: ISysParamService = {
    * @returns 系统参数列表、分页信息
    */
   async queryParams(params: SysParamSearchParams): Promise<PageResult<SysParam>> {
-    const response = await HttpRequest.get<PageResult<SysParam>>({
+    const response = await HttpRequest.post<PageResult<SysParam>>({
       url: SysParamAction.queryParams,
-      params,
+      data: params,
     });
     return response;
   },
