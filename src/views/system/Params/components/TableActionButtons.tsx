@@ -1,5 +1,6 @@
-import { PlusOutlined, DeleteOutlined, ReloadOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, ReloadOutlined, DownloadOutlined } from '@ant-design/icons';
 import { Button, Space, Upload, Dropdown } from 'antd';
+import { Icon } from '@iconify-icon/react';
 import type React from 'react';
 import { usePermission } from '@/hooks/usePermission';
 
@@ -72,16 +73,18 @@ const TableActionButtons: React.FC<TableActionButtonsProps> = ({
 
         {canImport && (
           <Upload accept=".xlsx,.xls,.csv" showUploadList={false} beforeUpload={handleFileUpload}>
-            <Button icon={<UploadOutlined />}>导入</Button>
+            <Button icon={<Icon icon="material-icon-theme:folder-import" className="text-xl! block" />}>导入</Button>
           </Upload>
         )}
 
         {canExport && (
-          <Dropdown menu={{ items: exportMenuItems }} placement="bottomLeft">
-            <Button icon={<DownloadOutlined />}>
-              导出
-            </Button>
-          </Dropdown>
+          <Dropdown.Button
+            menu={{ items: exportMenuItems }}
+            icon={<Icon icon="material-icon-theme:folder-export" className="text-xl! block" />}
+            placement="bottomLeft"
+          >
+            导出
+          </Dropdown.Button>
         )}
 
         <Button icon={<ReloadOutlined />} onClick={onRefresh} loading={loading}>
