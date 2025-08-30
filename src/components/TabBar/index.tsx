@@ -35,6 +35,8 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
     pinTab,
     unpinTab,
     resetTabs,
+    addTab,
+    setTabs,
   } = useTabStore();
   const { menus } = useMenuStore();
   const { homePath } = useUserStore();
@@ -64,9 +66,9 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
   React.useEffect(() => {
     // 只有在没有tab且有菜单数据且有homePath时才执行
     if (tabs.length === 0 && menus.length > 0 && homePath) {
+      // 首先创建homePath的tab（第一个位置）
       const homeRoute = findRouteByPath(homePath);
       if (homeRoute?.path) {
-        // 创建第一个固定的tab
         const homeTabItem: TabItem = {
           key: homePath,
           label: homeRoute.meta?.title || homePath,
@@ -76,16 +78,68 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
           route: homeRoute,
         };
 
-        // 添加到store
-        useTabStore.getState().addTab(homeTabItem);
+        // 使用头插入，不激活（因为后面可能还有当前页面的tab）
+        addTab(homeTabItem, { insertAt: 'head', activate: false });
+      }
 
-        // 如果当前路径不是homePath，则跳转过去
-        if (pathname !== homePath) {
-          navigate(homePath, { replace: true });
-        }
+      // 然后检查当前路径是否有效（在菜单中存在）
+      const currentRoute = findRouteByPath(pathname);
+
+      if (currentRoute?.path && pathname !== homePath) {
+        // 如果当前路径有效且不是homePath，创建对应的tab
+        const currentTabItem: TabItem = {
+          key: pathname,
+          label: currentRoute.meta?.title || pathname,
+          icon: currentRoute.meta?.icon,
+          path: pathname,
+          closable: true,
+          route: currentRoute,
+        };
+
+        // 使用尾插入，激活当前页面
+        addTab(currentTabItem, { insertAt: 'tail', activate: true });
+      } else if (pathname !== homePath) {
+        // 如果当前路径无效且不是homePath，跳转到homePath
+        navigate(homePath, { replace: true });
       }
     }
   }, [menus, tabs.length, homePath, findRouteByPath, navigate, pathname]);
+
+  // 确保 homePath 对应的 tab 始终存在（即使在其他tab被添加后）
+  React.useEffect(() => {
+    if (menus.length > 0 && homePath && tabs.length > 0) {
+      const homeRoute = findRouteByPath(homePath);
+      const homeTabExists = tabs.some((tab) => tab.key === homePath);
+
+      // 如果homePath的tab不存在，需要添加
+      if (homeRoute?.path && !homeTabExists) {
+        const homeTabItem: TabItem = {
+          key: homePath,
+          label: homeRoute.meta?.title || homePath,
+          icon: homeRoute.meta?.icon,
+          path: homePath,
+          closable: false, // 第一个tab不可关闭
+          route: homeRoute,
+        };
+
+        // 使用头插入，不激活，保持当前激活状态
+        addTab(homeTabItem, { insertAt: 'head', activate: false });
+      }
+      // 如果homePath的tab存在但不在第一个位置，需要重新排序
+      else if (homeRoute?.path && homeTabExists) {
+        const homeTabIndex = tabs.findIndex((tab) => tab.key === homePath);
+        // 只有当homePath不在第一个位置时才重新排序，避免不必要的操作
+        if (homeTabIndex > 0) {
+          const homeTab = tabs[homeTabIndex];
+          const otherTabs = tabs.filter((tab) => tab.key !== homePath);
+          const newTabs = [homeTab, ...otherTabs];
+
+          // 使用setTabs方法，一次性更新状态
+          setTabs(newTabs, activeKey);
+        }
+      }
+    }
+  }, [menus, homePath, tabs, findRouteByPath, activeKey]);
 
   // 当路径变化时，自动添加或激活tab
   React.useEffect(() => {

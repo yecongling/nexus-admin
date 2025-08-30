@@ -18,11 +18,13 @@ interface TabStore {
   // 当前激活的tab key
   activeKey: string;
   // 添加tab
-  addTab: (tab: TabItem) => void;
+  addTab: (tab: TabItem, options?: { insertAt?: 'head' | 'tail', activate?: boolean }) => void;
   // 移除tab
   removeTab: (targetKey: string) => string;
   // 设置激活的tab
   setActiveKey: (key: string) => void;
+  // 批量设置tabs（用于重新排序等场景）
+  setTabs: (tabs: TabItem[], activeKey?: string) => void;
   // 关闭其他tabs
   closeOtherTabs: (targetKey: string) => string;
   // 关闭左侧tabs
@@ -51,19 +53,36 @@ export const useTabStore = create<TabStore>()(
       tabs: [],
       activeKey: '',
 
-      addTab: (tab: TabItem) => {
+      addTab: (tab: TabItem, options?: { insertAt?: 'head' | 'tail', activate?: boolean }) => {
         const { tabs, activeKey } = get();
         const existingTabIndex = tabs.findIndex((t) => t.key === tab.key);
 
         if (existingTabIndex === -1) {
-          // 新tab，添加到末尾
+          // 新tab，根据选项决定插入位置
+          const { insertAt = 'tail', activate = true } = options || {};
+          
+          let newTabs: TabItem[];
+          if (insertAt === 'head') {
+            // 头插入：添加到数组开头
+            newTabs = [tab, ...tabs];
+          } else {
+            // 尾插入：添加到数组末尾（默认行为）
+            newTabs = [...tabs, tab];
+          }
+
+          // 根据activate选项决定是否激活新tab
+          const newActiveKey = activate ? tab.key : activeKey;
+
           set({
-            tabs: [...tabs, tab],
-            activeKey: tab.key,
+            tabs: newTabs,
+            activeKey: newActiveKey,
           });
         } else {
-          // tab已存在，只激活它
-          set({ activeKey: tab.key });
+          // tab已存在，根据activate选项决定是否激活
+          const { activate = true } = options || {};
+          if (activate) {
+            set({ activeKey: tab.key });
+          }
         }
       },
 
@@ -99,6 +118,10 @@ export const useTabStore = create<TabStore>()(
 
       setActiveKey: (key: string) => {
         set({ activeKey: key });
+      },
+
+      setTabs: (tabs: TabItem[], activeKey?: string) => {
+        set({ tabs, activeKey: activeKey || '' });
       },
 
       closeOtherTabs: (targetKey: string) => {
