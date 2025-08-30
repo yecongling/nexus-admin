@@ -93,7 +93,8 @@ const MenuComponent = () => {
   );
 
   const clickMenu: MenuProps["onClick"] = ({ key }: { key: string }) => {
-    navigate(key);
+    // 使用 replace 模式，替换当前历史记录，防止用户通过浏览器后退按钮回到之前的菜单
+    navigate(key, { replace: true });
   };
 
   useEffect(() => {

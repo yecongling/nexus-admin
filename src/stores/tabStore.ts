@@ -41,6 +41,8 @@ interface TabStore {
   getTab: (key: string) => TabItem | undefined;
   // 检查tab是否存在
   hasTab: (key: string) => boolean;
+  // 重置所有tabs（用于退出登录或页面刷新）
+  resetTabs: () => void;
 }
 
 export const useTabStore = create<TabStore>()(
@@ -181,6 +183,10 @@ export const useTabStore = create<TabStore>()(
       hasTab: (key: string) => {
         const { tabs } = get();
         return tabs.some((tab) => tab.key === key);
+      },
+
+      resetTabs: () => {
+        set({ tabs: [], activeKey: '' });
       },
     }),
     {

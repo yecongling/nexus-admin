@@ -17,6 +17,7 @@ import avatar from "@/assets/images/avatar.png";
 import { commonService } from "@/services/common";
 import { usePreferencesStore } from "@/stores/store";
 import { useUserStore } from "@/stores/userStore";
+import { useTabStore } from "@/stores/tabStore";
 
 /**
  * 用户信息下拉框
@@ -27,6 +28,7 @@ const UserDropdown: React.FC = () => {
     (state) => state.updatePreferences
   );
   const userStore = useUserStore();
+  const { resetTabs } = useTabStore();
   const { token } = theme.useToken();
   const { modal } = App.useApp();
   const { t } = useTranslation();
@@ -162,6 +164,8 @@ const UserDropdown: React.FC = () => {
             // 清除后端的信息
             commonService.logout(token as string).then((res: boolean) => {
               if (res) {
+                // 清空所有tab
+                resetTabs();
                 // 清空token
                 userStore.logout();
                 // 修改回document.title

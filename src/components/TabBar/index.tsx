@@ -33,6 +33,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
     reloadTab,
     pinTab,
     unpinTab,
+    resetTabs,
   } = useTabStore();
   const { menus } = useMenuStore();
 
@@ -88,13 +89,45 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
       // tab已存在，只激活它
       setActiveKey(pathname);
     }
-  }, [pathname, findRouteByPath, setActiveKey]);
+  }, [pathname, findRouteByPath, setActiveKey, tabs]);
+
+  // 监听用户退出登录和页面刷新事件
+  React.useEffect(() => {
+    const handleBeforeUnload = () => {
+      // 页面刷新或关闭时清空所有tab
+      resetTabs();
+    };
+
+    const handleStorageChange = (e: StorageEvent) => {
+      // 监听 localStorage 变化，检测用户登录状态变化
+      if (e.key === 'user-storage') {
+        try {
+          const userData = JSON.parse(e.newValue || '{}');
+          if (!userData.isLogin) {
+            // 用户退出登录，清空所有tab
+            resetTabs();
+          }
+        } catch (error) {
+          // 解析失败，忽略
+        }
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [resetTabs]);
 
   // 处理tab切换
   const handleTabChange = useCallback(
     (key: string) => {
       setActiveKey(key);
-      navigate(key);
+      // 使用 replace 模式，替换当前历史记录，防止用户通过浏览器后退按钮回到之前的菜单
+      navigate(key, { replace: true });
     },
     [setActiveKey, navigate],
   );
@@ -108,7 +141,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
         const newActiveKey = removeTab(e);
         // 如果关闭的是当前激活的tab，需要跳转到新的激活tab
         if (e === activeKey && newActiveKey) {
-          navigate(newActiveKey);
+          navigate(newActiveKey, { replace: true });
         }
       }
     },
@@ -129,7 +162,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
             const newActiveKey = removeTab(tab.key);
             // 如果关闭的是当前激活的tab，需要跳转到新的激活tab
             if (tab.key === activeKey && newActiveKey) {
-              navigate(newActiveKey);
+              navigate(newActiveKey, { replace: true });
             }
           },
         },
@@ -170,7 +203,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
             const newActiveKey = closeLeftTabs(tab.key);
             // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
             if (newActiveKey && newActiveKey !== activeKey) {
-              navigate(newActiveKey);
+              navigate(newActiveKey, { replace: true });
             }
           },
         },
@@ -184,7 +217,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
             const newActiveKey = closeRightTabs(tab.key);
             // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
             if (newActiveKey && newActiveKey !== activeKey) {
-              navigate(newActiveKey);
+              navigate(newActiveKey, { replace: true });
             }
           },
         },
@@ -198,7 +231,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
             const newActiveKey = closeOtherTabs(tab.key);
             // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
             if (newActiveKey && newActiveKey !== activeKey) {
-              navigate(newActiveKey);
+              navigate(newActiveKey, { replace: true });
             }
           },
         },
@@ -211,7 +244,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
             isClosingTabRef.current = true;
             closeAllTabs();
             // 关闭所有tab后跳转到首页或登录页
-            navigate('/');
+            navigate('/', { replace: true });
           },
         },
       ];
@@ -233,7 +266,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
             const newActiveKey = removeTab(activeKey);
             // 如果关闭的是当前激活的tab，需要跳转到新的激活tab
             if (newActiveKey) {
-              navigate(newActiveKey);
+              navigate(newActiveKey, { replace: true });
             }
           }
         },
@@ -280,7 +313,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
             const newActiveKey = closeLeftTabs(activeKey);
             // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
             if (newActiveKey && newActiveKey !== activeKey) {
-              navigate(newActiveKey);
+              navigate(newActiveKey, { replace: true });
             }
           }
         },
@@ -296,7 +329,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
             const newActiveKey = closeRightTabs(activeKey);
             // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
             if (newActiveKey && newActiveKey !== activeKey) {
-              navigate(newActiveKey);
+              navigate(newActiveKey, { replace: true });
             }
           }
         },
@@ -312,7 +345,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
             const newActiveKey = closeOtherTabs(activeKey);
             // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
             if (newActiveKey && newActiveKey !== activeKey) {
-              navigate(newActiveKey);
+              navigate(newActiveKey, { replace: true });
             }
           }
         },
