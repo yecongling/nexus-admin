@@ -1,6 +1,7 @@
 import { HttpRequest } from '@/utils/request';
 import type { UserModel } from './type';
 import type { UserSearchParams } from './type';
+import type { PageResult } from '@/types/global';
 
 /**
  * 用户信息操作枚举
@@ -30,6 +31,11 @@ const UserAction = {
    * 查询用户
    */
   getUserList: '/system/user/queryUserList',
+
+  /**
+   * 查询用户列表（分页）
+   */
+  queryUserListPage: '/system/user/queryUserListPage',
 
   /**
    * 批量锁定用户
@@ -90,6 +96,13 @@ export interface IUserService {
    * @returns 用户列表、分页信息
    */
   queryUsers(searchParams: UserSearchParams): Promise<Record<string, any>>;
+
+  /**
+   * 查询用户列表（分页）
+   * @param searchParams 查询参数（包括分页）
+   * @returns 用户列表、分页信息
+   */
+  queryUserListPage(searchParams: UserSearchParams): Promise<PageResult<UserModel>>;
 
   /**
    * 批量更新用户状态
@@ -181,6 +194,24 @@ export const userService: IUserService = {
       {
         url: UserAction.getUserList,
         params: searchParams,
+      },
+      {
+        successMessageMode: 'none',
+      },
+    );
+    return response;
+  },
+
+  /**
+   * 查询用户列表（分页）
+   * @param searchParams 查询参数（包括分页）
+   * @returns 用户列表、分页信息
+   */
+  async queryUserListPage(searchParams: UserSearchParams): Promise<PageResult<UserModel>> {
+    const response = await HttpRequest.post(
+      {
+        url: UserAction.queryUserListPage,
+        data: searchParams,
       },
       {
         successMessageMode: 'none',

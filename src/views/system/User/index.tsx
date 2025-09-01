@@ -68,7 +68,7 @@ const User: React.FC = () => {
     refetch,
   } = useQuery({
     queryKey: ['sys_users', searchParams],
-    queryFn: () => userService.queryUsers({ ...searchParams }),
+    queryFn: () => userService.queryUserListPage({ ...searchParams }),
   });
 
   // 选中的行
@@ -76,8 +76,8 @@ const User: React.FC = () => {
   const [selectedRows, setSelectedRows] = useState<UserModel[]>([]);
 
   // 表格数据
-  const data = result?.data || [];
-  const total = result?.total || 0;
+  const data = result?.records || [];
+  const total = result?.totalRow || 0;
 
   // 处理导入
   const handleImport = () => {

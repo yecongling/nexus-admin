@@ -8,7 +8,11 @@ import path from 'path';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    react(),
+    react({
+      babel: {
+        plugins: ['babel-plugin-react-compiler'],
+      },
+    }),
     tailwindcss(),
     viteCompression({
       verbose: true,
@@ -59,7 +63,7 @@ export default defineConfig({
             {
               name: 'axios',
               test: /node_modules[\\/]axios/,
-            }
+            },
           ],
         },
       },
