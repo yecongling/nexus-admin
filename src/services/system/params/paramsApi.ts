@@ -133,7 +133,7 @@ export const sysParamService: ISysParamService = {
     const response = await HttpRequest.post<PageResult<SysParam>>({
       url: SysParamAction.queryParams,
       data: params,
-    });
+    }, {successMessageMode: 'none'});
     return response;
   },
 
@@ -145,7 +145,7 @@ export const sysParamService: ISysParamService = {
   async getParamById(id: number): Promise<SysParam> {
     const response = await HttpRequest.get<SysParam>({
       url: `${SysParamAction.getParamById}/${id}`,
-    });
+    }, {successMessageMode: 'none'});
     return response;
   },
 
