@@ -1,16 +1,21 @@
+/**
+ * Axios 请求封装入口文件
+ */
+
 import { ContentTypeEnum } from '@/enums/httpEnum';
 import { deepMerge } from '../../utils';
-import { RFetch } from './Fetch';
-import type { CreateFetchOptions } from './types';
-import { transform } from './transform';
+import { RAxios } from './Axios';
+import { type CreateAxiosOptions, transform } from './transform';
 
 /**
- * 封装fetch
+ * 创建 Axios 请求实例
+ * @param opts 配置选项
  */
-function createFetch(opts?: Partial<CreateFetchOptions>) {
-  return new RFetch(
+function createAxios(opts?: Partial<CreateAxiosOptions>) {
+  return new RAxios(
     deepMerge(
       {
+        authenticationScheme: '',
         timeout: 0,
         headers: { 'Content-Type': ContentTypeEnum.JSON },
         // 数据处理方式
@@ -50,9 +55,9 @@ function createFetch(opts?: Partial<CreateFetchOptions>) {
   );
 }
 
-// 导出fetch请求对象
-export const FetchRequest = createFetch();
+// 导出 Axios 请求对象（向后兼容）
+export const HttpRequest = createAxios();
 
 // 导出类和函数
-export { RFetch, createFetch };
-export type { CreateFetchOptions } from './types';
+export { RAxios, createAxios };
+export type { CreateAxiosOptions } from './transform';

@@ -120,6 +120,18 @@ export class RFetch {
         }
       }
       
+      // 处理特殊响应类型
+      const responseType = (conf as any).responseType;
+      if (responseType === 'blob') {
+        return await processedResponse.blob() as unknown as T;
+      } else if (responseType === 'arraybuffer') {
+        return await processedResponse.arrayBuffer() as unknown as T;
+      } else if (responseType === 'text') {
+        return await processedResponse.text() as unknown as T;
+      } else if (responseType === 'json') {
+        return await processedResponse.json() as unknown as T;
+      }
+      
       return processedResponse as unknown as T;
     } catch (error) {
       // 请求错误处理

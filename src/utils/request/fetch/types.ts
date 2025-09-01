@@ -14,6 +14,7 @@ export interface CreateFetchOptions extends RequestInit {
   timeout?: number;
   data?: any;
   params?: any;
+  responseType?: 'json' | 'text' | 'blob' | 'arraybuffer' | 'document' | 'stream';
 }
 
 // Fetch 转换器接口

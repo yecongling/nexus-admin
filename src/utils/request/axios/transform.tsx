@@ -116,6 +116,14 @@ export const transform: AxiosTransform = {
     if (isReturnNativeResponse) {
       return res;
     }
+    
+    // 处理特殊响应类型（如 blob、arraybuffer 等）
+    const config = res.config as CreateAxiosOptions;
+    if (config.responseType && ['blob', 'arraybuffer', 'text'].includes(config.responseType)) {
+      // 对于 blob、arraybuffer、text 等特殊响应类型，直接返回原始数据
+      return res.data;
+    }
+    
     // 不进行任何处理，直接返回响应数据
     if (!isTransformResponse) {
       return res.data;
