@@ -12,20 +12,26 @@ const Footer: React.FC = () => {
         <div className='mr-2 flex items-center'>
             <Icon icon="uil:enter" className='text-xl'/>
             <span className='ml-1'>
-                选择
+                选择并跳转
             </span>
         </div>
         <div className='mr-2 flex items-center'>
             <Icon icon="mdi:arrow-up" className='text-xl' />
             <Icon icon="mdi:arrow-down" className='text-xl' />
             <span className='ml-1'>
-                导航
+                导航选择
             </span>
         </div>
-        <div className='flex items-center'>
+        <div className='mr-2 flex items-center'>
             <Icon icon="mdi:keyboard-esc" className='text-xl'/>
             <span className='ml-1'>
                 关闭
+            </span>
+        </div>
+        <div className='flex items-center'>
+            <Icon icon="mdi:backspace" className='text-xl'/>
+            <span className='ml-1'>
+                清空输入
             </span>
         </div>
       </div>
