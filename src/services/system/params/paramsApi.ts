@@ -17,6 +17,11 @@ const SysParamAction = {
   getParamById: '/system/param/getParamById',
 
   /**
+   * 根据编码查询系统参数
+   */
+  getParamByCode: '/system/param/getParamByCode',
+
+  /**
    * 新增系统参数
    */
   createParam: '/system/param/addParam',
@@ -69,6 +74,13 @@ export interface ISysParamService {
    * @returns 系统参数信息
    */
   getParamById(id: number): Promise<SysParam>;
+
+  /**
+   * 根据编码查询系统参数
+   * @param code 参数编码
+   * @returns 系统参数信息
+   */
+  getParamByCode(code: string): Promise<string>;
 
   /**
    * 新增系统参数
@@ -151,6 +163,21 @@ export const sysParamService: ISysParamService = {
         url: `${SysParamAction.getParamById}/${id}`,
       },
       { successMessageMode: 'none' },
+    );
+    return response;
+  },
+
+  /**
+   * 根据编码查询系统参数
+   * @param code 参数编码
+   * @returns 系统参数信息
+   */
+  async getParamByCode(code: string): Promise<string> {
+    const response = await HttpRequest.get<string>(
+      {
+        url: `${SysParamAction.getParamByCode}/${code}`,
+      },
+      { successMessageMode: 'none', requestType: RequestType.FETCH },
     );
     return response;
   },
