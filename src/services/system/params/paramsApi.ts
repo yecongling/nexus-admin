@@ -1,4 +1,4 @@
-import { HttpRequest } from '@/utils/request';
+import { HttpRequest, RequestType } from '@/utils/request';
 import type { PageResult } from '@/types/global';
 import type { SysParam, SysParamSearchParams, SysParamFormData, ParamCategory, ExportOptions } from './type';
 
@@ -130,10 +130,13 @@ export const sysParamService: ISysParamService = {
    * @returns 系统参数列表、分页信息
    */
   async queryParams(params: SysParamSearchParams): Promise<PageResult<SysParam>> {
-    const response = await HttpRequest.post<PageResult<SysParam>>({
-      url: SysParamAction.queryParams,
-      data: params,
-    }, {successMessageMode: 'none'});
+    const response = await HttpRequest.post<PageResult<SysParam>>(
+      {
+        url: SysParamAction.queryParams,
+        data: params,
+      },
+      { successMessageMode: 'none', requestType: RequestType.FETCH },
+    );
     return response;
   },
 
@@ -143,9 +146,12 @@ export const sysParamService: ISysParamService = {
    * @returns 系统参数信息
    */
   async getParamById(id: number): Promise<SysParam> {
-    const response = await HttpRequest.get<SysParam>({
-      url: `${SysParamAction.getParamById}/${id}`,
-    }, {successMessageMode: 'none'});
+    const response = await HttpRequest.get<SysParam>(
+      {
+        url: `${SysParamAction.getParamById}/${id}`,
+      },
+      { successMessageMode: 'none' },
+    );
     return response;
   },
 
@@ -220,7 +226,7 @@ export const sysParamService: ISysParamService = {
   async importParams(file: File): Promise<boolean> {
     const formData = new FormData();
     formData.append('file', file);
-    
+
     const response = await HttpRequest.post<boolean>({
       url: SysParamAction.importParams,
       data: formData,
@@ -238,9 +244,9 @@ export const sysParamService: ISysParamService = {
    */
   async exportParams(options: ExportOptions): Promise<Blob> {
     const { type, selectedIds, searchParams } = options;
-    
+
     let params: any = {};
-    
+
     if (type === 'selected' && selectedIds && selectedIds.length > 0) {
       // 导出选中的参数
       params = { ids: selectedIds };
@@ -248,7 +254,7 @@ export const sysParamService: ISysParamService = {
       // 导出全部或按搜索条件导出
       params = searchParams || {};
     }
-    
+
     const response = await HttpRequest.get<Blob>({
       url: SysParamAction.exportParams,
       params,

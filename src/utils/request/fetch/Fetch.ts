@@ -86,8 +86,11 @@ export class RFetch {
       // 创建AbortController
       const controller = this.createAbortController((this.options as any).timeout);
 
-      // 处理请求头
-      const headers = new Headers(conf.headers);
+      // 处理请求头 - 合并实例默认headers和请求配置headers
+      const defaultHeaders = this.options.headers || {};
+      const requestHeaders = conf.headers || {};
+      const mergedHeaders = { ...defaultHeaders, ...requestHeaders };
+      const headers = new Headers(mergedHeaders);
 
       // 处理请求体
       const body = this.processRequestBody((conf as any).data, headers);
