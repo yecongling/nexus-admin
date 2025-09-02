@@ -1,10 +1,4 @@
-import axios, {
-  type AxiosError,
-  type AxiosInstance,
-  type AxiosRequestConfig,
-  type AxiosResponse,
-  type InternalAxiosRequestConfig,
-} from 'axios';
+import axios, { type AxiosError, type AxiosInstance, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
 import { cloneDeep } from 'lodash-es';
 import type { RequestOptions } from '@/types/axios';
 import { isFunction } from '@/utils/is';
@@ -27,6 +21,16 @@ export class RAxios {
   private getTransform() {
     const { transform } = this.options;
     return transform;
+  }
+
+  /**
+   * 设置transform
+   * @param transform 新的transform实例
+   */
+  setTransform(transform: any) {
+    this.options.transform = transform;
+    // 重新设置拦截器
+    this.setupInterceptors();
   }
 
   /**
@@ -105,51 +109,5 @@ export class RAxios {
           reject(e);
         });
     });
-  }
-
-  /**
-   * 封装get请求
-   * @param config
-   * @param options
-   */
-  get<T = any>(config: AxiosRequestConfig, options?: RequestOptions): Promise<T> {
-    return this.request({ ...config, method: 'GET' }, options);
-  }
-
-  /**
-   * 封装post请求
-   *
-   * @param config
-   * @param options
-   */
-  post<T = any>(config: AxiosRequestConfig, options?: RequestOptions): Promise<T> {
-    return this.request({ ...config, method: 'POST' }, options);
-  }
-
-  /**
-   * 封装put请求
-   * @param config
-   * @param options
-   */
-  put<T = any>(config: AxiosRequestConfig, options?: RequestOptions): Promise<T> {
-    return this.request({ ...config, method: 'PUT' }, options);
-  }
-
-  /**
-   * 封装delete请求
-   * @param config
-   * @param options
-   */
-  delete<T = any>(config: AxiosRequestConfig, options?: RequestOptions): Promise<T> {
-    return this.request({ ...config, method: 'DELETE' }, options);
-  }
-
-  /**
-   * 封装patch请求
-   * @param config
-   * @param options
-   */
-  patch<T = any>(config: AxiosRequestConfig, options?: RequestOptions): Promise<T> {
-    return this.request({ ...config, method: 'PATCH' }, options);
   }
 }

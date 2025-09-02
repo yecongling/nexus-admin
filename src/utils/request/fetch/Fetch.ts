@@ -19,17 +19,25 @@ export class RFetch {
   }
 
   /**
+   * 设置transform
+   * @param transform 新的transform实例
+   */
+  setTransform(transform: any) {
+    this.options.transform = transform;
+  }
+
+  /**
    * 创建AbortController用于取消请求
    */
   private createAbortController(timeout?: number): AbortController {
     const controller = new AbortController();
-    
+
     if (timeout && timeout > 0) {
       setTimeout(() => {
         controller.abort();
       }, timeout);
     }
-    
+
     return controller;
   }
 
@@ -38,11 +46,11 @@ export class RFetch {
    */
   private processRequestBody(data: any, headers: Headers): any {
     const contentType = headers.get('Content-Type');
-    
+
     if (data === null || data === undefined) {
       return undefined;
     }
-    
+
     if (contentType?.includes('application/json')) {
       return JSON.stringify(data);
     } else if (contentType?.includes('application/x-www-form-urlencoded')) {
@@ -66,7 +74,7 @@ export class RFetch {
     const transform = this.getTransform();
     const { requestOptions } = this.options;
     const opt: RequestOptions = Object.assign({}, requestOptions, options);
-    
+
     // 请求前的数据处理
     const { beforeRequestHook, requestCatchHook, transformResponseHook } = transform || {};
     if (beforeRequestHook && isFunction(beforeRequestHook)) {
@@ -77,13 +85,13 @@ export class RFetch {
     try {
       // 创建AbortController
       const controller = this.createAbortController((this.options as any).timeout);
-      
+
       // 处理请求头
       const headers = new Headers(conf.headers);
-      
+
       // 处理请求体
       const body = this.processRequestBody((conf as any).data, headers);
-      
+
       // 构建fetch配置
       const fetchConfig: RequestInit = {
         method: conf.method || 'GET',
@@ -100,10 +108,10 @@ export class RFetch {
 
       // 发起请求
       const response = await fetch((conf as any).url, fetchConfig);
-      
+
       // 将config附加到response对象上，用于拦截器处理
       (response as any).config = conf;
-      
+
       // 响应拦截器处理
       let processedResponse = response;
       if (transform?.responseInterceptors && isFunction(transform.responseInterceptors)) {
@@ -119,78 +127,32 @@ export class RFetch {
           throw err || new Error('请求错误！');
         }
       }
-      
+
       // 处理特殊响应类型
       const responseType = (conf as any).responseType;
       if (responseType === 'blob') {
-        return await processedResponse.blob() as unknown as T;
+        return (await processedResponse.blob()) as unknown as T;
       } else if (responseType === 'arraybuffer') {
-        return await processedResponse.arrayBuffer() as unknown as T;
+        return (await processedResponse.arrayBuffer()) as unknown as T;
       } else if (responseType === 'text') {
-        return await processedResponse.text() as unknown as T;
+        return (await processedResponse.text()) as unknown as T;
       } else if (responseType === 'json') {
-        return await processedResponse.json() as unknown as T;
+        return (await processedResponse.json()) as unknown as T;
       }
-      
+
       return processedResponse as unknown as T;
     } catch (error) {
       // 请求错误处理
       if (requestCatchHook && isFunction(requestCatchHook)) {
         throw await requestCatchHook(error as Error, opt);
       }
-      
+
       // 响应错误拦截器处理
       if (transform?.responseInterceptorsCatch && isFunction(transform.responseInterceptorsCatch)) {
         transform.responseInterceptorsCatch(error as Error);
       }
-      
+
       throw error;
     }
-  }
-
-  /**
-   * 封装get请求
-   * @param config
-   * @param options
-   */
-  get<T = any>(config: CreateFetchOptions, options?: RequestOptions): Promise<T> {
-    return this.request({ ...config, method: 'GET' }, options);
-  }
-
-  /**
-   * 封装post请求
-   *
-   * @param config
-   * @param options
-   */
-  post<T = any>(config: CreateFetchOptions, options?: RequestOptions): Promise<T> {
-    return this.request({ ...config, method: 'POST' }, options);
-  }
-
-  /**
-   * 封装put请求
-   * @param config
-   * @param options
-   */
-  put<T = any>(config: CreateFetchOptions, options?: RequestOptions): Promise<T> {
-    return this.request({ ...config, method: 'PUT' }, options);
-  }
-
-  /**
-   * 封装delete请求
-   * @param config
-   * @param options
-   */
-  delete<T = any>(config: CreateFetchOptions, options?: RequestOptions): Promise<T> {
-    return this.request({ ...config, method: 'DELETE' }, options);
-  }
-
-  /**
-   * 封装patch请求
-   * @param config
-   * @param options
-   */
-  patch<T = any>(config: CreateFetchOptions, options?: RequestOptions): Promise<T> {
-    return this.request({ ...config, method: 'PATCH' }, options);
   }
 }

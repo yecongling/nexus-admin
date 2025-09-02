@@ -16,7 +16,10 @@ import type {
 import { RequestType as RequestTypeValues } from './types';
 import { RAxios } from './axios/Axios';
 import { RFetch } from './fetch/Fetch';
+import { createTransform as createAxiosTransform } from './axios/transform';
+import { createTransform as createFetchTransform } from './fetch/transform';
 import { deepMerge } from '../utils';
+import { cloneDeep } from 'lodash-es';
 import { ContentTypeEnum } from '@/enums/httpEnum';
 
 /**
@@ -61,13 +64,16 @@ export class UnifiedRequest implements IUnifiedRequest {
       },
     };
 
-    // 初始化 Axios 实例
-    const axiosConfig: CreateAxiosOptions = deepMerge(defaultConfig, this.baseConfig);
+    // 初始化 Axios 实例 - 使用深拷贝避免对象引用问题
+    const axiosConfig: CreateAxiosOptions = deepMerge(cloneDeep(defaultConfig), this.baseConfig);
     this.axiosInstance = new RAxios(axiosConfig);
-
-    // 初始化 Fetch 实例
-    const fetchConfig: CreateFetchOptions = deepMerge(defaultConfig, this.baseConfig);
+    
+    // 初始化 Fetch 实例 - 使用深拷贝避免对象引用问题
+    const fetchConfig: CreateFetchOptions = deepMerge(cloneDeep(defaultConfig), this.baseConfig);
     this.fetchInstance = new RFetch(fetchConfig);
+    // 分别设置transform，确保每个实例使用正确的transform
+    this.axiosInstance.setTransform(createAxiosTransform(this.axiosInstance));
+    this.fetchInstance.setTransform(createFetchTransform(this.fetchInstance));
   }
 
   /**
@@ -173,7 +179,7 @@ export class UnifiedRequest implements IUnifiedRequest {
    * @param options 请求选项
    */
   async get<T = any>(config: UnifiedRequestConfig, options?: ExtendedRequestOptions): Promise<T> {
-    return this.request<T>(config, options);
+    return this.request<T>({ ...config, method: 'GET' }, options);
   }
 
   /**
@@ -183,7 +189,7 @@ export class UnifiedRequest implements IUnifiedRequest {
    * @param options 请求选项
    */
   async post<T = any>(config: UnifiedRequestConfig, options?: ExtendedRequestOptions): Promise<T> {
-    return this.request<T>(config, options);
+    return this.request<T>({ ...config, method: 'POST' }, options);
   }
 
   /**
@@ -193,7 +199,7 @@ export class UnifiedRequest implements IUnifiedRequest {
    * @param options 请求选项
    */
   async put<T = any>(config: UnifiedRequestConfig, options?: ExtendedRequestOptions): Promise<T> {
-    return this.request<T>(config, options);
+    return this.request<T>({ ...config, method: 'PUT' }, options);
   }
 
   /**
@@ -203,7 +209,7 @@ export class UnifiedRequest implements IUnifiedRequest {
    * @param options 请求选项
    */
   async delete<T = any>(config: UnifiedRequestConfig, options?: ExtendedRequestOptions): Promise<T> {
-    return this.request<T>(config, options);
+    return this.request<T>({ ...config, method: 'DELETE' }, options);
   }
 
   /**
@@ -213,7 +219,7 @@ export class UnifiedRequest implements IUnifiedRequest {
    * @param options 请求选项
    */
   async patch<T = any>(config: UnifiedRequestConfig, options?: ExtendedRequestOptions): Promise<T> {
-    return this.request<T>(config, options);
+    return this.request<T>({ ...config, method: 'PATCH' }, options);
   }
 
   /**

@@ -5,7 +5,7 @@
 import { ContentTypeEnum } from '@/enums/httpEnum';
 import { deepMerge } from '../../utils';
 import { RAxios } from './Axios';
-import { type CreateAxiosOptions, transform } from './transform';
+import { type CreateAxiosOptions, createTransform } from './transform';
 
 /**
  * 创建 Axios 请求实例
@@ -18,8 +18,8 @@ function createAxios(opts?: Partial<CreateAxiosOptions>) {
         authenticationScheme: '',
         timeout: 0,
         headers: { 'Content-Type': ContentTypeEnum.JSON },
-        // 数据处理方式
-        transform,
+        // 数据处理方式 - 将在创建实例后设置
+        transform: undefined,
         // 默认返回值类型处理成json
         responseType: 'json',
         // 配置项，下面的选项都可以在独立的接口请求中覆盖
@@ -55,8 +55,14 @@ function createAxios(opts?: Partial<CreateAxiosOptions>) {
   );
 }
 
+// 创建axios请求对象
+const axiosInstance = createAxios();
+
+// 设置transform，传入自身实例
+axiosInstance.setTransform(createTransform(axiosInstance));
+
 // 导出 Axios 请求对象（向后兼容）
-export const HttpRequest = createAxios();
+export const HttpRequest = axiosInstance;
 
 // 导出类和函数
 export { RAxios, createAxios };

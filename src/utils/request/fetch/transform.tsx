@@ -12,7 +12,7 @@ import { isString } from '../../is';
 import { encrypt } from '../../encrypt';
 import type React from 'react';
 import { useUserStore } from '@/stores/userStore';
-import { FetchRequest } from '.';
+// 移除对FetchRequest的依赖，使用自身的请求实例
 import { commonService } from '@/services/common';
 import { t } from 'i18next';
 
@@ -35,9 +35,9 @@ function addSubscriber(callback: (token: string) => void) {
 
 
 /**
- * 定义一些拦截器的具体实现
+ * 创建transform实例，接受请求实例作为参数
  */
-export const transform: FetchTransform = {
+export const createTransform = (requestInstance: any): FetchTransform => ({
   /**
    * 处理响应数据
    * @param res
@@ -278,7 +278,7 @@ export const transform: FetchTransform = {
             // 执行等待的请求
             onTokenRefreshed(newToken);
             // 重新发起原始请求
-            const response = await FetchRequest.request(
+            const response = await requestInstance.request(
               { ...config },
               { token: newToken, isReturnNativeResponse: true },
             );
@@ -303,7 +303,7 @@ export const transform: FetchTransform = {
           return new Promise((resolve, reject) => {
             addSubscriber((token: string) => {
               // 重新发起原始请求
-              FetchRequest.request(
+              requestInstance.request(
                 { ...config },
                 { token: token, isReturnNativeResponse: true },
               )
@@ -354,4 +354,7 @@ export const transform: FetchTransform = {
 
     return Promise.reject(error);
   },
-};
+});
+
+// 为了向后兼容，导出一个默认的transform实例（需要在使用时传入请求实例）
+export const transform: FetchTransform = createTransform(null as any);

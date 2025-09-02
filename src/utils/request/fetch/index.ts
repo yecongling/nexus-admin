@@ -2,7 +2,7 @@ import { ContentTypeEnum } from '@/enums/httpEnum';
 import { deepMerge } from '../../utils';
 import { RFetch } from './Fetch';
 import type { CreateFetchOptions } from './types';
-import { transform } from './transform';
+import { createTransform } from './transform';
 
 /**
  * 封装fetch
@@ -13,8 +13,8 @@ function createFetch(opts?: Partial<CreateFetchOptions>) {
       {
         timeout: 0,
         headers: { 'Content-Type': ContentTypeEnum.JSON },
-        // 数据处理方式
-        transform,
+        // 数据处理方式 - 将在创建实例后设置
+        transform: undefined,
         // 默认返回值类型处理成json
         responseType: 'json',
         // 配置项，下面的选项都可以在独立的接口请求中覆盖
@@ -50,8 +50,14 @@ function createFetch(opts?: Partial<CreateFetchOptions>) {
   );
 }
 
+// 创建fetch请求对象
+const fetchInstance = createFetch();
+
+// 设置transform，传入自身实例
+fetchInstance.setTransform(createTransform(fetchInstance));
+
 // 导出fetch请求对象
-export const FetchRequest = createFetch();
+export const FetchRequest = fetchInstance;
 
 // 导出类和函数
 export { RFetch, createFetch };
