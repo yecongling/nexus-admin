@@ -24,6 +24,7 @@ const GlobalConfigProvider: React.FC = () => {
   return (
     <ConfigProvider
       theme={{
+        cssVar: true,
         token: {
           colorPrimary: colorPrimary,
         },

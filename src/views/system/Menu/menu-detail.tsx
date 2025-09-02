@@ -61,7 +61,7 @@ const MenuDetail: React.FC<MenuDetailProps> = ({ menu, onOpenDrawer, onDeleteMen
           title="切换菜单状态"
           description={`确定${menu?.status ? '禁用' : '启用'}菜单吗？`}
           onConfirm={() => {
-            toggleMenuStatusMutation.mutate({ id: menu.id, status: !menu.status });
+            toggleMenuStatusMutation.mutate({ id: menu?.id, status: !menu?.status });
           }}
         >
           <Switch size="small" value={menu?.status} disabled={!hasEditPermission} />

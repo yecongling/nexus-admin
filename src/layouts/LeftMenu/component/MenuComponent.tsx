@@ -1,15 +1,15 @@
-import { memo, useCallback, useEffect, useState, useMemo } from "react";
-import { Empty, Menu, Spin, type MenuProps } from "antd";
-import { useLocation, useNavigate } from "react-router";
-import { useTranslation } from "react-i18next";
-import { Icon } from "@iconify-icon/react";
-import { useMenuStore, usePreferencesStore } from "@/stores/store";
-import { getIcon, getOpenKeys, searchRoute } from "@/utils/utils";
-import type { RouteItem } from "@/types/route";
-import { useShallow } from "zustand/shallow";
-import { useTabStore } from "@/stores/tabStore";
+import { memo, useCallback, useEffect, useState, useMemo } from 'react';
+import { Empty, Menu, Spin, type MenuProps } from 'antd';
+import { useLocation, useNavigate } from 'react-router';
+import { useTranslation } from 'react-i18next';
+import { Icon } from '@iconify-icon/react';
+import { useMenuStore, usePreferencesStore } from '@/stores/store';
+import { getIcon, getOpenKeys, searchRoute } from '@/utils/utils';
+import type { RouteItem } from '@/types/route';
+import { useShallow } from 'zustand/shallow';
+import { useTabStore } from '@/stores/tabStore';
 
-type MenuItem = Required<MenuProps>["items"][number];
+type MenuItem = Required<MenuProps>['items'][number];
 
 /**
  * 菜单组件
@@ -27,17 +27,15 @@ const MenuComponent = () => {
       accordion: state.preferences.navigation.accordion,
       dynamicTitle: state.preferences.app.dynamicTitle,
       collapsed: state.preferences.sidebar.collapsed,
-    }))
+    })),
   );
   const mode = usePreferencesStore((state) => {
     let mode = state.preferences.theme.mode;
-    if (mode === "auto") {
-      mode = window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light";
+    if (mode === 'auto') {
+      mode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
     if (state.preferences.theme.semiDarkSidebar) {
-      mode = "dark";
+      mode = 'dark';
     }
     return mode;
   });
@@ -51,7 +49,7 @@ const MenuComponent = () => {
     key?: React.Key | null,
     icon?: React.ReactNode,
     children?: MenuItem[],
-    type?: "group"
+    type?: 'group',
   ): MenuItem => {
     return {
       key,
@@ -62,37 +60,21 @@ const MenuComponent = () => {
     } as MenuItem;
   };
 
-  const deepLoopFloat = useCallback(
-    (menuList: RouteItem[], newArr: MenuItem[] = []) => {
-      for (const item of menuList) {
-        if (
-          item?.meta?.menuType === 2 ||
-          item?.meta?.menuType === 3 ||
-          item?.hidden
-        ) {
-          continue;
-        }
-        if (!item?.children?.length) {
-          newArr.push(
-            getItem(item.meta?.title, item.path, getIcon(item.meta?.icon))
-          );
-          continue;
-        }
-        newArr.push(
-          getItem(
-            item.meta?.title,
-            item.path,
-            getIcon(item.meta?.icon),
-            deepLoopFloat(item.children)
-          )
-        );
+  const deepLoopFloat = useCallback((menuList: RouteItem[], newArr: MenuItem[] = []) => {
+    for (const item of menuList) {
+      if (item?.meta?.menuType === 2 || item?.meta?.menuType === 3 || item?.hidden) {
+        continue;
       }
-      return newArr;
-    },
-    []
-  );
+      if (!item?.children?.length) {
+        newArr.push(getItem(item.meta?.title, item.path, getIcon(item.meta?.icon)));
+        continue;
+      }
+      newArr.push(getItem(item.meta?.title, item.path, getIcon(item.meta?.icon), deepLoopFloat(item.children)));
+    }
+    return newArr;
+  }, []);
 
-  const clickMenu: MenuProps["onClick"] = ({ key }: { key: string }) => {
+  const clickMenu: MenuProps['onClick'] = ({ key }: { key: string }) => {
     // 使用 replace 模式，替换当前历史记录，防止用户通过浏览器后退按钮回到之前的菜单
     navigate(key, { replace: true });
   };
@@ -170,15 +152,17 @@ const MenuComponent = () => {
     >
       {menuList.length > 0 ? (
         <Menu
-          style={{ 
+          style={{
             borderRight: 0,
             height: '100%',
-            overflowY: 'auto'
+            overflowY: 'auto',
+            overflowX: 'hidden',
           }}
           mode="inline"
           theme={mode}
+          inlineCollapsed={collapsed}
           selectedKeys={currentSelectedKeys}
-          openKeys={collapsed ? [] : mergedOpenKeys}
+          {...(collapsed ? {} : { openKeys: mergedOpenKeys })}
           items={menuList}
           onClick={clickMenu}
           onOpenChange={onOpenChange}

@@ -15,13 +15,15 @@ const SystemLogo = () => {
     <div className="flex justify-between items-center toolbox">
       <Link to="/" style={{ width: '100%' }}>
         <section className="system-logo h-16 flex items-center shrink-0 box-border">
-          <Image
-            width={32}
-            height={32}
-            className="rounded-s-md transition-all duration-200 overflow-hidden shrink-0"
-            src={logo}
-            preview={false}
-          />
+          <div className="logo-container">
+            <Image
+              width={32}
+              height={32}
+              className="logo-image"
+              src={logo}
+              preview={false}
+            />
+          </div>
           <span className="system-name" style={{ color: colorPrimary }}>
             Nexus Admin
           </span>
