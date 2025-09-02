@@ -12,6 +12,7 @@ import {
   type SysParamSearchParams,
   type SysParamFormData,
 } from '@/services/system/params';
+import { updateParamCache, deleteParamCache, clearAllParamCache } from '@/utils/paramService';
 import { PAGINATION_CONFIG } from './config';
 import './styles/params.module.scss';
 
@@ -52,51 +53,59 @@ const Params: React.FC = () => {
   // 新增参数
   const createMutation = useMutation({
     mutationFn: (data: SysParamFormData) => sysParamService.createParam(data),
-    onSuccess: () => {
-      message.success('新增参数成功');
+    onSuccess: (_, data) => {
       setDrawerVisible(false);
       queryClient.invalidateQueries({ queryKey: ['sys_params'] });
-    },
-    onError: (error: any) => {
-      message.error(`新增参数失败: ${error.message || '未知错误'}`);
+      
+      // 更新参数缓存
+      if (data.code && data.value) {
+        updateParamCache(data.code, data.value);
+      }
     },
   });
 
   // 更新参数
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: SysParamFormData }) => sysParamService.updateParam(id, data),
-    onSuccess: () => {
-      message.success('更新参数成功');
+    onSuccess: (_, { data }) => {
       setDrawerVisible(false);
       queryClient.invalidateQueries({ queryKey: ['sys_params'] });
-    },
-    onError: (error: any) => {
-      message.error(`更新参数失败: ${error.message || '未知错误'}`);
+      
+      // 更新参数缓存
+      if (data.code && data.value) {
+        updateParamCache(data.code, data.value);
+      }
     },
   });
 
   // 删除参数
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => sysParamService.deleteParam(id),
-    onSuccess: () => {
-      message.success('删除参数成功');
+    mutationFn: ({ id }: { id: number; code: string }) => sysParamService.deleteParam(id),
+    onSuccess: (_, { code }) => {
       queryClient.invalidateQueries({ queryKey: ['sys_params'] });
-    },
-    onError: (error: any) => {
-      message.error(`删除参数失败: ${error.message || '未知错误'}`);
+      
+      // 删除参数缓存
+      if (code) {
+        deleteParamCache(code);
+      }
     },
   });
 
   // 批量删除参数
   const batchDeleteMutation = useMutation({
-    mutationFn: (ids: number[]) => sysParamService.batchDeleteParams(ids),
-    onSuccess: () => {
-      message.success('批量删除参数成功');
+    mutationFn: ({ ids }: { ids: number[]; codes: string[] }) => sysParamService.batchDeleteParams(ids),
+    onSuccess: (_, { codes }) => {
       setSelectedRowKeys([]);
       queryClient.invalidateQueries({ queryKey: ['sys_params'] });
-    },
-    onError: (error: any) => {
-      message.error(`批量删除参数失败: ${error.message || '未知错误'}`);
+      
+      // 批量删除参数缓存
+      if (codes && codes.length > 0) {
+        codes.forEach(code => {
+          if (code) {
+            deleteParamCache(code);
+          }
+        });
+      }
     },
   });
 
@@ -104,11 +113,10 @@ const Params: React.FC = () => {
   const importMutation = useMutation({
     mutationFn: (file: File) => sysParamService.importParams(file),
     onSuccess: () => {
-      message.success('导入参数成功');
       queryClient.invalidateQueries({ queryKey: ['sys_params'] });
-    },
-    onError: (error: any) => {
-      message.error(`导入参数失败: ${error.message || '未知错误'}`);
+      
+      // 导入可能影响多个参数，清空所有缓存
+      clearAllParamCache();
     },
   });
 
@@ -179,7 +187,7 @@ const Params: React.FC = () => {
         okText: '确定',
         cancelText: '取消',
         onOk: () => {
-          deleteMutation.mutate(record.id);
+          deleteMutation.mutate({ id: record.id, code: record.code });
         },
       });
     },
@@ -193,16 +201,25 @@ const Params: React.FC = () => {
       return;
     }
 
+    // 获取选中记录的code
+    const selectedRecords = result?.records?.filter(record => 
+      selectedRowKeys.includes(record.id)
+    ) || [];
+    const selectedCodes = selectedRecords.map(record => record.code);
+
     confirm({
       title: '确认批量删除',
       content: `确定要删除选中的 ${selectedRowKeys.length} 个参数吗？`,
       okText: '确定',
       cancelText: '取消',
       onOk: () => {
-        batchDeleteMutation.mutate(selectedRowKeys as number[]);
+        batchDeleteMutation.mutate({ 
+          ids: selectedRowKeys as number[], 
+          codes: selectedCodes 
+        });
       },
     });
-  }, [selectedRowKeys, batchDeleteMutation, message]);
+  }, [selectedRowKeys, batchDeleteMutation, message, result?.records]);
 
   // 处理刷新
   const handleRefresh = useCallback(() => {

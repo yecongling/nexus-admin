@@ -282,11 +282,14 @@ export const sysParamService: ISysParamService = {
       params = searchParams || {};
     }
 
-    const response = await HttpRequest.get<Blob>({
-      url: SysParamAction.exportParams,
-      params,
-      responseType: 'blob',
-    });
+    const response = await HttpRequest.get<Blob>(
+      {
+        url: SysParamAction.exportParams,
+        params,
+        responseType: 'blob',
+      },
+      { successMessageMode: 'none', errorMessageMode: 'none' },
+    );
     return response;
   },
 };
