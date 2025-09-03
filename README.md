@@ -23,7 +23,7 @@ Nexus 是一个现代化的集成信息管理平台，专为多协议、多系�
 
 - **React 19.1.9** - 现代化的用户界面框架
 - **Ant Design 5.x** - 企业级 UI 组件库
-- **Vite** - 快速的前端构建工具
+- **Rsbuild** - 快速的前端构建工具
 - **TypeScript** - 类型安全的 JavaScript 超集
 - **Zustand** - 轻量级状态管理
 - **React Router 7.x** - 客户端路由管理
@@ -187,7 +187,7 @@ nexus-admin/
 
 ### 环境要求
 
-- **Node.js**: >= 22.12.0
+- **Node.js**: >= 20
 - **Bun**: 最新版本
 - **Java**: JDK 21+
 - **数据库**: MySQL 8.0+ 或 PostgreSQL 13+
@@ -224,12 +224,12 @@ bun run preview
 
 ```bash
 # 开发环境
-VITE_API_BASE_URL=http://localhost:9193
-VITE_APP_TITLE=Nexus Admin
+RSBUILD_API_BASE_URL=http://localhost:9193
+RSBUILD_APP_TITLE=Nexus Admin
 
 # 生产环境
-VITE_API_BASE_URL=https://api.nexus.com
-VITE_APP_TITLE=Nexus 集成平台
+RSBUILD_API_BASE_URL=https://api.nexus.com
+RSBUILD_APP_TITLE=Nexus 集成平台
 ```
 
 ### 代理配置
@@ -237,7 +237,7 @@ VITE_APP_TITLE=Nexus 集成平台
 开发环境已配置 API 代理，将 `/api` 请求代理到后端服务：
 
 ```typescript
-// vite.config.ts
+// rsbuild.config.ts
 server: {
   port: 8000,
   proxy: {
@@ -304,7 +304,7 @@ CMD ["nginx", "-g", "daemon off;"]
 
 ```bash
 # 构建生产版本
-bun run build:prod
+bun run build
 
 # 部署到服务器
 rsync -av dist/ user@server:/var/www/nexus-admin/
