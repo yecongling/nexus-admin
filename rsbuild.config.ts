@@ -49,6 +49,7 @@ export default defineConfig({
     pluginBabel({
       include: /\.(?:jsx|tsx)$/,
       babelLoaderOptions(opts) {
+        // 启用react-compiler插件
         opts.plugins?.unshift('babel-plugin-react-compiler');
       },
     }),
@@ -133,7 +134,6 @@ export default defineConfig({
     },
     // 启用构建缓存
     buildCache: !isDev,
-    // 移除console.[method]语句
     removeConsole: true,
     // 开启包文件分析
     // bundleAnalyze: {

@@ -232,7 +232,7 @@ const Role: React.FC = () => {
             showQuickJumper: true,
             hideOnSinglePage: false,
             showSizeChanger: true,
-            showTotal: (total) => `共 ${total} 条`,
+            showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`,
             total: tableData?.total || 0,
             onChange(page, pageSize) {
               setSearchParams({

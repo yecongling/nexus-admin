@@ -4,27 +4,27 @@
 
 import { HttpRequest } from '@/utils/request';
 
-export enum Api {
+const Api = {
   /**
    * 获取所有端点配置列表
    */
-  queryEndpointConfigType = '/engine/endpointConfig/queryEndpointConfigType',
+  queryEndpointConfigType: '/engine/endpointConfig/queryEndpointConfigType',
 
   /**
    * 新增端点类型
    */
-  addEndpointType = '/engine/endpointConfig/addEndpointType',
+  addEndpointType: '/engine/endpointConfig/addEndpointType',
 
   /**
    * 修改端点类型
    */
-  updateEndpointType = '/engine/endpointConfig/updateEndpointType',
+  updateEndpointType: '/engine/endpointConfig/updateEndpointType',
 
   /**
    * 删除端点类型
    */
-  deleteEndpointType = '/engine/endpointConfig/deleteEndpointType',
-}
+  deleteEndpointType: '/engine/endpointConfig/deleteEndpointType',
+};
 
 /**
  * 获取所有端点配置列表

@@ -4,7 +4,7 @@ import { memo, useCallback, useEffect, useState } from 'react';
 import { CloseOutlined, DownOutlined, FolderFilled, FolderOpenFilled } from '@ant-design/icons';
 import { Button, Checkbox, Drawer, Space, Tree, type TreeProps } from 'antd';
 import { roleService } from '@/services/system/role/roleApi';
-import { getIcon } from '@/utils/utils';
+import { transformData } from '@/utils/utils';
 
 /**
  * 角色菜单授权界面
@@ -41,34 +41,12 @@ const RoleMenuDrawer: React.FC<RoleMenuDrawerProps> = ({ open, roleId, onOk, onC
   useEffect(() => {
     if (isSuccess) {
       const expanded: string[] = [];
-      const data = transformData(resp.menuList, expanded);
+      const data = transformData(resp.menuList, expanded, t);
       setTreeData(data);
       setChecked(resp.menuIds);
       setExpandedKeys(expanded);
     }
   }, [isSuccess, resp]);
-
-  /**
-   * 数据转换
-   * @param data 原始数据
-   * @param expanded 需要展开的数据
-   */
-  const transformData = useCallback((data: any, expanded: string[]) => {
-    return data.map((item: any) => {
-      if (item.icon) {
-        item.icon = getIcon(item.icon);
-      }
-      if (item.children?.length > 0) {
-        expanded.push(item.id);
-      }
-      if (item.children) {
-        transformData(item.children, expanded);
-      }
-      // 国际化翻译菜单名
-      item.name = t(item.name);
-      return item;
-    });
-  }, []);
 
   /**
    * 全选/取消全选
@@ -86,6 +64,7 @@ const RoleMenuDrawer: React.FC<RoleMenuDrawerProps> = ({ open, roleId, onOk, onC
         if (item.children?.length > 0) {
           transform(item.children, checkedKeys);
         }
+        return item;
       });
     };
     transform(treeData, checkedKeys);
@@ -110,7 +89,7 @@ const RoleMenuDrawer: React.FC<RoleMenuDrawerProps> = ({ open, roleId, onOk, onC
    */
   const handleChecked: TreeProps['onCheck'] = useCallback((checkedKeysValue: any) => {
     setChecked((checkedKeysValue as any).checked);
-  },[]);
+  }, []);
 
   return (
     <Drawer

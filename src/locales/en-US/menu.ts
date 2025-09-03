@@ -1,10 +1,10 @@
 const menu = {
-  home: 'Home',
   dashboard: {
     main: 'Dashboard',
     workbench: 'Workbench',
     monitor: 'Monitor',
   },
+  home: 'Home',
   statics: {
     main: 'Statics',
     messageSearch: 'Message Search',
@@ -75,5 +75,8 @@ const menu = {
     main: 'Editor',
     docWriter: 'Doc Writer',
   },
+  apps: {
+    add: "add app"
+  }
 };
 export default menu;

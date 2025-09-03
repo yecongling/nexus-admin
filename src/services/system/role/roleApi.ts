@@ -4,69 +4,69 @@ import type { RoleMenu, RoleModel, RoleSearchParams, UserSearchParams } from './
 /**
  * 枚举角色相关的api
  */
-export enum RoleApi {
+const RoleApi = {
   /**
    * 获取角色列表（分页查询）
    */
-  getRoleList = '/system/role/getRoleList',
+  getRoleList: '/system/role/getRoleList',
   /**
    * 获取角色详情
    */
-  getRoleDetail = '/system/role/detail',
+  getRoleDetail: '/system/role/detail',
   /**
    * 新增角色
    */
-  addRole = '/system/role/addRole',
+  addRole: '/system/role/addRole',
   /**
    * 编辑角色
    */
-  editRole = '/system/role/editRole',
+  editRole: '/system/role/editRole',
 
   /**
    * 改变角色状态
    */
-  changeStatus = '/system/role/changeStatus',
+  changeStatus: '/system/role/changeStatus',
 
   /**
    * 批量删除角色（物理删除）
    */
-  deleteBatchRoles = '/system/role/deleteBatchRoles',
+  deleteBatchRoles: '/system/role/deleteBatchRoles',
 
   /**
    * 批量删除角色（逻辑删除）
    */
-  logicDeleteBatchRoles = '/system/role/logicDeleteBatchRoles',
+  logicDeleteBatchRoles: '/system/role/logicDeleteBatchRoles',
 
   /**
    * 获取角色菜单
    */
-  getRoleMenu = '/system/role/getRoleMenu',
+  getRoleMenu: '/system/role/getRoleMenu',
 
   /**
    * 获取角色用户
    */
-  getRoleUser = '/system/role/getRoleUser',
+  getRoleUser: '/system/role/getRoleUser',
 
   /**
    * 获取不在该角色下的所有可用用户
    */
-  getUserNotInRoleByPage = '/system/role/getUserNotInRoleByPage',
+  getUserNotInRoleByPage: '/system/role/getUserNotInRoleByPage',
 
   /**
    * 给角色分配菜单
    */
-  assignRoleMenu = '/system/role/assignRoleMenu',
+  assignRoleMenu: '/system/role/assignRoleMenu',
 
   /**
    * 给角色分配用户
    */
-  assignRoleUser = '/system/role/assignRoleUser',
+  assignRoleUser: '/system/role/assignRoleUser',
 
   /**
    * 校验角色编码是否重复
    */
-  checkRoleCodeExist = '/system/role/checkRoleCodeExist',
-}
+  checkRoleCodeExist: '/system/role/checkRoleCodeExist',
+};
 
 /**
  * 角色管理服务接口

@@ -54,9 +54,9 @@ export interface MenuModel {
   sortNo: number;
 
   /**
-   * 始终显示
+   * 是否隐藏
    */
-  alwaysShow: boolean;
+  hidden: boolean;
 
   /**
    * 图标
@@ -67,6 +67,14 @@ export interface MenuModel {
    * 是路由
    */
   route: boolean;
+
+  /**
+   * 路由参数
+   */
+  routeQuery: Array<{
+    key: string;
+    value: string;
+  }>;
 
   /**
    * 是叶子节点

@@ -1,5 +1,5 @@
 import { ManOutlined, WomanOutlined } from '@ant-design/icons';
-import { Button, Space, Tag, Image, Dropdown, type TableProps, type MenuProps, Tooltip } from 'antd';
+import { Button, Space, Image, Dropdown, type TableProps, type MenuProps, Tooltip, Switch } from 'antd';
 import type { UserModel } from '@/services/system/user/type';
 import { Icon } from '@iconify-icon/react';
 
@@ -8,6 +8,8 @@ import { Icon } from '@iconify-icon/react';
  * @param handleEdit 编辑
  * @param handleDetail 详情
  * @param handleMore 更多
+ * @param onStatusChange 状态变更回调
+ * @param canUpdateStatus 是否有更新状态权限
  * @returns 表格列
  */
 export const getColumns = (
@@ -16,6 +18,8 @@ export const getColumns = (
   t: (key: string) => string,
   colorPrimary: string,
   handleMore: (record: UserModel) => MenuProps['items'],
+  onStatusChange?: (record: UserModel, checked: boolean) => void,
+  canUpdateStatus: boolean = false,
 ): TableProps<UserModel>['columns'] => [
   {
     dataIndex: 'id',
@@ -27,15 +31,16 @@ export const getColumns = (
     dataIndex: 'username',
     title: '用户名',
     key: 'username',
-    width: 160,
+    width: 140,
     align: 'left',
   },
   {
     dataIndex: 'realName',
-    title: '真实名',
+    title: '真实姓名',
     key: 'realName',
-    width: 140,
+    width: 120,
     align: 'left',
+    render: (text: string) => <span className="font-medium">{text || '-'}</span>,
   },
   {
     dataIndex: 'sex',
@@ -44,7 +49,12 @@ export const getColumns = (
     width: 80,
     align: 'center',
     render: (text: number) => {
-      return text === 1 ? <ManOutlined className="text-blue-400!" /> : <WomanOutlined className="text-pink-400!" />;
+      if (text === 1) {
+        return <ManOutlined className="text-blue-500!" />;
+      } else if (text === 2) {
+        return <WomanOutlined className="text-pink-500!" />;
+      }
+      return <span className="text-gray-400">-</span>;
     },
   },
   {
@@ -81,10 +91,27 @@ export const getColumns = (
     dataIndex: 'status',
     title: '状态',
     key: 'status',
-    width: 80,
+    width: 100,
     align: 'center',
-    render: (text: number) => {
-      return text === 1 ? <Tag color="#87d068">正常</Tag> : <Tag color="gray">冻结</Tag>;
+    render: (text: number, record: UserModel) => {
+      const isActive = text === 1;
+
+      return (
+        <div className="flex items-center justify-center">
+          <Switch
+            checked={isActive}
+            checkedChildren="启用"
+            unCheckedChildren="禁用"
+            disabled={!canUpdateStatus}
+            onChange={(checked) => {
+              if (onStatusChange) {
+                onStatusChange(record, checked);
+              }
+            }}
+            className={isActive ? 'bg-green-500' : 'bg-gray-400'}
+          />
+        </div>
+      );
     },
   },
   {
@@ -111,10 +138,7 @@ export const getColumns = (
         </Tooltip>
         <Dropdown menu={{ items: handleMore(record) }} placement="bottomRight" trigger={['click']}>
           <Tooltip title={t('common.operation.more')}>
-            <Button
-              type="text"
-              icon={<Icon icon="fluent:more-vertical-16-filled" className="text-xl block" />}
-            />
+            <Button type="text" icon={<Icon icon="fluent:more-vertical-16-filled" className="text-xl block" />} />
           </Tooltip>
         </Dropdown>
       </Space>

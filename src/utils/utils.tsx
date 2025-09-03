@@ -94,7 +94,7 @@ const customIcons: { [key: string]: any } = Icons;
  * 图标库
  * @param name 图表名
  */
-export const getIcon = (name: string | undefined) => {
+export const getIcon = (name: string | undefined | null) => {
   if (name && name.indexOf('nexus') > -1) {
     return <MyIcon type={`${name}`} />;
   }
@@ -106,7 +106,7 @@ export const getIcon = (name: string | undefined) => {
  * @param name 图标名
  * @returns
  */
-export const addIcon = (name: string | undefined) => {
+export const addIcon = (name: string | undefined | null) => {
   if (!name || !customIcons[name]) {
     return null;
   }
@@ -157,4 +157,29 @@ export function getShortcutLabel(shortcut: string): string {
     .replace('shift', isMac ? '⇧' : 'Shift')
     .replace('alt', isMac ? '⌥' : 'Alt')
     .replace('meta', isMac ? '⌘' : 'Meta'); // 可选;
+}
+
+/**
+ * 转换树组件的数据
+ * @param data 树组件的数据
+ * @param expanded 展开的节点
+ * @param t 国际化函数
+ * @returns 转换后的数据
+ */
+export function transformData(data: any[], expanded: string[], t: (key: string) => string) {
+  return data.map((item: any) => {
+    const newItem = {
+      ...item, // 先拷贝一份，避免修改原对象
+      icon: item.icon ? getIcon(item.icon) : undefined,
+      originalIcon: item.icon,
+      name: t(item.name),
+    };
+
+    if (item.children?.length > 0) {
+      expanded.push(item.id);
+      newItem.children = transformData(item.children, expanded, t);
+    }
+
+    return newItem;
+  });
 }

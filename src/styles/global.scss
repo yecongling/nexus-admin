@@ -190,7 +190,7 @@ code {
 }
 
 ::-webkit-scrollbar {
-  height: 6px;
+  // height: 6px;
   width: 6px;
 }
 
@@ -200,5 +200,5 @@ code {
 
 ::-webkit-scrollbar-thumb {
   border-radius: 4px;
-  background-color: transparent;
+  background: #d3d0d0;
 }

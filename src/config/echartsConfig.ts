@@ -6,7 +6,7 @@ import {
   GridComponent,
   LegendComponent,
 } from 'echarts/components';
-import { SVGRenderer, CanvasRenderer } from 'echarts/renderers';
+import { CanvasRenderer } from 'echarts/renderers';
 
 // 使用按需加载的模块
 echarts.use([
@@ -17,7 +17,6 @@ echarts.use([
   LineChart,
   BarChart,
   PieChart,
-  SVGRenderer,
   CanvasRenderer,
 ]);
 // 导出配置的echarts实例
