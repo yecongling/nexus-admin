@@ -78,8 +78,8 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
           route: homeRoute,
         };
 
-        // 使用头插入，不激活（因为后面可能还有当前页面的tab）
-        addTab(homeTabItem, { insertAt: 'head', activate: false });
+        // 使用头插入，激活 homePath（登录后默认激活首页）
+        addTab(homeTabItem, { insertAt: 'head', activate: true });
       }
 
       // 然后检查当前路径是否有效（在菜单中存在）

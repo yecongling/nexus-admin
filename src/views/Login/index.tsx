@@ -15,6 +15,7 @@ import { useQuery } from '@tanstack/react-query';
 import { commonService } from '@/services/common';
 import { useUserStore } from '@/stores/userStore';
 import { useTranslation } from 'react-i18next';
+import { useTabStore } from '@/stores/tabStore';
 
 /**
  * 登录模块
@@ -26,6 +27,7 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const { setMenus } = useMenuStore();
   const userStore = useUserStore();
+  const { resetTabs } = useTabStore();
   const { t } = useTranslation();
   // 加载状态
   const [loading, setLoading] = useState<boolean>(false);
@@ -86,6 +88,12 @@ const Login: React.FC = () => {
             const { accessToken, refreshToken, roleId } = data;
 
             userStore.login(values.username, accessToken, refreshToken, roleId);
+            // 登录成功后清空 TabBar 和 KeepAlive 缓存
+            resetTabs();
+            // 清空 KeepAlive 缓存
+            if ((window as any).__keepAliveClearAllCache) {
+              (window as any).__keepAliveClearAllCache();
+            }
             let { homePath } = data;
             // 登录成功根据角色获取菜单
             const menu = await commonService.getMenuListByRoleId(roleId, accessToken);
