@@ -26,52 +26,64 @@
 
 
 
-// 新的圆角立体卡片风格logo
+// 协调系统主题的logo卡片风格
 .system-logo-card {
   height: 64px;
   margin: 8px 12px;
   position: relative;
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   cursor: pointer;
   
-  // 靛蓝系列渐变背景 - 左上到右下
+  // 与系统主题协调的渐变背景
   background: linear-gradient(135deg, 
-    #1e3a8a 0%,     // 深靛蓝
-    #4338ca 100%    // 靛蓝紫
+    #f8fafc 0%,     // 浅灰白
+    #e2e8f0 50%,    // 浅灰
+    #cbd5e1 100%    // 中灰
   );
   
-  // 立体阴影效果 - 减少扩散范围
+  // 边框和阴影效果
+  border: 1px solid rgba(148, 163, 184, 0.2);
   box-shadow: 
-    0 4px 16px rgba(30, 58, 138, 0.2),
-    0 2px 8px rgba(30, 58, 138, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    0 1px 3px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
 
   // hover浮动效果
   &:hover {
-    transform: translateY(-4px) scale(1.02);
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, 
+      #ffffff 0%,     // 纯白
+      #f1f5f9 50%,    // 极浅灰
+      #e2e8f0 100%    // 浅灰
+    );
+    border-color: rgba(59, 130, 246, 0.3);
     box-shadow: 
-      0 8px 24px rgba(30, 58, 138, 0.3),
-      0 4px 12px rgba(30, 58, 138, 0.25),
-      0 2px 6px rgba(30, 58, 138, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+      0 4px 16px rgba(0, 0, 0, 0.1),
+      0 2px 8px rgba(0, 0, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
 
     .logo-background {
-      transform: scale(1.1) rotate(3deg);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      transform: scale(1.05);
+      background: linear-gradient(135deg, 
+        rgba(59, 130, 246, 0.1) 0%,
+        rgba(59, 130, 246, 0.05) 100%
+      );
+      border-color: rgba(59, 130, 246, 0.2);
     }
 
     .system-name {
-      transform: translateX(4px);
-      text-shadow: 0 2px 8px rgba(255, 255, 255, 0.3);
+      transform: translateX(2px);
+      color: #1e40af;
     }
 
     .card-glow {
-      opacity: 1;
-      transform: scale(1.1);
+      opacity: 0.3;
+      background: linear-gradient(135deg, 
+        rgba(59, 130, 246, 0.1) 0%,
+        rgba(147, 197, 253, 0.05) 100%
+      );
     }
   }
 
@@ -95,21 +107,20 @@
   .logo-background {
     width: 48px;
     height: 48px;
-    border-radius: 12px;
+    border-radius: 10px;
     background: linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.2) 0%,
-      rgba(255, 255, 255, 0.1) 50%,
-      rgba(255, 255, 255, 0.05) 100%
+      rgba(255, 255, 255, 0.8) 0%,
+      rgba(248, 250, 252, 0.6) 50%,
+      rgba(241, 245, 249, 0.4) 100%
     );
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(148, 163, 184, 0.3);
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     box-shadow: 
-      0 4px 12px rgba(0, 0, 0, 0.15),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      0 2px 6px rgba(0, 0, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
   }
 
   // logo图片
@@ -129,10 +140,9 @@
     align-items: center;
     position: relative;
     z-index: 1;
-    font-weight: 700;
-    font-size: 18px;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    letter-spacing: 0.5px;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.3px;
   }
 
   // 发光效果
@@ -142,16 +152,16 @@
     left: -2px;
     right: -2px;
     bottom: -2px;
-    border-radius: 18px;
+    border-radius: 14px;
     background: linear-gradient(135deg, 
-      rgba(99, 102, 241, 0.3) 0%,
-      rgba(67, 56, 202, 0.2) 50%,
-      rgba(99, 102, 241, 0.3) 100%
+      rgba(59, 130, 246, 0.1) 0%,
+      rgba(147, 197, 253, 0.05) 50%,
+      rgba(59, 130, 246, 0.1) 100%
     );
     opacity: 0;
-    transition: all 0.4s ease;
+    transition: all 0.3s ease;
     z-index: 0;
-    filter: blur(8px);
+    filter: blur(4px);
   }
 }
 

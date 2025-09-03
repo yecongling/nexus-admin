@@ -38,7 +38,7 @@ const LeftMenu: React.FC = () => {
   return (
     <Layout.Sider
       trigger={null}
-      collapsedWidth={48}
+      collapsedWidth={64}
       style={{
         overflow: 'hidden',
         position: 'relative',
