@@ -36,19 +36,16 @@
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   cursor: pointer;
   
-  // 靛蓝系列渐变背景
+  // 靛蓝系列渐变背景 - 左上到右下
   background: linear-gradient(135deg, 
     #1e3a8a 0%,     // 深靛蓝
-    #3730a3 25%,    // 靛蓝
-    #4338ca 50%,    // 靛蓝紫
-    #3730a3 75%,    // 靛蓝
-    #1e3a8a 100%    // 深靛蓝
+    #4338ca 100%    // 靛蓝紫
   );
   
-  // 立体阴影效果
+  // 立体阴影效果 - 减少扩散范围
   box-shadow: 
-    0 8px 32px rgba(30, 58, 138, 0.3),
     0 4px 16px rgba(30, 58, 138, 0.2),
+    0 2px 8px rgba(30, 58, 138, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
     inset 0 -1px 0 rgba(0, 0, 0, 0.1);
 
@@ -56,9 +53,9 @@
   &:hover {
     transform: translateY(-4px) scale(1.02);
     box-shadow: 
-      0 16px 48px rgba(30, 58, 138, 0.4),
       0 8px 24px rgba(30, 58, 138, 0.3),
-      0 4px 12px rgba(30, 58, 138, 0.2),
+      0 4px 12px rgba(30, 58, 138, 0.25),
+      0 2px 6px rgba(30, 58, 138, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.15),
       inset 0 -1px 0 rgba(0, 0, 0, 0.1);
 

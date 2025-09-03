@@ -157,6 +157,7 @@ const MenuComponent = () => {
             height: '100%',
             overflowY: 'auto',
             overflowX: 'hidden',
+            padding: '0 8px',
           }}
           mode="inline"
           theme={mode}

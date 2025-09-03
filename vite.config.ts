@@ -1,14 +1,21 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
-// import { mockDevServerPlugin } from "vite-plugin-mock-dev-server";
+import { mockDevServerPlugin } from 'vite-plugin-mock-dev-server';
 import viteCompression from 'vite-plugin-compression';
 import path from 'path';
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    react(),
+    react(
+      // 目前不能使用react编译器插件，这里使用了装饰器语法不支持导致无法构建包
+      // {
+      //   babel: {
+      //     plugins: ['babel-plugin-react-compiler'],
+      //   },
+      // },
+    ),
     tailwindcss(),
     viteCompression({
       verbose: true,
@@ -17,9 +24,9 @@ export default defineConfig({
       algorithm: 'gzip',
       ext: '.gz',
     }),
-    // mockDevServerPlugin({
-    //   prefix: "/api",
-    // }),
+    mockDevServerPlugin({
+      prefix: '/api',
+    }),
   ],
   // 配置分包
   build: {
