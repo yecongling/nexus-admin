@@ -15,7 +15,7 @@ const SimpleTest: React.FC = () => {
           language="javascript"
           theme="vs"
           height="300px"
-          onChange={setCode}
+          onChange={(value) => setCode(value || '')}
           placeholder="请输入 JavaScript 代码..."
         />
       </div>

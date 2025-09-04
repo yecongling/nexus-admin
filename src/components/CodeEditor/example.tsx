@@ -37,15 +37,12 @@ helloWorld();`);
   const [height, setHeight] = useState(400);
 
   // 示例代码
-  const sampleCodes = {
+  const sampleCodes: Record<SupportedLanguage, string> = {
     javascript: `// JavaScript 示例
 function fibonacci(n) {
   if (n <= 1) return n;
   return fibonacci(n - 1) + fibonacci(n - 2);
-}
-
-console.log(fibonacci(10));`,
-    
+}`,
     python: `# Python 示例
 def fibonacci(n):
     if n <= 1:
@@ -53,7 +50,6 @@ def fibonacci(n):
     return fibonacci(n - 1) + fibonacci(n - 2)
 
 print(fibonacci(10))`,
-    
     java: `// Java 示例
 public class Fibonacci {
     public static int fibonacci(int n) {
@@ -65,7 +61,6 @@ public class Fibonacci {
         System.out.println(fibonacci(10));
     }
 }`,
-    
     sql: `-- SQL 示例
 SELECT 
     u.user_id,
@@ -77,7 +72,6 @@ WHERE u.created_at >= '2024-01-01'
 GROUP BY u.user_id, u.username
 HAVING order_count > 0
 ORDER BY order_count DESC;`,
-    
     json: `{
   "name": "示例配置",
   "version": "1.0.0",
@@ -92,27 +86,102 @@ ORDER BY order_count DESC;`,
       "错误提示",
       "代码格式化"
     ]
-  },
-  "dependencies": {
-    "react": "^18.0.0",
-    "typescript": "^5.0.0"
   }
 }`,
-    
     groovy: `// Groovy 示例
-class Calculator {
-    def add(a, b) {
-        return a + b
-    }
-    
-    def multiply(a, b) {
-        return a * b
-    }
+def fibonacci(n) {
+    if (n <= 1) return n
+    fibonacci(n - 1) + fibonacci(n - 2)
 }
 
-def calc = new Calculator()
-println "2 + 3 = " + calc.add(2, 3)
-println "4 * 5 = " + calc.multiply(4, 5)`,
+println(fibonacci(10))`,
+    typescript: `// TypeScript 示例
+function fibonacci(n: number): number {
+  if (n <= 1) return n;
+  return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+console.log(fibonacci(10));`,
+    html: `<!-- HTML 示例 -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>示例页面</title>
+  </head>
+  <body>
+    <h1>Hello, World!</h1>
+    <p>这是一个HTML示例。</p>
+  </body>
+</html>`,
+    css: `/* CSS 示例 */
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f5f5f5;
+  color: #222;
+}
+h1 {
+  color: #1677ff;
+}`,
+    xml: `<!-- XML 示例 -->
+<config>
+  <name>示例配置</name>
+  <version>1.0.0</version>
+  <description>这是一个XML配置文件示例</description>
+  <settings>
+    <theme>dark</theme>
+    <fontSize>14</fontSize>
+    <autoSave>true</autoSave>
+  </settings>
+</config>`,
+    yaml: `# YAML 示例
+name: 示例配置
+version: 1.0.0
+description: 这是一个YAML配置文件示例
+settings:
+  theme: dark
+  fontSize: 14
+  autoSave: true
+  features:
+    - 语法高亮
+    - 代码补全
+    - 错误提示`,
+    markdown: `# Markdown 示例
+
+这是一个 **Markdown** 文档示例。
+
+## 功能特性
+
+- 支持标题
+- 支持**粗体**和*斜体*
+- 支持代码块
+
+\`\`\`javascript
+console.log("Hello, World!");
+\`\`\`
+
+> 这是一个引用块`,
+    shell: `#!/bin/bash
+# Shell 脚本示例
+
+echo "Hello, World!"
+
+# 定义变量
+NAME="Nexus Admin"
+VERSION="1.0.0"
+
+# 条件判断
+if [ "$VERSION" = "1.0.0" ]; then
+    echo "当前版本: $VERSION"
+fi
+
+# 循环
+for i in {1..5}; do
+    echo "循环次数: $i"
+done`,
+    plaintext: `这是一个纯文本示例
+支持多行文本
+没有语法高亮
+适合显示日志、配置文件等内容`
   };
 
   // 处理代码变化
@@ -218,7 +287,7 @@ println "4 * 5 = " + calc.multiply(4, 5)`,
               <InputNumber
                 id={fontSizeId}
                 value={fontSize}
-                onChange={setFontSize}
+                onChange={(value) => setFontSize(value || 14)}
                 min={10}
                 max={24}
                 style={{ width: '100%', marginTop: '8px' }}
@@ -232,7 +301,7 @@ println "4 * 5 = " + calc.multiply(4, 5)`,
               <InputNumber
                 id={heightId}
                 value={height}
-                onChange={setHeight}
+                onChange={(value) => setHeight(value || 400)}
                 min={200}
                 max={800}
                 style={{ width: '100%', marginTop: '8px' }}

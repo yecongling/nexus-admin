@@ -15,6 +15,7 @@ import {
 import { updateParamCache, deleteParamCache, clearAllParamCache } from '@/utils/paramService';
 import { PAGINATION_CONFIG } from './config';
 import './styles/params.module.scss';
+import { isEqual } from 'lodash-es';
 
 const { confirm } = Modal;
 
@@ -149,19 +150,17 @@ const Params: React.FC = () => {
 
   // 处理搜索
   const handleSearch = useCallback((values: SysParamSearchParams) => {
-    setSearchParams((prev) => ({
-      ...prev,
+    const search = {
       ...values,
-      pageNum: 1, // 重置到第一页
-    }));
-  }, []);
-
-  // 处理重置
-  const handleReset = useCallback(() => {
-    setSearchParams({
-      pageNum: 1,
-      pageSize: 10,
-    });
+      pageNum: searchParams.pageNum,
+      pageSize: searchParams.pageSize,
+    };
+    if (isEqual(search, searchParams)) {
+      // 参数没有变化，手动刷新数据
+      refetch();
+      return;
+    }
+    setSearchParams((prev: SysParamSearchParams) => ({ ...prev, ...search }));
   }, []);
 
   // 处理新增
@@ -301,11 +300,10 @@ const Params: React.FC = () => {
     exportMutation.isPending;
 
   return (
-    <div className="bg-gray-50 h-full flex flex-col params-container">
+    <div className="h-full flex flex-col params-container gap-4">
       {/* 搜索表单 */}
       <SearchForm
         onSearch={handleSearch}
-        onReset={handleReset}
         loading={isLoading}
         expanded={searchExpanded}
         onToggleExpand={handleToggleSearchExpand}

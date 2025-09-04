@@ -32,9 +32,17 @@ const ParamDrawer: React.FC<ParamDrawerProps> = ({ open, title, loading, initial
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
+      values.categoryName = CATEGORY_OPTIONS.find(option => option.value === values.category)?.label || '';
+      values.status = Boolean(values.status);
+      values.required = Boolean(values.required);
       onOk(values);
-    } catch (error) {
+    } catch (error: any) {
       // 表单验证失败
+      const firstErrorField = error.errorFields?.[0]?.name;
+      if (firstErrorField) {
+        form.scrollToField(firstErrorField);
+        form.focusField(firstErrorField);
+      }
     }
   };
 

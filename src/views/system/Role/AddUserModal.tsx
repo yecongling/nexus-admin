@@ -152,7 +152,7 @@ const AddUser: React.FC<AddUserProps> = ({ open, onOk, onCancel, roleId }) => {
 
   return (
     <DragModal open={open} onCancel={onCancel} title="添加用户" width={{ xl: 800, xxl: 1000 }} onOk={handleOk}>
-      <Card className="mb-2!">
+      <Card>
         <Form form={form} onFinish={onFinish}>
           <Row gutter={12}>
             <Col span={6}>
@@ -196,7 +196,7 @@ const AddUser: React.FC<AddUserProps> = ({ open, onOk, onCancel, roleId }) => {
           </Row>
         </Form>
       </Card>
-      <Card className="mt-2">
+      <Card className="mt-4!">
         <Table
           size="small"
           bordered

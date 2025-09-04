@@ -26,13 +26,13 @@ interface TabStore {
   // 批量设置tabs（用于重新排序等场景）
   setTabs: (tabs: TabItem[], activeKey?: string) => void;
   // 关闭其他tabs
-  closeOtherTabs: (targetKey: string) => string;
+  closeOtherTabs: (targetKey: string, homePath?: string) => string;
   // 关闭左侧tabs
-  closeLeftTabs: (targetKey: string) => string;
+  closeLeftTabs: (targetKey: string, homePath?: string) => string;
   // 关闭右侧tabs
-  closeRightTabs: (targetKey: string) => string;
+  closeRightTabs: (targetKey: string, homePath?: string) => string;
   // 关闭所有tabs
-  closeAllTabs: () => string;
+  closeAllTabs: (homePath?: string) => string;
   // 重新加载tab
   reloadTab: (targetKey: string) => void;
   // 固定tab
@@ -124,14 +124,21 @@ export const useTabStore = create<TabStore>()(
         set({ tabs, activeKey: activeKey || '' });
       },
 
-      closeOtherTabs: (targetKey: string) => {
+      closeOtherTabs: (targetKey: string, homePath?: string) => {
         const { tabs, activeKey } = get();
         const targetTab = tabs.find((tab) => tab.key === targetKey);
         if (targetTab) {
+          // 保留目标tab和homePath的tab
+          const homeTab = homePath ? tabs.find((tab) => tab.key === homePath) : null;
+          const newTabs = [targetTab];
+          if (homeTab && homeTab.key !== targetKey) {
+            newTabs.push(homeTab);
+          }
+          
           // 如果当前激活的tab不在保留的tab中，需要激活目标tab
-          const newActiveKey = tabs.some(tab => tab.key === activeKey) ? activeKey : targetKey;
+          const newActiveKey = newTabs.some(tab => tab.key === activeKey) ? activeKey : targetKey;
           set({
-            tabs: [targetTab],
+            tabs: newTabs,
             activeKey: newActiveKey,
           });
           return newActiveKey;
@@ -139,11 +146,20 @@ export const useTabStore = create<TabStore>()(
         return activeKey;
       },
 
-      closeLeftTabs: (targetKey: string) => {
+      closeLeftTabs: (targetKey: string, homePath?: string) => {
         const { tabs, activeKey } = get();
         const targetIndex = tabs.findIndex((tab) => tab.key === targetKey);
         if (targetIndex > 0) {
-          const newTabs = tabs.slice(targetIndex);
+          let newTabs = tabs.slice(targetIndex);
+          
+          // 如果homePath的tab在左侧被删除了，需要保留它
+          if (homePath) {
+            const homeTab = tabs.find((tab) => tab.key === homePath);
+            if (homeTab && !newTabs.some(tab => tab.key === homePath)) {
+              newTabs = [homeTab, ...newTabs];
+            }
+          }
+          
           // 如果当前激活的tab不在保留的tab中，需要激活目标tab
           const newActiveKey = newTabs.some(tab => tab.key === activeKey) ? activeKey : targetKey;
           set({ 
@@ -155,11 +171,20 @@ export const useTabStore = create<TabStore>()(
         return activeKey;
       },
 
-      closeRightTabs: (targetKey: string) => {
+      closeRightTabs: (targetKey: string, homePath?: string) => {
         const { tabs, activeKey } = get();
         const targetIndex = tabs.findIndex((tab) => tab.key === targetKey);
         if (targetIndex >= 0 && targetIndex < tabs.length - 1) {
-          const newTabs = tabs.slice(0, targetIndex + 1);
+          let newTabs = tabs.slice(0, targetIndex + 1);
+          
+          // 如果homePath的tab在右侧被删除了，需要保留它
+          if (homePath) {
+            const homeTab = tabs.find((tab) => tab.key === homePath);
+            if (homeTab && !newTabs.some(tab => tab.key === homePath)) {
+              newTabs.push(homeTab);
+            }
+          }
+          
           // 如果当前激活的tab不在保留的tab中，需要激活目标tab
           const newActiveKey = newTabs.some(tab => tab.key === activeKey) ? activeKey : targetKey;
           set({ 
@@ -171,7 +196,22 @@ export const useTabStore = create<TabStore>()(
         return activeKey;
       },
 
-      closeAllTabs: () => {
+      closeAllTabs: (homePath?: string) => {
+        const { tabs } = get();
+        
+        if (homePath) {
+          // 保留homePath的tab
+          const homeTab = tabs.find((tab) => tab.key === homePath);
+          if (homeTab) {
+            set({ 
+              tabs: [homeTab], 
+              activeKey: homePath 
+            });
+            return homePath;
+          }
+        }
+        
+        // 如果没有homePath或找不到homeTab，清空所有tabs
         set({ tabs: [], activeKey: '' });
         return '';
       },

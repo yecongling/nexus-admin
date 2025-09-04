@@ -16,9 +16,7 @@ const Content: React.FC = () => {
   const location = useLocation();
   return (
     <Layout.Content
-      style={{
-        padding: "8px",
-      }}
+      className="overflow-x-hidden overflow-y-auto"
     >
       <Suspense fallback={<Skeleton />}>
         <ErrorBoundary key={location.pathname} fallback={<ErrorFallback />}>

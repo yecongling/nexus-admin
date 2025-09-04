@@ -62,10 +62,15 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
     [menus],
   );
 
-  // 确保 homePath 对应的 tab 永远在第一个显示且固定
+  // 初始化标记，避免重复初始化
+  const isInitializedRef = useRef(false);
+
+  // 确保 homePath 对应的 tab 永远在第一个显示且固定（仅在初始化时执行）
   React.useEffect(() => {
-    // 只有在没有tab且有菜单数据且有homePath时才执行
-    if (tabs.length === 0 && menus.length > 0 && homePath) {
+    // 只有在没有tab且有菜单数据且有homePath且未初始化时才执行
+    if (!isInitializedRef.current && tabs.length === 0 && menus.length > 0 && homePath) {
+      isInitializedRef.current = true;
+      
       // 首先创建homePath的tab（第一个位置）
       const homeRoute = findRouteByPath(homePath);
       if (homeRoute?.path) {
@@ -78,8 +83,8 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
           route: homeRoute,
         };
 
-        // 使用头插入，不激活（因为后面可能还有当前页面的tab）
-        addTab(homeTabItem, { insertAt: 'head', activate: false });
+        // 使用头插入，激活 homePath（登录后默认激活首页）
+        addTab(homeTabItem, { insertAt: 'head', activate: true });
       }
 
       // 然后检查当前路径是否有效（在菜单中存在）
@@ -103,7 +108,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
         navigate(homePath, { replace: true });
       }
     }
-  }, [menus, tabs.length, homePath, findRouteByPath, navigate, pathname]);
+  }, [menus, homePath, findRouteByPath, navigate, tabs.length, pathname]); // 重新添加必要的依赖
 
   // 确保 homePath 对应的 tab 始终存在（即使在其他tab被添加后）
   React.useEffect(() => {
@@ -139,40 +144,76 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
         }
       }
     }
-  }, [menus, homePath, tabs, findRouteByPath, activeKey]);
+  }, [menus, homePath, findRouteByPath]); // 移除tabs和activeKey依赖，减少不必要的重新排序
 
-  // 当路径变化时，自动添加或激活tab
-  React.useEffect(() => {
-    // 如果正在关闭tab，跳过执行
-    if (isClosingTabRef.current) {
-      isClosingTabRef.current = false;
-      return;
-    }
 
-    if (!pathname || pathname === '/login') return;
+  // 合并路径变化处理和空tabs处理逻辑
+  const pathAndTabsHandler = useMemo(() => {
+    return () => {
+      // 如果正在关闭tab，跳过执行
+      if (isClosingTabRef.current) {
+        isClosingTabRef.current = false;
+        return;
+      }
 
-    const route = findRouteByPath(pathname);
-    if (!route) return;
+      if (!pathname || pathname === '/login') return;
 
-    const tabItem: TabItem = {
-      key: pathname,
-      label: route.meta?.title || pathname,
-      icon: route.meta?.icon,
-      path: pathname,
-      closable: true,
-      route,
+      // 如果当前没有tabs，说明是关闭所有tabs后的情况，需要跳转到首页
+      if (tabs.length === 0) {
+        if (homePath && pathname !== homePath) {
+          navigate(homePath, { replace: true });
+        }
+        return;
+      }
+
+      // 如果tabs存在但只有一个且是homePath，且当前路径不是homePath，则添加新tab
+      if (tabs.length === 1 && tabs[0].key === homePath && pathname !== homePath) {
+        const route = findRouteByPath(pathname);
+        if (route) {
+          const tabItem: TabItem = {
+            key: pathname,
+            label: route.meta?.title || pathname,
+            icon: route.meta?.icon,
+            path: pathname,
+            closable: true,
+            route,
+          };
+          useTabStore.getState().addTab(tabItem);
+        }
+        return;
+      }
+
+      // 如果tabs存在且超过1个，检查当前路径对应的tab
+      if (tabs.length > 1) {
+        const route = findRouteByPath(pathname);
+        if (!route) return;
+
+        const tabItem: TabItem = {
+          key: pathname,
+          label: route.meta?.title || pathname,
+          icon: route.meta?.icon,
+          path: pathname,
+          closable: true,
+          route,
+        };
+
+        // 检查tab是否已存在
+        const existingTab = tabs.find((tab) => tab.key === pathname);
+        if (!existingTab) {
+          // 新tab，添加到store
+          useTabStore.getState().addTab(tabItem);
+        } else {
+          // tab已存在，只激活它
+          setActiveKey(pathname);
+        }
+      }
     };
+  }, [pathname, tabs, homePath, findRouteByPath, setActiveKey, navigate]);
 
-    // 检查tab是否已存在
-    const existingTab = tabs.find((tab) => tab.key === pathname);
-    if (!existingTab) {
-      // 新tab，添加到store
-      useTabStore.getState().addTab(tabItem);
-    } else {
-      // tab已存在，只激活它
-      setActiveKey(pathname);
-    }
-  }, [pathname, findRouteByPath, setActiveKey, tabs]);
+  // 合并路径变化和空tabs处理
+  React.useEffect(() => {
+    pathAndTabsHandler();
+  }, [pathAndTabsHandler]);
 
   // 监听用户退出登录和页面刷新事件
   React.useEffect(() => {
@@ -205,9 +246,20 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
     };
   }, [resetTabs]);
 
-  // 处理tab切换
-  const handleTabChange = useCallback(
-    (key: string) => {
+  // 处理tab点击切换
+  const handleTabClick = useCallback(
+    (key: string, e?: React.MouseEvent<Element, MouseEvent> | React.KeyboardEvent<Element>) => {
+      // 检查事件是否来自Dropdown菜单，如果是则阻止tab切换
+      if (e && e.target) {
+        const target = e.target as HTMLElement;
+        // 检查点击的元素是否在Dropdown菜单内部
+        if (target.closest('.ant-dropdown-menu') || 
+            target.closest('.ant-dropdown-menu-item') ||
+            target.closest('[role="menuitem"]')) {
+          return; // 阻止tab切换
+        }
+      }
+      
       setActiveKey(key);
       // 使用 replace 模式，替换当前历史记录，防止用户通过浏览器后退按钮回到之前的菜单
       navigate(key, { replace: true });
@@ -283,7 +335,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
           onClick: () => {
             // 标记正在关闭tab
             isClosingTabRef.current = true;
-            const newActiveKey = closeLeftTabs(tab.key);
+            const newActiveKey = closeLeftTabs(tab.key, homePath);
             // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
             if (newActiveKey && newActiveKey !== activeKey) {
               navigate(newActiveKey, { replace: true });
@@ -297,7 +349,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
           onClick: () => {
             // 标记正在关闭tab
             isClosingTabRef.current = true;
-            const newActiveKey = closeRightTabs(tab.key);
+            const newActiveKey = closeRightTabs(tab.key, homePath);
             // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
             if (newActiveKey && newActiveKey !== activeKey) {
               navigate(newActiveKey, { replace: true });
@@ -311,7 +363,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
           onClick: () => {
             // 标记正在关闭tab
             isClosingTabRef.current = true;
-            const newActiveKey = closeOtherTabs(tab.key);
+            const newActiveKey = closeOtherTabs(tab.key, homePath);
             // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
             if (newActiveKey && newActiveKey !== activeKey) {
               navigate(newActiveKey, { replace: true });
@@ -325,14 +377,23 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
           onClick: () => {
             // 标记正在关闭tab
             isClosingTabRef.current = true;
-            closeAllTabs();
-            // 关闭所有tab后跳转到首页或登录页
-            navigate('/', { replace: true });
+            const newActiveKey = closeAllTabs(homePath);
+            // 关闭所有tab后跳转到新的激活tab
+            if (newActiveKey) {
+              // 如果当前不在homePath，需要跳转到homePath
+              if (pathname !== homePath) {
+                navigate(newActiveKey, { replace: true });
+              }
+            } else if (homePath) {
+              navigate(homePath, { replace: true });
+            } else {
+              navigate('/', { replace: true });
+            }
           },
         },
       ];
     },
-    [t, removeTab, navigate, pinTab, unpinTab, reloadTab, closeLeftTabs, closeRightTabs, closeOtherTabs, closeAllTabs],
+    [t, removeTab, navigate, pinTab, unpinTab, reloadTab, closeLeftTabs, closeRightTabs, closeOtherTabs, closeAllTabs, homePath, pathname],
   );
 
   // 右侧下拉菜单配置
@@ -393,7 +454,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
           if (activeKey) {
             // 标记正在关闭tab
             isClosingTabRef.current = true;
-            const newActiveKey = closeLeftTabs(activeKey);
+            const newActiveKey = closeLeftTabs(activeKey, homePath);
             // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
             if (newActiveKey && newActiveKey !== activeKey) {
               navigate(newActiveKey, { replace: true });
@@ -409,7 +470,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
           if (activeKey) {
             // 标记正在关闭tab
             isClosingTabRef.current = true;
-            const newActiveKey = closeRightTabs(activeKey);
+            const newActiveKey = closeRightTabs(activeKey, homePath);
             // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
             if (newActiveKey && newActiveKey !== activeKey) {
               navigate(newActiveKey, { replace: true });
@@ -425,7 +486,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
           if (activeKey) {
             // 标记正在关闭tab
             isClosingTabRef.current = true;
-            const newActiveKey = closeOtherTabs(activeKey);
+            const newActiveKey = closeOtherTabs(activeKey, homePath);
             // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
             if (newActiveKey && newActiveKey !== activeKey) {
               navigate(newActiveKey, { replace: true });
@@ -440,9 +501,18 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
         onClick: () => {
           // 标记正在关闭tab
           isClosingTabRef.current = true;
-          closeAllTabs();
-          // 关闭所有tab后跳转到首页或登录页
-          navigate('/');
+          const newActiveKey = closeAllTabs(homePath);
+          // 关闭所有tab后跳转到新的激活tab
+          if (newActiveKey) {
+            // 如果当前不在homePath，需要跳转到homePath
+            if (pathname !== homePath) {
+              navigate(newActiveKey, { replace: true });
+            }
+          } else if (homePath) {
+            navigate(homePath, { replace: true });
+          } else {
+            navigate('/', { replace: true });
+          }
         },
       },
     ];
@@ -457,6 +527,8 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
     closeRightTabs,
     closeOtherTabs,
     closeAllTabs,
+    homePath,
+    pathname,
   ]);
 
   // 构建tab items
@@ -488,7 +560,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
           type="editable-card"
           tabBarGutter={0}
           activeKey={activeKey}
-          onChange={handleTabChange}
+          onTabClick={handleTabClick}
           onEdit={handleTabEdit}
           items={tabItems}
           size="middle"
