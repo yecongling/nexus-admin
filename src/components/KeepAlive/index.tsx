@@ -204,7 +204,7 @@ const KeepAlive: React.FC<KeepAliveProps> = ({ children }) => {
   }
 
   return (
-    <div ref={containerRef} className="h-full relative flex flex-col overflow-x-hidden overflow-y-auto">
+    <div ref={containerRef} className="h-full relative flex flex-col p-4">
       {currentComponent}
     </div>
   );
