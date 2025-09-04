@@ -46,13 +46,15 @@ export default defineConfig({
         router: true,
       },
     }),
-    pluginBabel({
-      include: /\.(?:jsx|tsx)$/,
-      babelLoaderOptions(opts) {
-        // 启用react-compiler插件
-        opts.plugins?.unshift('babel-plugin-react-compiler');
-      },
-    }),
+    // 只在生产环境启用编译器
+    ...(isDev ? [] : [
+      pluginBabel({
+        include: /\.(?:jsx|tsx)$/,
+        babelLoaderOptions(opts) {
+          opts.plugins?.unshift('babel-plugin-react-compiler');
+        },
+      })
+    ]),
     // 将SVG转换为React组件
     pluginSvgr(),
     pluginSass({
