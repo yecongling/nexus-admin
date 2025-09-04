@@ -36,7 +36,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-100 mb-4">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-100">
       <div className="p-4">
         <Form
           form={form}

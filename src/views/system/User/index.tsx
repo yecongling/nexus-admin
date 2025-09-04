@@ -366,7 +366,7 @@ const User: React.FC = () => {
   );
 
   return (
-    <div className="user-management-container h-full flex flex-col gap-2">
+    <div className="user-management-container h-full flex flex-col gap-4">
       {/* 搜索表单 */}
       <SearchForm onSearch={handleSearch} isLoading={isLoading} />
 

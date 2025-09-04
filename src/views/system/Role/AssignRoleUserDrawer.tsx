@@ -283,7 +283,7 @@ const RoleUserDrawer: React.FC<RoleUserDrawerProps> = ({
         onClose={onCancel}
         classNames={{ footer: "text-right", body: "flex flex-col" }}
       >
-        <Card className="mb-2!">
+        <Card>
           <Form form={form} onFinish={onFinish}>
             <Row gutter={12}>
               <Col span={6}>
@@ -348,7 +348,7 @@ const RoleUserDrawer: React.FC<RoleUserDrawerProps> = ({
           </Form>
         </Card>
         <Card
-          className="mt-2 flex-1 min-h-0"
+          className="mt-4! flex-1 min-h-0"
           styles={{ body: { height: "100%" } }}
         >
           <Space>

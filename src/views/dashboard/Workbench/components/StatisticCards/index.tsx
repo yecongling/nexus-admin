@@ -86,7 +86,7 @@ export const StatisticCards: React.FC = () => {
   }
 
   return (
-    <Row gutter={[8, 16]}>
+    <Row gutter={[16, 16]}>
       {statistics.map((item, index) => (
         <Col xs={24} sm={12} lg={6} key={`stat-${item.title}-${index}`}>
           <div className={styles.statisticCard}>
