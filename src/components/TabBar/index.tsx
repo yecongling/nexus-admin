@@ -65,54 +65,145 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
   // 初始化标记，避免重复初始化
   const isInitializedRef = useRef(false);
 
-  // 确保 homePath 对应的 tab 永远在第一个显示且固定（仅在初始化时执行）
+  // 页面刷新时的状态恢复逻辑
   React.useEffect(() => {
-    // 只有在没有tab且有菜单数据且有homePath且未初始化时才执行
-    if (!isInitializedRef.current && tabs.length === 0 && menus.length > 0 && homePath) {
+    // 只有在有菜单数据且有homePath且未初始化时才执行
+    if (!isInitializedRef.current && menus.length > 0 && homePath) {
       isInitializedRef.current = true;
       
-      // 首先创建homePath的tab（第一个位置）
-      const homeRoute = findRouteByPath(homePath);
-      if (homeRoute?.path) {
-        const homeTabItem: TabItem = {
-          key: homePath,
-          label: homeRoute.meta?.title || homePath,
-          icon: homeRoute.meta?.icon,
-          path: homePath,
-          closable: false, // 第一个tab不可关闭
-          route: homeRoute,
-        };
+      // 如果当前没有tabs，说明是首次加载，需要初始化
+      if (tabs.length === 0) {
+        // 首先创建homePath的tab（第一个位置）
+        const homeRoute = findRouteByPath(homePath);
+        if (homeRoute?.path) {
+          const homeTabItem: TabItem = {
+            key: homePath,
+            label: homeRoute.meta?.title || homePath,
+            icon: homeRoute.meta?.icon,
+            path: homePath,
+            closable: false, // 第一个tab不可关闭
+            route: homeRoute,
+          };
 
-        // 使用头插入，激活 homePath（登录后默认激活首页）
-        addTab(homeTabItem, { insertAt: 'head', activate: true });
-      }
+          // 使用头插入，但不激活（根据当前路径决定激活哪个）
+          addTab(homeTabItem, { insertAt: 'head', activate: false });
+        }
 
-      // 然后检查当前路径是否有效（在菜单中存在）
-      const currentRoute = findRouteByPath(pathname);
+        // 然后检查当前路径是否有效（在菜单中存在）
+        const currentRoute = findRouteByPath(pathname);
 
-      if (currentRoute?.path && pathname !== homePath) {
-        // 如果当前路径有效且不是homePath，创建对应的tab
-        const currentTabItem: TabItem = {
-          key: pathname,
-          label: currentRoute.meta?.title || pathname,
-          icon: currentRoute.meta?.icon,
-          path: pathname,
-          closable: true,
-          route: currentRoute,
-        };
+        if (currentRoute?.path && pathname !== homePath) {
+          // 如果当前路径有效且不是homePath，创建对应的tab
+          const currentTabItem: TabItem = {
+            key: pathname,
+            label: currentRoute.meta?.title || pathname,
+            icon: currentRoute.meta?.icon,
+            path: pathname,
+            closable: true,
+            route: currentRoute,
+          };
 
-        // 使用尾插入，激活当前页面
-        addTab(currentTabItem, { insertAt: 'tail', activate: true });
-      } else if (pathname !== homePath) {
-        // 如果当前路径无效且不是homePath，跳转到homePath
-        navigate(homePath, { replace: true });
+          // 使用尾插入，激活当前页面
+          addTab(currentTabItem, { insertAt: 'tail', activate: true });
+        } else if (pathname === homePath) {
+          // 如果当前路径就是homePath，激活homePath的tab
+          setActiveKey(homePath);
+        } else {
+          // 如果当前路径无效且不是homePath，跳转到homePath
+          navigate(homePath, { replace: true });
+        }
+      } else {
+        // 页面刷新时，tabs已经存在，需要确保状态正确
+        // 1. 确保homePath的tab存在且不可关闭
+        const homeTab = tabs.find(tab => tab.key === homePath);
+        if (homeTab) {
+          // 确保homePath的tab不可关闭
+          if (homeTab.closable) {
+            const updatedTabs = tabs.map(tab => 
+              tab.key === homePath ? { ...tab, closable: false } : tab
+            );
+            setTabs(updatedTabs, activeKey);
+          }
+        } else {
+          // 如果homePath的tab不存在，需要添加
+          const homeRoute = findRouteByPath(homePath);
+          if (homeRoute?.path) {
+            const homeTabItem: TabItem = {
+              key: homePath,
+              label: homeRoute.meta?.title || homePath,
+              icon: homeRoute.meta?.icon,
+              path: homePath,
+              closable: false,
+              route: homeRoute,
+            };
+            addTab(homeTabItem, { insertAt: 'head', activate: false });
+          }
+        }
+
+        // 2. 确保当前路径对应的tab存在并激活
+        const currentTab = tabs.find(tab => tab.key === pathname);
+        if (!currentTab && pathname !== homePath) {
+          const currentRoute = findRouteByPath(pathname);
+          if (currentRoute?.path) {
+            const currentTabItem: TabItem = {
+              key: pathname,
+              label: currentRoute.meta?.title || pathname,
+              icon: currentRoute.meta?.icon,
+              path: pathname,
+              closable: true,
+              route: currentRoute,
+            };
+            addTab(currentTabItem, { insertAt: 'tail', activate: true });
+          }
+        } else if (currentTab) {
+          // 如果当前路径的tab存在，激活它
+          setActiveKey(pathname);
+        } else if (pathname === homePath) {
+          // 如果当前路径就是homePath，确保激活homePath的tab
+          setActiveKey(homePath);
+        }
+
+        // 3. 确保homePath的tab在第一个位置
+        const homeTabIndex = tabs.findIndex(tab => tab.key === homePath);
+        if (homeTabIndex > 0) {
+          const homeTab = tabs[homeTabIndex];
+          const otherTabs = tabs.filter(tab => tab.key !== homePath);
+          const newTabs = [homeTab, ...otherTabs];
+          setTabs(newTabs, activeKey);
+        }
       }
     }
-  }, [menus, homePath, findRouteByPath, navigate, tabs.length, pathname]); // 重新添加必要的依赖
+  }, [menus, homePath, findRouteByPath, navigate, tabs, activeKey, addTab, setActiveKey, setTabs, pathname]);
 
-  // 确保 homePath 对应的 tab 始终存在（即使在其他tab被添加后）
+  // 处理路径变化时的tab激活逻辑
   React.useEffect(() => {
-    if (menus.length > 0 && homePath && tabs.length > 0) {
+    // 只有在初始化完成后才处理路径变化
+    if (isInitializedRef.current && menus.length > 0 && homePath && tabs.length > 0) {
+      // 确保当前路径对应的tab被激活
+      const currentTab = tabs.find(tab => tab.key === pathname);
+      if (currentTab && activeKey !== pathname) {
+        setActiveKey(pathname);
+      } else if (!currentTab && pathname !== homePath) {
+        // 如果当前路径的tab不存在且不是homePath，创建并激活它
+        const currentRoute = findRouteByPath(pathname);
+        if (currentRoute?.path) {
+          const currentTabItem: TabItem = {
+            key: pathname,
+            label: currentRoute.meta?.title || pathname,
+            icon: currentRoute.meta?.icon,
+            path: pathname,
+            closable: true,
+            route: currentRoute,
+          };
+          addTab(currentTabItem, { insertAt: 'tail', activate: true });
+        }
+      }
+    }
+  }, [pathname, tabs, activeKey, setActiveKey, menus, homePath, findRouteByPath, addTab]);
+
+  // 确保 homePath 对应的 tab 始终存在且不可关闭（在tabs变化时检查）
+  React.useEffect(() => {
+    if (menus.length > 0 && homePath && tabs.length > 0 && isInitializedRef.current) {
       const homeRoute = findRouteByPath(homePath);
       const homeTabExists = tabs.some((tab) => tab.key === homePath);
 
@@ -144,50 +235,34 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
         }
       }
     }
-  }, [menus, homePath, findRouteByPath]); // 移除tabs和activeKey依赖，减少不必要的重新排序
+  }, [menus, homePath, findRouteByPath, tabs, activeKey, addTab, setTabs]);
 
 
-  // 合并路径变化处理和空tabs处理逻辑
-  const pathAndTabsHandler = useMemo(() => {
-    return () => {
-      // 如果正在关闭tab，跳过执行
-      if (isClosingTabRef.current) {
-        isClosingTabRef.current = false;
-        return;
+  // 处理路径变化时的tab管理逻辑（仅在初始化完成后执行）
+  React.useEffect(() => {
+    // 如果正在关闭tab，跳过执行
+    if (isClosingTabRef.current) {
+      isClosingTabRef.current = false;
+      return;
+    }
+
+    // 只有在初始化完成后才处理路径变化
+    if (!isInitializedRef.current || !menus.length || !homePath) return;
+
+    if (!pathname || pathname === '/login') return;
+
+    // 如果当前没有tabs，说明是关闭所有tabs后的情况，需要跳转到首页
+    if (tabs.length === 0) {
+      if (homePath && pathname !== homePath) {
+        navigate(homePath, { replace: true });
       }
+      return;
+    }
 
-      if (!pathname || pathname === '/login') return;
-
-      // 如果当前没有tabs，说明是关闭所有tabs后的情况，需要跳转到首页
-      if (tabs.length === 0) {
-        if (homePath && pathname !== homePath) {
-          navigate(homePath, { replace: true });
-        }
-        return;
-      }
-
-      // 如果tabs存在但只有一个且是homePath，且当前路径不是homePath，则添加新tab
-      if (tabs.length === 1 && tabs[0].key === homePath && pathname !== homePath) {
-        const route = findRouteByPath(pathname);
-        if (route) {
-          const tabItem: TabItem = {
-            key: pathname,
-            label: route.meta?.title || pathname,
-            icon: route.meta?.icon,
-            path: pathname,
-            closable: true,
-            route,
-          };
-          useTabStore.getState().addTab(tabItem);
-        }
-        return;
-      }
-
-      // 如果tabs存在且超过1个，检查当前路径对应的tab
-      if (tabs.length > 1) {
-        const route = findRouteByPath(pathname);
-        if (!route) return;
-
+    // 如果tabs存在但只有一个且是homePath，且当前路径不是homePath，则添加新tab
+    if (tabs.length === 1 && tabs[0].key === homePath && pathname !== homePath) {
+      const route = findRouteByPath(pathname);
+      if (route) {
         const tabItem: TabItem = {
           key: pathname,
           label: route.meta?.title || pathname,
@@ -196,32 +271,39 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
           closable: true,
           route,
         };
-
-        // 检查tab是否已存在
-        const existingTab = tabs.find((tab) => tab.key === pathname);
-        if (!existingTab) {
-          // 新tab，添加到store
-          useTabStore.getState().addTab(tabItem);
-        } else {
-          // tab已存在，只激活它
-          setActiveKey(pathname);
-        }
+        useTabStore.getState().addTab(tabItem);
       }
-    };
-  }, [pathname, tabs, homePath, findRouteByPath, setActiveKey, navigate]);
+      return;
+    }
 
-  // 合并路径变化和空tabs处理
+    // 如果tabs存在且超过1个，检查当前路径对应的tab
+    if (tabs.length > 1) {
+      const route = findRouteByPath(pathname);
+      if (!route) return;
+
+      const tabItem: TabItem = {
+        key: pathname,
+        label: route.meta?.title || pathname,
+        icon: route.meta?.icon,
+        path: pathname,
+        closable: true,
+        route,
+      };
+
+      // 检查tab是否已存在
+      const existingTab = tabs.find((tab) => tab.key === pathname);
+      if (!existingTab) {
+        // 新tab，添加到store
+        useTabStore.getState().addTab(tabItem);
+      } else {
+        // tab已存在，只激活它
+        setActiveKey(pathname);
+      }
+    }
+  }, [pathname, tabs, homePath, findRouteByPath, setActiveKey, navigate, menus]);
+
+  // 监听用户退出登录事件（不监听页面刷新）
   React.useEffect(() => {
-    pathAndTabsHandler();
-  }, [pathAndTabsHandler]);
-
-  // 监听用户退出登录和页面刷新事件
-  React.useEffect(() => {
-    const handleBeforeUnload = () => {
-      // 页面刷新或关闭时清空所有tab
-      resetTabs();
-    };
-
     const handleStorageChange = (e: StorageEvent) => {
       // 监听 localStorage 变化，检测用户登录状态变化
       if (e.key === 'user-storage') {
@@ -237,11 +319,9 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
       }
     };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
     window.addEventListener('storage', handleStorageChange);
 
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
       window.removeEventListener('storage', handleStorageChange);
     };
   }, [resetTabs]);
