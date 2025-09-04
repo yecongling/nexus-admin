@@ -45,6 +45,7 @@ const LeftMenu: React.FC = () => {
         transition: 'width .2s cubic-bezier(.34,.69,.1,1)',
         zIndex: 999,
         boxShadow: '0 2px 5px #00000014',
+        borderRight: '1px solid #ededed'
       }}
       collapsible
       width={sidebar.width}

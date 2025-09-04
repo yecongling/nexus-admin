@@ -6,7 +6,6 @@ import { CATEGORY_OPTIONS } from '@/services/system/params';
 
 interface SearchFormProps {
   onSearch: (values: SysParamSearchParams) => void;
-  onReset: () => void;
   loading?: boolean;
   onToggleExpand?: (expanded: boolean) => void;
   expanded?: boolean;
@@ -14,7 +13,6 @@ interface SearchFormProps {
 
 const SearchForm: React.FC<SearchFormProps> = ({
   onSearch,
-  onReset,
   loading = false,
   onToggleExpand,
   expanded = false,
@@ -29,7 +27,6 @@ const SearchForm: React.FC<SearchFormProps> = ({
 
   const handleReset = () => {
     form.resetFields();
-    onReset();
   };
 
   const handleToggleExpand = () => {
@@ -56,13 +53,23 @@ const SearchForm: React.FC<SearchFormProps> = ({
               <Input allowClear autoComplete="off" placeholder="请输入参数名称" />
             </Form.Item>
 
-            <Form.Item name="code" label="键值" colon={false} className="mb-0">
+            <Form.Item name="code" label="编码" colon={false} className="mb-0">
               <Input allowClear autoComplete="off" placeholder="请输入参数键值" />
             </Form.Item>
 
             <Form.Item name="category" label="分类" colon={false} className="mb-0">
               <Select allowClear placeholder="请选择参数分类" options={CATEGORY_OPTIONS} />
             </Form.Item>
+            <Form.Item name="status" label="状态" colon={false} className="mb-0">
+                <Select
+                  allowClear
+                  placeholder="请选择状态"
+                  options={[
+                    { value: 1, label: '启用' },
+                    { value: 0, label: '禁用' },
+                  ]}
+                />
+              </Form.Item>
           </div>
 
           {/* 高级搜索条件 */}
@@ -93,17 +100,6 @@ const SearchForm: React.FC<SearchFormProps> = ({
                   options={[
                     { value: true, label: '是' },
                     { value: false, label: '否' },
-                  ]}
-                />
-              </Form.Item>
-
-              <Form.Item name="status" label="状态" colon={false} className="mb-0">
-                <Select
-                  allowClear
-                  placeholder="请选择状态"
-                  options={[
-                    { value: 1, label: '启用' },
-                    { value: 0, label: '禁用' },
                   ]}
                 />
               </Form.Item>
