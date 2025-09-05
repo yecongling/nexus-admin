@@ -43,29 +43,51 @@ export default defineConfig({
         toplevel: true,
       },
     },
+    // 优化构建
+    target: 'es2015',
+    // 设置 chunk 大小警告限制
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
-        chunkFileNames: 'static/js/[name]-[hash].js',
+        // 使用更安全的文件命名，不暴露库名
+        chunkFileNames: 'static/js/[hash].js',
+        entryFileNames: 'static/js/[hash].js',
         // 按文件类型进行拆分文件夹
-        assetFileNames: 'static/[ext]/[name]-[hash].[ext]',
-        // 手动拆分代码
+        assetFileNames: 'static/[ext]/[hash].[ext]',
+        // 使用 rolldown 的 advancedChunks 进行高级代码分割
         advancedChunks: {
           groups: [
             {
-              name: 'react',
-              test: /node_modules[\\/]react(?:-dom)/,
+              name: 'react-vendor',
+              test: /node_modules[\\/](react|react-dom)/,
             },
             {
-              name: 'antd',
-              test: /node_modules[\\/]antd/,
+              name: 'utils-vendor',
+              test: /node_modules[\\/](lodash-es|dayjs)/,
             },
             {
-              name: 'antd-icons',
+              name: 'network-vendor',
+              test: /node_modules[\\/]axios/,
+            },
+            {
+              name: 'chart-vendor',
+              test: /node_modules[\\/]echarts/,
+            },
+            {
+              name: 'antd-vendor',
+              test: /node_modules[\\/]antd(?!.*@ant-design\/icons)/,
+            },
+            {
+              name: 'antd-icons-vendor',
               test: /node_modules[\\/]@ant-design\/icons/,
             },
             {
-              name: 'axios',
-              test: /node_modules[\\/]axios/,
+              name: 'other-vendor',
+              test: /node_modules[\\/](classnames|@iconify-icon)/,
+            },
+            {
+              name: 'vendor',
+              test: /node_modules/,
             },
           ],
         },
@@ -78,6 +100,19 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
+  },
+  // 优化依赖预构建
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'antd',
+      'lodash-es',
+      'dayjs',
+      'axios',
+      'echarts',
+    ],
+    exclude: ['@ant-design/icons'],
   },
   // css预处理器
   css: {

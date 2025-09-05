@@ -23,9 +23,9 @@ import {
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import IconPanel from '@/components/IconPanel';
+import OptimizedIconPanel from '@/components/IconPanel/optimized-icon-panel';
 import { menuService } from '@/services/system/menu/menuApi';
-import { addIcon } from '@/utils/utils';
+import { addIcon } from '@/utils/optimized-icons';
 
 // 菜单类型枚举
 const MenuType = {
@@ -322,7 +322,7 @@ const MenuInfoDrawer: React.FC<MenuInfoDrawerProps> = ({ open, operation, onClos
                   <Dropdown
                     trigger={['click']}
                     placement="bottom"
-                    popupRender={() => <IconPanel onSelect={handleIconSelect} />}
+                    popupRender={() => <OptimizedIconPanel onSelect={handleIconSelect} />}
                     overlayClassName="w-[360px] h-[300px] bg-white overflow-y-auto p-2 shadow-xl"
                   >
                     <SettingOutlined className="cursor-pointer" />

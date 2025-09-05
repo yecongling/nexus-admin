@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useTabStore, type TabItem } from '@/stores/tabStore';
 import { useMenuStore } from '@/stores/store';
 import { useUserStore } from '@/stores/userStore';
-import { getIcon } from '@/utils/utils';
+import { getIcon } from '@/utils/optimized-icons';
 import type { RouteItem } from '@/types/route';
 import { DownOutlined } from '@ant-design/icons';
 import './tabBar.scss';
