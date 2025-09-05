@@ -59,11 +59,11 @@ export default defineConfig({
           groups: [
             {
               name: 'react-vendor',
-              test: /node_modules[\\/](react|react-dom)/,
+              test: /node_modules[\\/](react|react-dom|react-router)/,
             },
             {
               name: 'utils-vendor',
-              test: /node_modules[\\/](lodash-es|dayjs)/,
+              test: /node_modules[\\/](lodash-es|dayjs|crypto-js|jsencrypt)/,
             },
             {
               name: 'network-vendor',
@@ -75,7 +75,7 @@ export default defineConfig({
             },
             {
               name: 'antd-vendor',
-              test: /node_modules[\\/]antd(?!.*@ant-design\/icons)/,
+              test: /node_modules[\\/]antd/,
             },
             {
               name: 'antd-icons-vendor',
@@ -83,7 +83,7 @@ export default defineConfig({
             },
             {
               name: 'other-vendor',
-              test: /node_modules[\\/](classnames|@iconify-icon)/,
+              test: /node_modules[\\/](classnames|@iconify-icon|i18next)/,
             },
             {
               name: 'vendor',
@@ -103,16 +103,7 @@ export default defineConfig({
   },
   // 优化依赖预构建
   optimizeDeps: {
-    include: [
-      'react',
-      'react-dom',
-      'antd',
-      'lodash-es',
-      'dayjs',
-      'axios',
-      'echarts',
-    ],
-    exclude: ['@ant-design/icons'],
+    include: ['react', 'react-dom', 'antd', 'lodash-es', 'dayjs', 'axios', 'echarts', '@ant-design/icons'],
   },
   // css预处理器
   css: {

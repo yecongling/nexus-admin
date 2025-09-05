@@ -21,6 +21,11 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
 
   // 使用ref来跟踪是否正在关闭tab，避免useEffect重复执行
   const isClosingTabRef = useRef(false);
+  
+  // 用于右键菜单的状态管理
+  const [contextMenuVisible, setContextMenuVisible] = React.useState(false);
+  const [contextMenuPosition, setContextMenuPosition] = React.useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [contextMenuTabKey, setContextMenuTabKey] = React.useState<string>('');
 
   const {
     tabs,
@@ -326,11 +331,30 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
     };
   }, [resetTabs]);
 
+  // 处理右键菜单显示
+  const handleContextMenu = useCallback(
+    (e: React.MouseEvent, tabKey: string) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      setContextMenuTabKey(tabKey);
+      setContextMenuPosition({ x: e.clientX, y: e.clientY });
+      setContextMenuVisible(true);
+    },
+    []
+  );
+
+  // 处理右键菜单隐藏
+  const handleContextMenuClose = useCallback(() => {
+    setContextMenuVisible(false);
+    setContextMenuTabKey('');
+  }, []);
+
   // 处理tab点击切换
   const handleTabClick = useCallback(
     (key: string, e?: React.MouseEvent<Element, MouseEvent> | React.KeyboardEvent<Element>) => {
       // 检查事件是否来自Dropdown菜单，如果是则阻止tab切换
-      if (e && e.target) {
+      if (e?.target) {
         const target = e.target as HTMLElement;
         // 检查点击的元素是否在Dropdown菜单内部
         if (target.closest('.ant-dropdown-menu') || 
@@ -363,9 +387,14 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
     [removeTab, navigate, activeKey],
   );
 
-  // 右键菜单配置
-  const getContextMenu = useCallback(
-    (tab: TabItem): MenuProps['items'] => {
+  // 统一的菜单配置函数
+  const getMenuItems = useCallback(
+    (targetTabKey?: string): MenuProps['items'] => {
+      const tabKey = targetTabKey || activeKey;
+      const targetTab = tabs.find(tab => tab.key === tabKey);
+      
+      if (!tabKey || !targetTab) return [];
+
       return [
         {
           key: 'close',
@@ -374,22 +403,22 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
           onClick: () => {
             // 标记正在关闭tab
             isClosingTabRef.current = true;
-            const newActiveKey = removeTab(tab.key);
+            const newActiveKey = removeTab(tabKey);
             // 如果关闭的是当前激活的tab，需要跳转到新的激活tab
-            if (tab.key === activeKey && newActiveKey) {
+            if (tabKey === activeKey && newActiveKey) {
               navigate(newActiveKey, { replace: true });
             }
           },
         },
         {
           key: 'pin',
-          label: tab.closable ? t('common.pin') : t('common.unpin'),
+          label: targetTab.closable ? t('common.pin') : t('common.unpin'),
           icon: <span>📌</span>,
           onClick: () => {
-            if (tab.closable) {
-              pinTab(tab.key);
+            if (targetTab.closable) {
+              pinTab(tabKey);
             } else {
-              unpinTab(tab.key);
+              unpinTab(tabKey);
             }
           },
         },
@@ -397,14 +426,14 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
           key: 'reload',
           label: t('common.reload'),
           icon: <span>🔄</span>,
-          onClick: () => reloadTab(tab.key),
+          onClick: () => reloadTab(tabKey),
         },
         {
           key: 'openInNewWindow',
           label: t('common.openInNewWindow'),
           icon: <span>⧉</span>,
           onClick: () => {
-            window.open(tab.path, '_blank');
+            window.open(targetTab.path, '_blank');
           },
         },
         { type: 'divider' },
@@ -415,7 +444,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
           onClick: () => {
             // 标记正在关闭tab
             isClosingTabRef.current = true;
-            const newActiveKey = closeLeftTabs(tab.key, homePath);
+            const newActiveKey = closeLeftTabs(tabKey, homePath);
             // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
             if (newActiveKey && newActiveKey !== activeKey) {
               navigate(newActiveKey, { replace: true });
@@ -429,7 +458,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
           onClick: () => {
             // 标记正在关闭tab
             isClosingTabRef.current = true;
-            const newActiveKey = closeRightTabs(tab.key, homePath);
+            const newActiveKey = closeRightTabs(tabKey, homePath);
             // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
             if (newActiveKey && newActiveKey !== activeKey) {
               navigate(newActiveKey, { replace: true });
@@ -443,7 +472,7 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
           onClick: () => {
             // 标记正在关闭tab
             isClosingTabRef.current = true;
-            const newActiveKey = closeOtherTabs(tab.key, homePath);
+            const newActiveKey = closeOtherTabs(tabKey, homePath);
             // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
             if (newActiveKey && newActiveKey !== activeKey) {
               navigate(newActiveKey, { replace: true });
@@ -473,160 +502,26 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
         },
       ];
     },
-    [t, removeTab, navigate, pinTab, unpinTab, reloadTab, closeLeftTabs, closeRightTabs, closeOtherTabs, closeAllTabs, homePath, pathname],
+    [t, tabs, activeKey, removeTab, navigate, pinTab, unpinTab, reloadTab, closeLeftTabs, closeRightTabs, closeOtherTabs, closeAllTabs, homePath, pathname],
   );
-
-  // 右侧下拉菜单配置
-  const getRightMenu = useCallback((): MenuProps['items'] => {
-    return [
-      {
-        key: 'close',
-        label: t('common.close'),
-        icon: <span>✕</span>,
-        onClick: () => {
-          if (activeKey) {
-            // 标记正在关闭tab
-            isClosingTabRef.current = true;
-            const newActiveKey = removeTab(activeKey);
-            // 如果关闭的是当前激活的tab，需要跳转到新的激活tab
-            if (newActiveKey) {
-              navigate(newActiveKey, { replace: true });
-            }
-          }
-        },
-      },
-      {
-        key: 'pin',
-        label: t('common.pin'),
-        icon: <span>📌</span>,
-        onClick: () => {
-          if (activeKey) {
-            pinTab(activeKey);
-          }
-        },
-      },
-      {
-        key: 'reload',
-        label: t('common.reload'),
-        icon: <span>🔄</span>,
-        onClick: () => {
-          if (activeKey) {
-            reloadTab(activeKey);
-          }
-        },
-      },
-      {
-        key: 'openInNewWindow',
-        label: t('common.openInNewWindow'),
-        icon: <span>⧉</span>,
-        onClick: () => {
-          if (activeKey) {
-            window.open(activeKey, '_blank');
-          }
-        },
-      },
-      { type: 'divider' },
-      {
-        key: 'closeLeft',
-        label: t('common.closeLeftTabs'),
-        icon: <span>◀</span>,
-        onClick: () => {
-          if (activeKey) {
-            // 标记正在关闭tab
-            isClosingTabRef.current = true;
-            const newActiveKey = closeLeftTabs(activeKey, homePath);
-            // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
-            if (newActiveKey && newActiveKey !== activeKey) {
-              navigate(newActiveKey, { replace: true });
-            }
-          }
-        },
-      },
-      {
-        key: 'closeRight',
-        label: t('common.closeRightTabs'),
-        icon: <span>▶</span>,
-        onClick: () => {
-          if (activeKey) {
-            // 标记正在关闭tab
-            isClosingTabRef.current = true;
-            const newActiveKey = closeRightTabs(activeKey, homePath);
-            // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
-            if (newActiveKey && newActiveKey !== activeKey) {
-              navigate(newActiveKey, { replace: true });
-            }
-          }
-        },
-      },
-      {
-        key: 'closeOthers',
-        label: t('common.closeOtherTabs'),
-        icon: <span>❌</span>,
-        onClick: () => {
-          if (activeKey) {
-            // 标记正在关闭tab
-            isClosingTabRef.current = true;
-            const newActiveKey = closeOtherTabs(activeKey, homePath);
-            // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
-            if (newActiveKey && newActiveKey !== activeKey) {
-              navigate(newActiveKey, { replace: true });
-            }
-          }
-        },
-      },
-      {
-        key: 'closeAll',
-        label: t('common.closeAllTabs'),
-        icon: <span>❌</span>,
-        onClick: () => {
-          // 标记正在关闭tab
-          isClosingTabRef.current = true;
-          const newActiveKey = closeAllTabs(homePath);
-          // 关闭所有tab后跳转到新的激活tab
-          if (newActiveKey) {
-            // 如果当前不在homePath，需要跳转到homePath
-            if (pathname !== homePath) {
-              navigate(newActiveKey, { replace: true });
-            }
-          } else if (homePath) {
-            navigate(homePath, { replace: true });
-          } else {
-            navigate('/', { replace: true });
-          }
-        },
-      },
-    ];
-  }, [
-    t,
-    activeKey,
-    removeTab,
-    navigate,
-    pinTab,
-    reloadTab,
-    closeLeftTabs,
-    closeRightTabs,
-    closeOtherTabs,
-    closeAllTabs,
-    homePath,
-    pathname,
-  ]);
 
   // 构建tab items
   const tabItems = useMemo((): TabsProps['items'] => {
     return tabs.map((tab) => ({
       key: tab.key,
       label: (
-        <Dropdown menu={{ items: getContextMenu(tab) }} trigger={['contextMenu']} placement="bottomLeft">
-          <div className="flex items-center gap-1">
-            <span className="mr-0.5">{tab.icon && getIcon(tab.icon)}</span>
-            <span>{t(tab.label)}</span>
-          </div>
-        </Dropdown>
+        <div 
+          className="flex items-center gap-1 tab-label"
+          onContextMenu={(e) => handleContextMenu(e, tab.key)}
+        >
+          <span className="mr-0.5">{tab.icon && getIcon(tab.icon)}</span>
+          <span>{t(tab.label)}</span>
+        </div>
       ),
       closable: tab.closable && tabs.length > 1, // 只有一个tab时不显示关闭按钮
       children: null, // 内容由KeepAlive组件渲染
     }));
-  }, [tabs, getContextMenu]);
+  }, [tabs, handleContextMenu]);
 
   // 如果没有tabs，不渲染组件
   if (tabs.length === 0) {
@@ -652,11 +547,28 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
         {/* 右侧功能区域 */}
         <div className="tab-bar-actions">
           {/* 下拉菜单 */}
-          <Dropdown menu={{ items: getRightMenu() }} placement="bottomRight" trigger={['click']}>
+          <Dropdown menu={{ items: getMenuItems() }} placement="bottomRight" trigger={['click']}>
             <Button type="text" size="small" icon={<DownOutlined />} className="tab-action-btn" />
           </Dropdown>
         </div>
       </div>
+
+      {/* 统一的右键菜单 */}
+      <Dropdown
+        menu={{ items: getMenuItems(contextMenuTabKey) }}
+        open={contextMenuVisible}
+        onOpenChange={(open) => !open && handleContextMenuClose()}
+        placement="bottomLeft"
+        trigger={['contextMenu']}
+        getPopupContainer={() => document.body}
+        overlayStyle={{
+          position: 'fixed',
+          left: contextMenuPosition.x,
+          top: contextMenuPosition.y,
+        }}
+      >
+        <div style={{ display: 'none' }} />
+      </Dropdown>
     </div>
   );
 };
