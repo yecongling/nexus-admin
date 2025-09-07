@@ -44,8 +44,7 @@ export default defineConfig({
       },
     },
     sourcemap: true,
-    // 优化构建
-    target: 'es2015',
+
     // 设置 chunk 大小警告限制
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
