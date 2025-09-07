@@ -43,6 +43,7 @@ export default defineConfig({
         toplevel: true,
       },
     },
+    sourcemap: true,
     // 优化构建
     target: 'es2015',
     // 设置 chunk 大小警告限制
