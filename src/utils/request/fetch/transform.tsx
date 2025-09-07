@@ -176,17 +176,17 @@ export const createTransform = (requestInstance: any): FetchTransform => ({
     const headers = new Headers(config.headers);
     
     // 进行数据加密
-    if ((config as any).data && cpt === 1) {
+    if ((config as any).body && cpt === 1) {
       // 判定json数据需要转为json字符串才能加密
       if (
-        typeof (config as any).data === 'object' &&
+        typeof (config as any).body === 'object' &&
         (headers.get('Content-Type') === 'application/json' ||
           headers.get('Content-Type') === 'application/json;charset=UTF-8')
       ) {
-        (config as any).data = JSON.stringify((config as any).data);
+        (config as any).body = JSON.stringify((config as any).body);
       }
-      const result = encrypt((config as any).data);
-      (config as any).data = result.data;
+      const result = encrypt((config as any).body);
+      (config as any).body = result.data;
       // 将秘钥放到请求头里面
       if (result.key) {
         headers.set('X-Encrypted-Key', result.key);
