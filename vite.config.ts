@@ -50,10 +50,10 @@ export default defineConfig({
     rollupOptions: {
       output: {
         // 使用更安全的文件命名，不暴露库名
-        chunkFileNames: 'static/js/[hash].js',
-        entryFileNames: 'static/js/[hash].js',
+        chunkFileNames: 'static/js/[name]-[hash].js',
+        entryFileNames: 'static/js/[name]-[hash].js',
         // 按文件类型进行拆分文件夹
-        assetFileNames: 'static/[ext]/[hash].[ext]',
+        assetFileNames: 'static/[ext]/[name]-[hash].[ext]',
         // 使用 rolldown 的 advancedChunks 进行高级代码分割
         advancedChunks: {
           groups: [
@@ -85,10 +85,10 @@ export default defineConfig({
               name: 'other-vendor',
               test: /node_modules[\\/](classnames|@iconify-icon|i18next)/,
             },
-            {
-              name: 'vendor',
-              test: /node_modules/,
-            },
+            // {
+            //   name: 'vendor',
+            //   test: /node_modules/,
+            // },
           ],
         },
       },
