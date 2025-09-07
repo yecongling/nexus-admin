@@ -85,10 +85,6 @@ export default defineConfig({
               name: 'other-vendor',
               test: /node_modules[\\/](classnames|@iconify-icon|i18next)/,
             },
-            {
-              name: 'vendor',
-              test: /node_modules/,
-            },
           ],
         },
       },
