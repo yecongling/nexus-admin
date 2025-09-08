@@ -1,0 +1,309 @@
+import { HttpRequest } from '@/utils/request';
+import type {
+  WorkflowVersion,
+  WorkflowLock,
+  WorkflowBranch,
+  WorkflowVersionDelta,
+  VersionListParams,
+  CreateVersionParams,
+  PublishVersionParams,
+  VersionCompareParams,
+  RollbackVersionParams,
+} from './model';
+import type { PageResult } from '@/types/global';
+
+/**
+ * 版本管理相关接口地址
+ */
+const VersionsApi: Record<string, string> = {
+  /**
+   * 获取版本列表
+   */
+  getVersionList: '/api/workflows/{workflowId}/versions',
+  /**
+   * 获取版本详情
+   */
+  getVersionDetail: '/api/workflows/{workflowId}/versions/{versionId}',
+  /**
+   * 创建版本
+   */
+  createVersion: '/api/workflows/{workflowId}/versions',
+  /**
+   * 发布版本
+   */
+  publishVersion: '/api/workflows/{workflowId}/versions/{version}/publish',
+  /**
+   * 删除版本
+   */
+  deleteVersion: '/api/workflows/{workflowId}/versions/{versionId}',
+  /**
+   * 版本对比
+   */
+  compareVersions: '/api/workflows/{workflowId}/versions/compare',
+  /**
+   * 回滚版本
+   */
+  rollbackVersion: '/api/workflows/{workflowId}/versions/rollback',
+  /**
+   * 下载版本
+   */
+  downloadVersion: '/api/workflows/{workflowId}/versions/{versionId}/download',
+  /**
+   * 获取版本锁信息
+   */
+  getVersionLocks: '/api/workflows/{workflowId}/versions/locks',
+  /**
+   * 获取版本分支列表
+   */
+  getVersionBranches: '/api/workflows/{workflowId}/branches',
+  /**
+   * 版本影响评估
+   */
+  assessVersionImpact: '/api/workflows/{workflowId}/versions/{versionId}/impact',
+  /**
+   * 锁定版本进行编辑
+   */
+  lockVersion: '/api/workflows/{workflowId}/versions/{version}/lock',
+  /**
+   * 释放版本锁定
+   */
+  unlockVersion: '/api/workflows/{workflowId}/versions/{version}/lock',
+};
+
+/**
+ * 版本管理服务接口
+ */
+export interface IVersionsService {
+  /**
+   * 获取版本列表
+   */
+  getVersionList(params: VersionListParams): Promise<PageResult<WorkflowVersion>>;
+  /**
+   * 获取版本详情
+   */
+  getVersionDetail(workflowId: number, versionId: number): Promise<WorkflowVersion>;
+  /**
+   * 创建版本
+   */
+  createVersion(params: CreateVersionParams): Promise<WorkflowVersion>;
+  /**
+   * 发布版本
+   */
+  publishVersion(params: PublishVersionParams): Promise<boolean>;
+  /**
+   * 删除版本
+   */
+  deleteVersion(workflowId: number, versionId: number): Promise<boolean>;
+  /**
+   * 版本对比
+   */
+  compareVersions(params: VersionCompareParams): Promise<{
+    deltas: WorkflowVersionDelta[];
+    diffContent: string;
+  }>;
+  /**
+   * 回滚版本
+   */
+  rollbackVersion(params: RollbackVersionParams): Promise<boolean>;
+  /**
+   * 下载版本
+   */
+  downloadVersion(workflowId: number, versionId: number): Promise<Blob>;
+  /**
+   * 获取版本锁信息
+   */
+  getVersionLocks(workflowId: number): Promise<WorkflowLock[]>;
+  /**
+   * 获取版本分支列表
+   */
+  getVersionBranches(workflowId: number): Promise<WorkflowBranch[]>;
+  /**
+   * 版本影响评估
+   */
+  assessVersionImpact(workflowId: number, versionId: number): Promise<{
+    backwardCompatible: boolean;
+    nonDestructive: boolean;
+    requiresRedeployment: boolean;
+  }>;
+  /**
+   * 锁定版本进行编辑
+   */
+  lockVersion(workflowId: number, version: string): Promise<WorkflowLock>;
+  /**
+   * 释放版本锁定
+   */
+  unlockVersion(workflowId: number, version: string): Promise<boolean>;
+}
+
+/**
+ * 版本管理服务实现
+ */
+export const versionsService: IVersionsService = {
+  /**
+   * 获取版本列表
+   */
+  async getVersionList(params: VersionListParams): Promise<PageResult<WorkflowVersion>> {
+    const response = await HttpRequest.get(
+      {
+        url: VersionsApi.getVersionList.replace('{workflowId}', params.workflowId.toString()),
+        params: {
+          pageNum: params.pageNum,
+          pageSize: params.pageSize,
+          status: params.status,
+          branch: params.branch,
+          keyword: params.keyword,
+        },
+      },
+      {
+        successMessageMode: 'none',
+      },
+    );
+    return response;
+  },
+
+  /**
+   * 获取版本详情
+   */
+  async getVersionDetail(workflowId: number, versionId: number): Promise<WorkflowVersion> {
+    const response = await HttpRequest.get({
+      url: VersionsApi.getVersionDetail
+        .replace('{workflowId}', workflowId.toString())
+        .replace('{versionId}', versionId.toString()),
+    });
+    return response;
+  },
+
+  /**
+   * 创建版本
+   */
+  async createVersion(params: CreateVersionParams): Promise<WorkflowVersion> {
+    const response = await HttpRequest.post({
+      url: VersionsApi.createVersion.replace('{workflowId}', params.workflowId.toString()),
+      data: params,
+    });
+    return response;
+  },
+
+  /**
+   * 发布版本
+   */
+  async publishVersion(params: PublishVersionParams): Promise<boolean> {
+    const response = await HttpRequest.post({
+      url: VersionsApi.publishVersion
+        .replace('{workflowId}', params.workflowId.toString())
+        .replace('{version}', params.version),
+      data: params,
+    });
+    return response;
+  },
+
+  /**
+   * 删除版本
+   */
+  async deleteVersion(workflowId: number, versionId: number): Promise<boolean> {
+    const response = await HttpRequest.delete({
+      url: VersionsApi.deleteVersion
+        .replace('{workflowId}', workflowId.toString())
+        .replace('{versionId}', versionId.toString()),
+    });
+    return response;
+  },
+
+  /**
+   * 版本对比
+   */
+  async compareVersions(params: VersionCompareParams): Promise<{
+    deltas: WorkflowVersionDelta[];
+    diffContent: string;
+  }> {
+    const response = await HttpRequest.post({
+      url: VersionsApi.compareVersions.replace('{workflowId}', params.workflowId.toString()),
+      data: params,
+    });
+    return response;
+  },
+
+  /**
+   * 回滚版本
+   */
+  async rollbackVersion(params: RollbackVersionParams): Promise<boolean> {
+    const response = await HttpRequest.post({
+      url: VersionsApi.rollbackVersion.replace('{workflowId}', params.workflowId.toString()),
+      data: params,
+    });
+    return response;
+  },
+
+  /**
+   * 下载版本
+   */
+  async downloadVersion(workflowId: number, versionId: number): Promise<Blob> {
+    const response = await HttpRequest.get({
+      url: VersionsApi.downloadVersion
+        .replace('{workflowId}', workflowId.toString())
+        .replace('{versionId}', versionId.toString()),
+      responseType: 'blob',
+    });
+    return response;
+  },
+
+  /**
+   * 获取版本锁信息
+   */
+  async getVersionLocks(workflowId: number): Promise<WorkflowLock[]> {
+    const response = await HttpRequest.get({
+      url: VersionsApi.getVersionLocks.replace('{workflowId}', workflowId.toString()),
+    });
+    return response;
+  },
+
+  /**
+   * 获取版本分支列表
+   */
+  async getVersionBranches(workflowId: number): Promise<WorkflowBranch[]> {
+    const response = await HttpRequest.get({
+      url: VersionsApi.getVersionBranches.replace('{workflowId}', workflowId.toString()),
+    });
+    return response;
+  },
+
+  /**
+   * 版本影响评估
+   */
+  async assessVersionImpact(workflowId: number, versionId: number): Promise<{
+    backwardCompatible: boolean;
+    nonDestructive: boolean;
+    requiresRedeployment: boolean;
+  }> {
+    const response = await HttpRequest.get({
+      url: VersionsApi.assessVersionImpact
+        .replace('{workflowId}', workflowId.toString())
+        .replace('{versionId}', versionId.toString()),
+    });
+    return response;
+  },
+
+  /**
+   * 锁定版本进行编辑
+   */
+  async lockVersion(workflowId: number, version: string): Promise<WorkflowLock> {
+    const response = await HttpRequest.post({
+      url: VersionsApi.lockVersion
+        .replace('{workflowId}', workflowId.toString())
+        .replace('{version}', version),
+    });
+    return response;
+  },
+
+  /**
+   * 释放版本锁定
+   */
+  async unlockVersion(workflowId: number, version: string): Promise<boolean> {
+    const response = await HttpRequest.delete({
+      url: VersionsApi.unlockVersion
+        .replace('{workflowId}', workflowId.toString())
+        .replace('{version}', version),
+    });
+    return response;
+  },
+};
