@@ -25,7 +25,7 @@ import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   ExclamationCircleOutlined,
-  ArrowUpOutlined,
+  CloudUploadOutlined,
 } from '@ant-design/icons';
 import { versionsService } from '@/services/integrated/version/api';
 import { type WorkflowVersion, VersionStatus, type VersionType } from '@/services/integrated/version/model';
@@ -286,7 +286,7 @@ const VersionList: React.FC<VersionListProps> = ({
         <Button
           key="publish"
           type="primary"
-          icon={<ArrowUpOutlined />}
+          icon={<CloudUploadOutlined />}
           onClick={() => onPublishVersion?.(version)}
         >
           发布
