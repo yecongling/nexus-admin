@@ -1,14 +1,6 @@
 import type React from 'react';
 import { useState, useEffect } from 'react';
-import {
-  Select,
-  Typography,
-  Row,
-  Col,
-  Alert,
-  Spin,
-  message,
-} from 'antd';
+import { Select, Typography, Row, Col, Alert, Spin, message } from 'antd';
 import DragModal from '@/components/modal/DragModal';
 import { versionsService } from '@/services/integrated/version/api';
 import type { WorkflowVersion, WorkflowVersionDelta } from '@/services/integrated/version/model';
@@ -18,7 +10,7 @@ const { Option } = Select;
 const { Title, Text } = Typography;
 
 interface VersionComparisonProps {
-  workflowId: number;
+  workflowId: string;
   visible: boolean;
   onClose: () => void;
   baseVersion?: string;
@@ -40,16 +32,16 @@ const VersionComparison: React.FC<VersionComparisonProps> = ({
 
   // 模拟版本数据
   const mockVersions: WorkflowVersion[] = [
-    { id: 1, version: 'v2.0.0', versionName: '重大功能更新' } as WorkflowVersion,
-    { id: 2, version: 'v2.1.0', versionName: '优化用户体验版本' } as WorkflowVersion,
-    { id: 3, version: 'v1.5.2', versionName: 'bug修复版本' } as WorkflowVersion,
+    { id: '1', version: 'v2.0.0', versionName: '重大功能更新' } as WorkflowVersion,
+    { id: '2', version: 'v2.1.0', versionName: '优化用户体验版本' } as WorkflowVersion,
+    { id: '3', version: 'v1.5.2', versionName: 'bug修复版本' } as WorkflowVersion,
   ];
 
   // 模拟差异数据
   const mockDeltas: WorkflowVersionDelta[] = [
     {
-      id: 1,
-      workflowId: 1,
+      id: '1',
+      workflowId: '1',
       fromVersion: 'v2.0.0',
       toVersion: 'v2.1.0',
       deltaType: 'MODIFY',
@@ -59,8 +51,8 @@ const VersionComparison: React.FC<VersionComparisonProps> = ({
       createdAt: '2024-03-15T14:30:00Z',
     },
     {
-      id: 2,
-      workflowId: 1,
+      id: '2',
+      workflowId: '1',
       fromVersion: 'v2.0.0',
       toVersion: 'v2.1.0',
       deltaType: 'ADD',
@@ -70,8 +62,8 @@ const VersionComparison: React.FC<VersionComparisonProps> = ({
       createdAt: '2024-03-15T14:30:00Z',
     },
     {
-      id: 3,
-      workflowId: 1,
+      id: '3',
+      workflowId: '1',
       fromVersion: 'v2.0.0',
       toVersion: 'v2.1.0',
       deltaType: 'MODIFY',
@@ -96,10 +88,10 @@ const VersionComparison: React.FC<VersionComparisonProps> = ({
 
   const loadVersions = async () => {
     try {
-      const result = await versionsService.getVersionList({ 
-        workflowId, 
-        pageNum: 1, 
-        pageSize: 100 
+      const result = await versionsService.getVersionList({
+        workflowId,
+        pageNum: 1,
+        pageSize: 100,
       });
       setVersions(result.records || mockVersions);
     } catch (error) {
@@ -130,58 +122,63 @@ const VersionComparison: React.FC<VersionComparisonProps> = ({
     }
   };
 
-
   const generateOriginalContent = () => {
-    return JSON.stringify({
-      nodes: [
-        {
-          id: "start_node",
-          name: "开始节点",
-          type: "start"
-        },
-        {
-          id: "process_node",
-          name: "处理节点",
-          timeout: 300
-        }
-      ]
-    }, null, 2);
+    return JSON.stringify(
+      {
+        nodes: [
+          {
+            id: 'start_node',
+            name: '开始节点',
+            type: 'start',
+          },
+          {
+            id: 'process_node',
+            name: '处理节点',
+            timeout: 300,
+          },
+        ],
+      },
+      null,
+      2,
+    );
   };
 
   const generateModifiedContent = () => {
-    return JSON.stringify({
-      nodes: [
-        {
-          id: "start_node",
-          name: "流程开始",
-          type: "start"
-        },
-        {
-          id: "validation_node",
-          name: "数据验证",
-          type: "validation"
-        },
-        {
-          id: "process_node",
-          name: "处理节点",
-          timeout: 600
-        }
-      ]
-    }, null, 2);
+    return JSON.stringify(
+      {
+        nodes: [
+          {
+            id: 'start_node',
+            name: '流程开始',
+            type: 'start',
+          },
+          {
+            id: 'validation_node',
+            name: '数据验证',
+            type: 'validation',
+          },
+          {
+            id: 'process_node',
+            name: '处理节点',
+            timeout: 600,
+          },
+        ],
+      },
+      null,
+      2,
+    );
   };
 
-
-
   const getChangeSummary = () => {
-    const addCount = deltas.filter(d => d.deltaType === 'ADD').length;
-    const modifyCount = deltas.filter(d => d.deltaType === 'MODIFY').length;
-    const deleteCount = deltas.filter(d => d.deltaType === 'DELETE').length;
-    
+    const addCount = deltas.filter((d) => d.deltaType === 'ADD').length;
+    const modifyCount = deltas.filter((d) => d.deltaType === 'MODIFY').length;
+    const deleteCount = deltas.filter((d) => d.deltaType === 'DELETE').length;
+
     return {
       add: addCount,
       modify: modifyCount,
       delete: deleteCount,
-      total: addCount + modifyCount + deleteCount
+      total: addCount + modifyCount + deleteCount,
     };
   };
 
@@ -197,13 +194,14 @@ const VersionComparison: React.FC<VersionComparisonProps> = ({
       style={{ maxWidth: '1200px' }}
       title={
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Title level={4} style={{ margin: 0 }}>版本对比</Title>
+          <Title level={4} style={{ margin: 0 }}>
+            版本对比
+          </Title>
         </div>
       }
       footer={null}
     >
       <div style={{ maxHeight: '70vh', overflow: 'auto' }}>
-
         {/* 版本选择 */}
         <Row gutter={16} style={{ marginBottom: 16 }}>
           <Col span={12}>
@@ -214,7 +212,7 @@ const VersionComparison: React.FC<VersionComparisonProps> = ({
               style={{ width: '100%', marginTop: 8 }}
               placeholder="选择基础版本"
             >
-              {versions.map(version => (
+              {versions.map((version) => (
                 <Option key={version.version} value={version.version}>
                   {version.version} - {version.versionName}
                 </Option>
@@ -229,7 +227,7 @@ const VersionComparison: React.FC<VersionComparisonProps> = ({
               style={{ width: '100%', marginTop: 8 }}
               placeholder="选择目标版本"
             >
-              {versions.map(version => (
+              {versions.map((version) => (
                 <Option key={version.version} value={version.version}>
                   {version.version} - {version.versionName}
                 </Option>
@@ -266,9 +264,7 @@ const VersionComparison: React.FC<VersionComparisonProps> = ({
               />
             </div>
           ) : (
-            <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
-              请选择要对比的两个版本
-            </div>
+            <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>请选择要对比的两个版本</div>
           )}
         </Spin>
       </div>

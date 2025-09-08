@@ -27,7 +27,7 @@ const VersionsApi: Record<string, string> = {
   /**
    * 创建版本
    */
-  createVersion: '/api/workflows/{workflowId}/versions',
+  createVersion: '/api/workflows/{workflowId}/createVersion',
   /**
    * 发布版本
    */
@@ -81,7 +81,7 @@ export interface IVersionsService {
   /**
    * 获取版本详情
    */
-  getVersionDetail(workflowId: number, versionId: number): Promise<WorkflowVersion>;
+  getVersionDetail(workflowId: string, versionId: string): Promise<WorkflowVersion>;
   /**
    * 创建版本
    */
@@ -93,7 +93,7 @@ export interface IVersionsService {
   /**
    * 删除版本
    */
-  deleteVersion(workflowId: number, versionId: number): Promise<boolean>;
+  deleteVersion(workflowId: string, versionId: string): Promise<boolean>;
   /**
    * 版本对比
    */
@@ -108,19 +108,22 @@ export interface IVersionsService {
   /**
    * 下载版本
    */
-  downloadVersion(workflowId: number, versionId: number): Promise<Blob>;
+  downloadVersion(workflowId: string, versionId: string): Promise<Blob>;
   /**
    * 获取版本锁信息
    */
-  getVersionLocks(workflowId: number): Promise<WorkflowLock[]>;
+  getVersionLocks(workflowId: string): Promise<WorkflowLock[]>;
   /**
    * 获取版本分支列表
    */
-  getVersionBranches(workflowId: number): Promise<WorkflowBranch[]>;
+  getVersionBranches(workflowId: string): Promise<WorkflowBranch[]>;
   /**
    * 版本影响评估
    */
-  assessVersionImpact(workflowId: number, versionId: number): Promise<{
+  assessVersionImpact(
+    workflowId: string,
+    versionId: string,
+  ): Promise<{
     backwardCompatible: boolean;
     nonDestructive: boolean;
     requiresRedeployment: boolean;
@@ -128,11 +131,11 @@ export interface IVersionsService {
   /**
    * 锁定版本进行编辑
    */
-  lockVersion(workflowId: number, version: string): Promise<WorkflowLock>;
+  lockVersion(workflowId: string, version: string): Promise<WorkflowLock>;
   /**
    * 释放版本锁定
    */
-  unlockVersion(workflowId: number, version: string): Promise<boolean>;
+  unlockVersion(workflowId: string, version: string): Promise<boolean>;
 }
 
 /**
@@ -145,7 +148,7 @@ export const versionsService: IVersionsService = {
   async getVersionList(params: VersionListParams): Promise<PageResult<WorkflowVersion>> {
     const response = await HttpRequest.get(
       {
-        url: VersionsApi.getVersionList.replace('{workflowId}', params.workflowId.toString()),
+        url: VersionsApi.getVersionList.replace('{workflowId}', params.workflowId),
         params: {
           pageNum: params.pageNum,
           pageSize: params.pageSize,
@@ -156,6 +159,7 @@ export const versionsService: IVersionsService = {
       },
       {
         successMessageMode: 'none',
+        requestType: 'fetch',
       },
     );
     return response;
@@ -164,11 +168,10 @@ export const versionsService: IVersionsService = {
   /**
    * 获取版本详情
    */
-  async getVersionDetail(workflowId: number, versionId: number): Promise<WorkflowVersion> {
+  async getVersionDetail(workflowId: string, versionId: string): Promise<WorkflowVersion> {
     const response = await HttpRequest.get({
-      url: VersionsApi.getVersionDetail
-        .replace('{workflowId}', workflowId.toString())
-        .replace('{versionId}', versionId.toString()),
+      url: VersionsApi.getVersionDetail.replace('{workflowId}', workflowId).replace('{versionId}', versionId),
+      requestType: 'fetch',
     });
     return response;
   },
@@ -178,21 +181,23 @@ export const versionsService: IVersionsService = {
    */
   async createVersion(params: CreateVersionParams): Promise<WorkflowVersion> {
     const response = await HttpRequest.post({
-      url: VersionsApi.createVersion.replace('{workflowId}', params.workflowId.toString()),
+      url: VersionsApi.createVersion.replace('{workflowId}', params.workflowId),
       data: params,
+      requestType: 'fetch',
     });
     return response;
   },
 
-  /**
+  /** 
    * 发布版本
    */
   async publishVersion(params: PublishVersionParams): Promise<boolean> {
     const response = await HttpRequest.post({
       url: VersionsApi.publishVersion
-        .replace('{workflowId}', params.workflowId.toString())
+        .replace('{workflowId}', params.workflowId)
         .replace('{version}', params.version),
       data: params,
+      requestType: 'fetch',
     });
     return response;
   },
@@ -200,11 +205,10 @@ export const versionsService: IVersionsService = {
   /**
    * 删除版本
    */
-  async deleteVersion(workflowId: number, versionId: number): Promise<boolean> {
+  async deleteVersion(workflowId: string, versionId: string): Promise<boolean> {
     const response = await HttpRequest.delete({
-      url: VersionsApi.deleteVersion
-        .replace('{workflowId}', workflowId.toString())
-        .replace('{versionId}', versionId.toString()),
+      url: VersionsApi.deleteVersion.replace('{workflowId}', workflowId).replace('{versionId}', versionId),
+      requestType: 'fetch',
     });
     return response;
   },
@@ -217,8 +221,9 @@ export const versionsService: IVersionsService = {
     diffContent: string;
   }> {
     const response = await HttpRequest.post({
-      url: VersionsApi.compareVersions.replace('{workflowId}', params.workflowId.toString()),
+      url: VersionsApi.compareVersions.replace('{workflowId}', params.workflowId),
       data: params,
+      requestType: 'fetch',
     });
     return response;
   },
@@ -228,8 +233,9 @@ export const versionsService: IVersionsService = {
    */
   async rollbackVersion(params: RollbackVersionParams): Promise<boolean> {
     const response = await HttpRequest.post({
-      url: VersionsApi.rollbackVersion.replace('{workflowId}', params.workflowId.toString()),
+      url: VersionsApi.rollbackVersion.replace('{workflowId}', params.workflowId),
       data: params,
+      requestType: 'fetch',
     });
     return response;
   },
@@ -237,12 +243,11 @@ export const versionsService: IVersionsService = {
   /**
    * 下载版本
    */
-  async downloadVersion(workflowId: number, versionId: number): Promise<Blob> {
+  async downloadVersion(workflowId: string, versionId: string): Promise<Blob> {
     const response = await HttpRequest.get({
-      url: VersionsApi.downloadVersion
-        .replace('{workflowId}', workflowId.toString())
-        .replace('{versionId}', versionId.toString()),
+      url: VersionsApi.downloadVersion.replace('{workflowId}', workflowId).replace('{versionId}', versionId),
       responseType: 'blob',
+      requestType: 'fetch',
     });
     return response;
   },
@@ -250,9 +255,10 @@ export const versionsService: IVersionsService = {
   /**
    * 获取版本锁信息
    */
-  async getVersionLocks(workflowId: number): Promise<WorkflowLock[]> {
+  async getVersionLocks(workflowId: string): Promise<WorkflowLock[]> {
     const response = await HttpRequest.get({
-      url: VersionsApi.getVersionLocks.replace('{workflowId}', workflowId.toString()),
+      url: VersionsApi.getVersionLocks.replace('{workflowId}', workflowId),
+      requestType: 'fetch',
     });
     return response;
   },
@@ -260,9 +266,10 @@ export const versionsService: IVersionsService = {
   /**
    * 获取版本分支列表
    */
-  async getVersionBranches(workflowId: number): Promise<WorkflowBranch[]> {
+  async getVersionBranches(workflowId: string): Promise<WorkflowBranch[]> {
     const response = await HttpRequest.get({
-      url: VersionsApi.getVersionBranches.replace('{workflowId}', workflowId.toString()),
+      url: VersionsApi.getVersionBranches.replace('{workflowId}', workflowId),
+      requestType: 'fetch',
     });
     return response;
   },
@@ -270,15 +277,17 @@ export const versionsService: IVersionsService = {
   /**
    * 版本影响评估
    */
-  async assessVersionImpact(workflowId: number, versionId: number): Promise<{
+  async assessVersionImpact(
+    workflowId: string,
+    versionId: string,
+  ): Promise<{
     backwardCompatible: boolean;
     nonDestructive: boolean;
     requiresRedeployment: boolean;
   }> {
     const response = await HttpRequest.get({
-      url: VersionsApi.assessVersionImpact
-        .replace('{workflowId}', workflowId.toString())
-        .replace('{versionId}', versionId.toString()),
+      url: VersionsApi.assessVersionImpact.replace('{workflowId}', workflowId).replace('{versionId}', versionId),
+      requestType: 'fetch',
     });
     return response;
   },
@@ -286,11 +295,10 @@ export const versionsService: IVersionsService = {
   /**
    * 锁定版本进行编辑
    */
-  async lockVersion(workflowId: number, version: string): Promise<WorkflowLock> {
+  async lockVersion(workflowId: string, version: string): Promise<WorkflowLock> {
     const response = await HttpRequest.post({
-      url: VersionsApi.lockVersion
-        .replace('{workflowId}', workflowId.toString())
-        .replace('{version}', version),
+      url: VersionsApi.lockVersion.replace('{workflowId}', workflowId).replace('{version}', version),
+      requestType: 'fetch',
     });
     return response;
   },
@@ -298,11 +306,10 @@ export const versionsService: IVersionsService = {
   /**
    * 释放版本锁定
    */
-  async unlockVersion(workflowId: number, version: string): Promise<boolean> {
+  async unlockVersion(workflowId: string, version: string): Promise<boolean> {
     const response = await HttpRequest.delete({
-      url: VersionsApi.unlockVersion
-        .replace('{workflowId}', workflowId.toString())
-        .replace('{version}', version),
+      url: VersionsApi.unlockVersion.replace('{workflowId}', workflowId).replace('{version}', version),
+      requestType: 'fetch',
     });
     return response;
   },

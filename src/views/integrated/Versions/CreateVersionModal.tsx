@@ -1,8 +1,8 @@
 import type React from 'react';
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Modal, Form, Input, Select, Checkbox, Button, message, Typography } from 'antd';
-import { versionsService } from '@/services/integrated/version/api';
-import type { CreateVersionParams, VersionType, WorkflowVersion } from '@/services/integrated/version/model';
+import type { CreateVersionParams } from '@/services/integrated/version/model';
+import { useVersionList, useCreateVersion } from '@/views/integrated/Versions/useVersionQueries';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -11,7 +11,7 @@ const { Title } = Typography;
 interface CreateVersionModalProps {
   visible: boolean;
   onClose: () => void;
-  workflowId: number;
+  workflowId: string;
   currentVersion?: string;
 }
 
@@ -22,80 +22,81 @@ const CreateVersionModal: React.FC<CreateVersionModalProps> = ({
   currentVersion = 'v2.1.0',
 }) => {
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
-  const [versions, setVersions] = useState<WorkflowVersion[]>([]);
 
-  // 模拟版本数据
-  const mockVersions: WorkflowVersion[] = [
-    { id: 1, version: 'v2.1.0', versionName: '优化用户体验版本' } as WorkflowVersion,
-    { id: 2, version: 'v2.0.0', versionName: '重大功能更新' } as WorkflowVersion,
-    { id: 3, version: 'v1.5.2', versionName: 'bug修复版本' } as WorkflowVersion,
-  ];
+  // 使用 React Query 获取版本列表
+  const { data: versionResult } = useVersionList({
+    workflowId,
+    pageNum: 1,
+    pageSize: 100,
+  });
+
+  // 版本数据
+  const versions = versionResult?.records || [];
+
+  // 创建版本 mutation
+  const createVersionMutation = useCreateVersion();
 
   useEffect(() => {
     if (visible) {
-      loadVersions();
       form.resetFields();
       // 设置默认的基于版本
       form.setFieldsValue({
         basedOnVersion: currentVersion,
       });
     }
-  }, [visible, currentVersion]);
+  }, [visible, currentVersion, form]);
 
-  const loadVersions = async () => {
-    try {
-      const result = await versionsService.getVersionList({
-        workflowId,
-        pageNum: 1,
-        pageSize: 100,
-      });
-      setVersions(result.records || mockVersions);
-    } catch (error) {
-      // 如果API调用失败，使用模拟数据
-      setVersions(mockVersions);
-      message.warning('使用模拟数据，API调用失败');
-    }
-  };
-
+  /**
+   * 提交表单
+   */
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
-      setLoading(true);
 
       const params: CreateVersionParams = {
         workflowId,
         versionType: values.versionType,
+        version: values.version,
         versionName: values.versionName,
         description: values.description,
         basedOnVersion: values.basedOnVersion,
         publishImmediately: values.publishImmediately || false,
       };
 
-      await versionsService.createVersion(params);
-      message.success('版本创建成功');
-      onClose();
+      createVersionMutation.mutate(params, {
+        onSuccess: () => {
+          onClose();
+        },
+      });
     } catch (error: any) {
       if (error.errorFields) {
         // 表单验证错误
         return;
       }
       message.error('创建版本失败');
-    } finally {
-      setLoading(false);
     }
   };
 
-  const getVersionTypeOptions = () => {
-    const versionType = form.getFieldValue('versionType');
-    const basedOnVersion = form.getFieldValue('basedOnVersion');
+  // 版本类型选项，使用 useMemo 避免不必要的重新计算
+  const versionTypeOptions = useMemo(() => {
+    // 只有在弹窗打开时才获取表单值，避免警告
+    let versionType: string | undefined, basedOnVersion: string | undefined;
+    if (visible) {
+      try {
+        versionType = form.getFieldValue('versionType');
+        basedOnVersion = form.getFieldValue('basedOnVersion');
+      } catch (error) {
+        // 如果表单还没有初始化，忽略错误
+        console.debug('Form not initialized yet:', error);
+      }
+    }
 
     // 根据基础版本自动建议版本类型
     if (basedOnVersion && !versionType) {
       const baseVersion = versions.find((v) => v.version === basedOnVersion);
       if (baseVersion) {
-        // 这里可以根据版本号规则自动建议下一个版本类型
-        // 简化处理，提供所有选项
+        // @todo 这里可以根据版本号规则自动建议下一个版本类型
+        // @todo 简化处理，提供所有选项
       }
     }
 
@@ -105,22 +106,7 @@ const CreateVersionModal: React.FC<CreateVersionModalProps> = ({
       { value: 'MAJOR', label: '主版本 (v3.0.0)', description: '重大变更，可能不兼容' },
       { value: 'HOTFIX', label: '热修复 (v2.1.1-hotfix)', description: '紧急修复' },
     ];
-  };
-
-  const getVersionTypeLabel = (type: VersionType) => {
-    switch (type) {
-      case 'PATCH':
-        return '补丁版本';
-      case 'MINOR':
-        return '次版本';
-      case 'MAJOR':
-        return '主版本';
-      case 'HOTFIX':
-        return '热修复';
-      default:
-        return type;
-    }
-  };
+  }, [visible, versions]);
 
   return (
     <Modal
@@ -136,22 +122,12 @@ const CreateVersionModal: React.FC<CreateVersionModalProps> = ({
       width={600}
       footer={null}
     >
-      <div style={{ marginBottom: 16 }}>
-        <Title level={5} style={{ margin: 0 }}>
-          创建新版本
-        </Title>
-      </div>
 
       <Form form={form} layout="vertical" onFinish={handleSubmit}>
         <Form.Item name="versionType" label="版本类型" rules={[{ required: true, message: '请选择版本类型' }]}>
           <Select placeholder="选择版本类型">
-            {getVersionTypeOptions().map((option) => (
-              <Option key={option.value} value={option.value}>
-                <div>
-                  <div>{option.label}</div>
-                  <div style={{ fontSize: '12px', color: '#666' }}>{option.description}</div>
-                </div>
-              </Option>
+            {versionTypeOptions.map((option) => (
+              <Option key={option.value} value={option.value} >{option.label}</Option>
             ))}
           </Select>
         </Form.Item>
@@ -165,6 +141,10 @@ const CreateVersionModal: React.FC<CreateVersionModalProps> = ({
           ]}
         >
           <Input placeholder="输入版本名称..." />
+        </Form.Item>
+
+        <Form.Item name="version" label="版本号" rules={[{ required: true, message: '请输入版本号' }]}>
+          <Input placeholder="输入版本号..." />
         </Form.Item>
 
         <Form.Item name="description" label="版本描述" rules={[{ max: 1000, message: '版本描述不能超过1000个字符' }]}>
@@ -190,7 +170,7 @@ const CreateVersionModal: React.FC<CreateVersionModalProps> = ({
           <Button onClick={onClose} style={{ marginRight: 8 }}>
             取消
           </Button>
-          <Button type="primary" htmlType="submit" loading={loading}>
+          <Button type="primary" htmlType="submit" loading={createVersionMutation.isPending}>
             创建版本
           </Button>
         </Form.Item>

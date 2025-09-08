@@ -4,11 +4,11 @@
 
 // 版本锁表实体
 export interface WorkflowLock {
-  id: number;
-  workflowId: number;
+  id: string;
+  workflowId: string;
   version: string;
   lockToken: string;
-  lockedBy: number;
+  lockedBy: string;
   lockedAt: string;
   expiresAt: string;
   lockType: 'EDIT' | 'PUBLISH' | 'DELETE';
@@ -16,8 +16,8 @@ export interface WorkflowLock {
 
 // 流程版本主表实体
 export interface WorkflowVersion {
-  id: number;
-  workflowId: number;
+  id: string;
+  workflowId: string;
   version: string;
   versionName?: string;
   description?: string;
@@ -30,33 +30,33 @@ export interface WorkflowVersion {
   checkSum?: string;
   tags?: any; // JSON
   metadata?: any; // JSON
-  publishedBy: number;
+  publishedBy: string;
   publishedTime: string;
-  createBy: number;
+  createBy: string;
   createTime: string;
-  updateBy: number;
+  updateBy: string;
   updateTime: string;
 }
 
 // 版本分支表实体
 export interface WorkflowBranch {
-  id: number;
-  workflowId: number;
+  id: string;
+  workflowId: string;
   branchName: string;
   branchType: 'MASTER' | 'FEATURE' | 'HOTFIX' | 'RELEASE';
   baseVersion: string;
   headVersion?: string;
-  createdBy: number;
+  createdBy: string;
   createdAt: string;
   status: 'ACTIVE' | 'MERGED' | 'DELETED';
   mergedAt?: string;
-  mergedBy?: number;
+  mergedBy?: string;
 }
 
 // 版本差异表实体
 export interface WorkflowVersionDelta {
-  id: number;
-  workflowId: number;
+  id: string;
+  workflowId: string;
   fromVersion: string;
   toVersion: string;
   deltaType: 'ADD' | 'MODIFY' | 'DELETE';
@@ -119,7 +119,7 @@ export enum StorageType {
 
 // 版本列表查询参数
 export interface VersionListParams {
-  workflowId: number;
+  workflowId: string;
   pageNum?: number;
   pageSize?: number;
   status?: number;
@@ -129,8 +129,9 @@ export interface VersionListParams {
 
 // 版本创建参数
 export interface CreateVersionParams {
-  workflowId: number;
+  workflowId: string;
   versionType: VersionType;
+  version: string;
   versionName: string;
   description?: string;
   basedOnVersion: string;
@@ -139,21 +140,21 @@ export interface CreateVersionParams {
 
 // 版本对比参数
 export interface VersionCompareParams {
-  workflowId: number;
+  workflowId: string;
   baseVersion: string;
   targetVersion: string;
 }
 
 // 版本发布参数
 export interface PublishVersionParams {
-  workflowId: number;
+  workflowId: string;
   version: string;
   publishNote?: string;
 }
 
 // 版本回滚参数
 export interface RollbackVersionParams {
-  workflowId: number;
+  workflowId: string;
   fromVersion: string;
   toVersion: string;
   rollbackNote?: string;

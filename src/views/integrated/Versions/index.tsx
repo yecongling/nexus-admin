@@ -5,7 +5,7 @@ import VersionList from './VersionList';
 import VersionComparison from './VersionComparison';
 import CreateVersionModal from './CreateVersionModal';
 import ReleaseConfirmation from './ReleaseConfirmation';
-import { versionsService } from '@/services/integrated/version/api';
+import { useDeleteVersion } from '@/views/integrated/Versions/useVersionQueries';
 import type { WorkflowVersion } from '@/services/integrated/version/model';
 
 /**
@@ -22,7 +22,10 @@ const Versions: React.FC = () => {
   }>({});
 
   // 模拟工作流ID，实际应该从路由参数或props获取
-  const workflowId = 1;
+  const workflowId = '1';
+
+  // 删除版本 mutation
+  const deleteVersionMutation = useDeleteVersion();
 
   // 查看版本详情
   const handleViewVersion = (version: WorkflowVersion) => {
@@ -55,13 +58,11 @@ const Versions: React.FC = () => {
   };
 
   // 删除版本
-  const handleDeleteVersion = async (version: WorkflowVersion) => {
-    try {
-      await versionsService.deleteVersion(workflowId, version.id);
-      message.success(`版本 ${version.version} 删除成功`);
-    } catch (error) {
-      message.error('删除版本失败');
-    }
+  const handleDeleteVersion = (version: WorkflowVersion) => {
+    deleteVersionMutation.mutate({
+      workflowId,
+      versionId: version.id,
+    });
   };
 
   // 发布版本
