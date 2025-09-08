@@ -52,42 +52,63 @@ export const createTransform = (requestInstance: any): FetchTransform => ({
     if (isReturnNativeResponse) {
       return res;
     }
-    // 不进行任何处理，直接返回响应数据
-    if (!isTransformResponse) {
-      return await res.json();
-    }
     
     // 检查响应状态
     if (!res.ok) {
       throw new Error(`HTTP Error: ${res.status}`);
     }
     
-    // 错误的时候返回
-    const data = await res.json();
-    if (!data) {
-      throw new Error(t('common.errorMsg.noData'));
-    }
-    const { code, data: rtn, message: msg } = data;
-    // 系统默认200状态码为正常成功请求，可在枚举中配置自己的
-    const hasSuccess =
-      data && Reflect.has(data, 'code') && code === HttpCodeEnum.SUCCESS;
-    if (hasSuccess) {
-      if (msg && options.successMessageMode === 'success') {
-        // 信息成功提示
-        antdUtils.message?.success(msg);
+    // 根据 Content-Type 判断响应格式
+    const contentType = res.headers.get('content-type') || '';
+    
+    // 如果是 JSON 格式，进行业务逻辑处理
+    if (contentType.includes('application/json')) {
+      // 不进行任何处理，直接返回响应数据
+      if (!isTransformResponse) {
+        return await res.json();
       }
-      return rtn;
+      
+      // 错误的时候返回
+      const data = await res.json();
+      if (!data) {
+        throw new Error(t('common.errorMsg.noData'));
+      }
+      const { code, data: rtn, message: msg } = data;
+      // 系统默认200状态码为正常成功请求，可在枚举中配置自己的
+      const hasSuccess =
+        data && Reflect.has(data, 'code') && code === HttpCodeEnum.SUCCESS;
+      if (hasSuccess) {
+        if (msg && options.successMessageMode === 'success') {
+          // 信息成功提示
+          antdUtils.message?.success(msg);
+        }
+        return rtn;
+      }
+      if (options.errorMessageMode === 'modal') {
+        antdUtils.modal?.error({
+          title: `${t('common.errorMsg.serverException')},${t('common.errorMsg.statusCode')}(${code})`,
+          content: msg,
+          okText: t('common.operation.confirm'),
+        });
+      } else if (options.errorMessageMode === 'message') {
+        antdUtils.message?.error(msg);
+      }
+      throw new Error(msg || t('common.errorMsg.requestFailed'));
     }
-    if (options.errorMessageMode === 'modal') {
-      antdUtils.modal?.error({
-        title: `${t('common.errorMsg.serverException')},${t('common.errorMsg.statusCode')}(${code})`,
-        content: msg,
-        okText: t('common.operation.confirm'),
-      });
-    } else if (options.errorMessageMode === 'message') {
-      antdUtils.message?.error(msg);
+    
+    // 非 JSON 格式，根据 Content-Type 返回相应格式
+    if (contentType.includes('text/')) {
+      return await res.text();
+    } else if (contentType.includes('application/octet-stream') || contentType.includes('application/pdf')) {
+      return await res.blob();
+    } else {
+      // 默认尝试 JSON，如果失败则返回文本
+      try {
+        return await res.json();
+      } catch {
+        return await res.text();
+      }
     }
-    throw new Error(msg || t('common.errorMsg.requestFailed'));
   },
 
   // 请求之前处理config
@@ -234,86 +255,112 @@ export const createTransform = (requestInstance: any): FetchTransform => ({
     const userStore = useUserStore.getState();
     const config = (res as any).config;
     
-    // 检查响应状态
+    // 检查响应状态 - fetch 中 401 等状态码实际上 res.ok = true
+    // 只有在网络错误或 CORS 错误时 res.ok 才为 false
     if (!res.ok) {
-      const result = await res.json().catch(() => ({}));
-      const { code: responseCode } = result;
+      // 网络错误或 CORS 错误，直接返回
+      return res;
+    }
+    
+    // 检查 Content-Type 是否为 JSON
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      // 非 JSON 响应，直接返回
+      return res;
+    }
+    
+    // 解析 JSON 响应获取业务状态码
+    let result: any = {};
+    try {
+      // 克隆响应对象，避免多次读取 body
+      const clonedResponse = res.clone();
+      result = await clonedResponse.json();
+    } catch (parseError) {
+      // 如果解析失败，直接返回原响应
+      console.warn('Failed to parse response as JSON:', parseError);
+      return res;
+    }
+    
+    const { code: responseCode } = result;
+    
+    // 判断是否跳过请求
+    if (
+      config?.requestOptions?.skipAuthInterceptor &&
+      responseCode === HttpCodeEnum.RC401
+    ) {
+      antdUtils.modal?.confirm({
+        title: t('login.loginValid'),
+        content: t('login.retryLogin'),
+        onOk() {
+          userStore.logout();
+          window.location.href = '/login';
+        },
+        okText: t('common.operation.confirm'),
+      });
+      throw new Error(t('login.loginValid'));
+    }
+    
+    // 判断业务状态码是否为401(即token失效),添加_retry属性防止重复刷新token
+    if (responseCode === HttpCodeEnum.RC401 && !config?._retry) {
+      config._retry = true;
       
-      // 判断是否跳过请求
-      if (
-        config?.requestOptions?.skipAuthInterceptor &&
-        responseCode === HttpCodeEnum.RC401
-      ) {
-        antdUtils.modal?.confirm({
-          title: t('login.loginValid'),
-          content: t('login.retryLogin'),
-          onOk() {
-            userStore.logout();
-            window.location.href = '/login';
-          },
-          okText: t('common.operation.confirm'),
-        });
-        return Promise.reject(t('login.loginValid'));
-      }
-      
-      // 判断responseCode是否为401(即token失效),添加_retry属性防止重复刷新token
-      if (
-        responseCode === HttpCodeEnum.RC401 &&
-        !config?._retry
-      ) {
-        config._retry = true;
-        // 判断是否正在刷新token
-        if (!isRefreshing) {
-          isRefreshing = true;
-          try {
-            // 调用刷新token的接口
-            const newToken = await commonService.refreshToken(
-              userStore.refreshToken,
-            );
-            if (!newToken) {
-              throw new Error('refresh token failed');
-            }
-            // 更新token到store
-            userStore.setToken(newToken);
-            // 执行等待的请求
-            onTokenRefreshed(newToken);
-            // 重新发起原始请求
-            const response = await requestInstance.request(
-              { ...config },
-              { token: newToken, isReturnNativeResponse: true },
-            );
-            return response;
-          } catch (refreshError) {
-            // 刷新 token 失败，跳转登录页
-            antdUtils.modal?.confirm({
-              title: t('login.loginValid'),
-              content: t('login.retryLogin'),
-              onOk() {
-                userStore.logout();
-                window.location.href = '/login';
-              },
-              okText: t('common.operation.confirm'),
-            });
-            return Promise.reject(refreshError);
-          } finally {
-            isRefreshing = false;
+      // 判断是否正在刷新token
+      if (!isRefreshing) {
+        isRefreshing = true;
+        try {
+          // 调用刷新token的接口
+          const newToken = await commonService.refreshToken(
+            userStore.refreshToken,
+          );
+          if (!newToken) {
+            throw new Error('refresh token failed');
           }
-        } else {
-          // 正在刷新token，将请求加入队列
-          return new Promise((resolve, reject) => {
-            addSubscriber((token: string) => {
-              // 重新发起原始请求
-              requestInstance.request(
-                { ...config },
-                { token: token, isReturnNativeResponse: true },
-              )
-                .then(resolve)
-                .catch(reject);
-            });
+          // 更新token到store
+          userStore.setToken(newToken);
+          // 执行等待的请求
+          onTokenRefreshed(newToken);
+          // 重新发起原始请求
+          const response = await requestInstance.request(
+            { ...config },
+            { token: newToken, isReturnNativeResponse: true },
+          );
+          return response;
+        } catch (refreshError) {
+          // 刷新 token 失败，跳转登录页
+          antdUtils.modal?.confirm({
+            title: t('login.loginValid'),
+            content: t('login.retryLogin'),
+            onOk() {
+              userStore.logout();
+              window.location.href = '/login';
+            },
+            okText: t('common.operation.confirm'),
           });
+          throw refreshError;
+        } finally {
+          isRefreshing = false;
         }
+      } else {
+        // 正在刷新token，将请求加入队列
+        return new Promise((resolve, reject) => {
+          addSubscriber((token: string) => {
+            // 重新发起原始请求
+            requestInstance.request(
+              { ...config },
+              { token: token, isReturnNativeResponse: true },
+            )
+              .then(resolve)
+              .catch(reject);
+          });
+        });
       }
     }
+    
+    // 如果是401错误且已经重试过，则抛出错误
+    if (responseCode === HttpCodeEnum.RC401) {
+      throw new Error(t('login.loginValid'));
+    }
+    
     return res;
   },
 
