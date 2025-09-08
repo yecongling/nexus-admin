@@ -13,6 +13,7 @@ import {
   message,
   Modal,
   Pagination,
+  theme,
 } from 'antd';
 import {
   PlusOutlined,
@@ -24,6 +25,7 @@ import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   ExclamationCircleOutlined,
+  ArrowUpOutlined,
 } from '@ant-design/icons';
 import { versionsService } from '@/services/integrated/version/api';
 import { type WorkflowVersion, VersionStatus, type VersionType } from '@/services/integrated/version/model';
@@ -31,6 +33,8 @@ import { type WorkflowVersion, VersionStatus, type VersionType } from '@/service
 const { Search } = Input;
 const { Option } = Select;
 const { Title, Text } = Typography;
+
+const { useToken } = theme;
 
 interface VersionListProps {
   workflowId: number;
@@ -55,6 +59,7 @@ const VersionList: React.FC<VersionListProps> = ({
   onRollbackVersion,
   onCreateVersion,
 }) => {
+  const { token } = useToken();
   const [, setLoading] = useState(false);
   const [versions, setVersions] = useState<WorkflowVersion[]>([]);
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -281,6 +286,7 @@ const VersionList: React.FC<VersionListProps> = ({
         <Button
           key="publish"
           type="primary"
+          icon={<ArrowUpOutlined />}
           onClick={() => onPublishVersion?.(version)}
         >
           发布
@@ -349,19 +355,10 @@ const VersionList: React.FC<VersionListProps> = ({
   };
 
   return (
-    <div>
-      {/* 页面标题和面包屑 */}
-      <div style={{ marginBottom: 24 }}>
-        <Title level={3} style={{ margin: 0 }}>
-          版本列表页面
-        </Title>
-        <div style={{ marginTop: 8, color: '#666' }}>
-          流程管理 &gt; 流程设计 &gt; 订单处理流程 &gt; 版本管理
-        </div>
-      </div>
+    <div className='h-full flex flex-col box-border'>
 
       {/* 搜索和筛选区域 */}
-      <Card style={{ marginBottom: 16 }}>
+      <Card className='mb-4! flex-shrink-0'>
         <Row gutter={16} align="middle">
           <Col flex="auto">
             <Search
@@ -409,76 +406,79 @@ const VersionList: React.FC<VersionListProps> = ({
         </Row>
       </Card>
 
-      {/* 版本列表 */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        {versions.map((version) => {
-          const statusInfo = getStatusInfo(version.status);
-          const isCurrentVersion = version.status === VersionStatus.PUBLISHED && version.version === 'v2.1.0';
-          
-          return (
-            <Card
-              key={version.id}
-              hoverable
-              style={{ 
-                border: isCurrentVersion ? '2px solid #1890ff' : undefined,
-                position: 'relative'
-              }}
-            >
-              <Row gutter={16} align="middle">
-                <Col flex="none">
-                  <Tag color={version.versionType === 'MAJOR' ? 'blue' : 'green'}>
-                    {version.version}
-                  </Tag>
-                </Col>
-                <Col flex="auto">
-                  <div>
-                    <Title level={5} style={{ margin: 0, marginBottom: 4 }}>
-                      {version.versionName}
-                      {isCurrentVersion && (
-                        <Tag color="green" style={{ marginLeft: 8 }}>
-                          当前版本
-                        </Tag>
-                      )}
-                    </Title>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 8 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                        <span style={{ color: statusInfo.color }}>
-                          {statusInfo.icon}
-                        </span>
-                        <Text type="secondary">{statusInfo.text}</Text>
+      {/* 版本列表区域 - 占据剩余空间并支持滚动 */}
+      <div className='flex-1 overflow-hidden flex flex-col'>
+        <div style={{ 
+          flex: 1,
+          overflow: 'auto',
+          paddingRight: '8px' // 为滚动条留出空间
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {versions.map((version) => {
+              const statusInfo = getStatusInfo(version.status);
+              const isCurrentVersion = version.status === VersionStatus.PUBLISHED && version.version === 'v2.1.0';
+              
+              return (
+                <Card
+                  key={version.id}
+                  hoverable
+                  style={{ 
+                    border: isCurrentVersion ? `2px solid ${token.colorPrimary}` : undefined,
+                    position: 'relative'
+                  }}
+                >
+                  <Row gutter={16} align="middle">
+                    <Col flex="none">
+                      <Tag color={version.versionType === 'MAJOR' ? 'blue' : 'green'}>
+                        {version.version}
+                      </Tag>
+                    </Col>
+                    <Col flex="auto">
+                      <div>
+                        <Title level={5} style={{ margin: 0, marginBottom: 4 }}>
+                          {version.versionName}
+                          {isCurrentVersion && (
+                            <Tag color="green" style={{ marginLeft: 8 }}>
+                              当前版本
+                            </Tag>
+                          )}
+                        </Title>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 8 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <span style={{ color: statusInfo.color }}>
+                              {statusInfo.icon}
+                            </span>
+                            <Text type="secondary">{statusInfo.text}</Text>
+                          </div>
+                          <Text type="secondary">
+                            {getVersionTypeText(version.versionType as any)}
+                          </Text>
+                          <Text type="secondary">
+                            创建人：张三
+                          </Text>
+                          <Text type="secondary">
+                            {formatDate(version.createTime)}
+                          </Text>
+                          <Text type="secondary">
+                            {formatFileSize(version.fileSize)}
+                          </Text>
+                        </div>
                       </div>
-                      <Text type="secondary">
-                        {getVersionTypeText(version.versionType as any)}
-                      </Text>
-                      <Text type="secondary">
-                        创建人：张三
-                      </Text>
-                      <Text type="secondary">
-                        {formatDate(version.createTime)}
-                      </Text>
-                      <Text type="secondary">
-                        {formatFileSize(version.fileSize)}
-                      </Text>
-                    </div>
-                  </div>
-                </Col>
-                <Col flex="none">
-                  {renderActionButtons(version)}
-                </Col>
-              </Row>
-            </Card>
-          );
-        })}
+                    </Col>
+                    <Col flex="none">
+                      {renderActionButtons(version)}
+                    </Col>
+                  </Row>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
-      {/* 分页组件 */}
-      <div style={{ 
-        marginTop: 24, 
-        display: 'flex', 
-        justifyContent: 'center',
-        padding: '16px 0'
-      }}>
+      {/* 分页组件 - 固定在底部 */}
         <Pagination
+          className='flex-shrink-0 flex justify-center p-4 bg-bg-container mt-4!  '
           current={pagination.current}
           pageSize={pagination.pageSize}
           total={pagination.total}
@@ -492,7 +492,6 @@ const VersionList: React.FC<VersionListProps> = ({
           pageSizeOptions={['10', '20', '50', '100']}
         />
       </div>
-    </div>
   );
 };
 

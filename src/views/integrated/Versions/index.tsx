@@ -101,7 +101,7 @@ const Versions: React.FC = () => {
   };
 
   return (
-    <div>
+    <>
       <VersionList
         workflowId={workflowId}
         onViewVersion={handleViewVersion}
@@ -134,7 +134,7 @@ const Versions: React.FC = () => {
         onClose={handleCloseReleaseConfirmation}
         version={selectedVersion}
       />
-    </div>
+    </>
   );
 };
 

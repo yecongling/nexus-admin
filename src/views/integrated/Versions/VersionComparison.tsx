@@ -1,9 +1,7 @@
 import type React from 'react';
 import { useState, useEffect } from 'react';
 import {
-  Card,
   Select,
-  Button,
   Typography,
   Row,
   Col,
@@ -11,7 +9,7 @@ import {
   Spin,
   message,
 } from 'antd';
-import { CloseOutlined } from '@ant-design/icons';
+import DragModal from '@/components/modal/DragModal';
 import { versionsService } from '@/services/integrated/version/api';
 import type { WorkflowVersion, WorkflowVersionDelta } from '@/services/integrated/version/model';
 
@@ -213,41 +211,19 @@ const VersionComparison: React.FC<VersionComparisonProps> = ({
   const summary = getChangeSummary();
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      zIndex: 1000,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px'
-    }}>
-      <Card
-        style={{
-          width: '90%',
-          maxWidth: '1200px',
-          maxHeight: '90vh',
-          overflow: 'auto'
-        }}
-        title={
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Title level={4} style={{ margin: 0 }}>版本对比页面</Title>
-            <Button
-              type="text"
-              icon={<CloseOutlined />}
-              onClick={onClose}
-            />
-          </div>
-        }
-      >
-        {/* 面包屑 */}
-        <div style={{ marginBottom: 16, color: '#666' }}>
-          版本管理 &gt; 版本对比 &gt; {baseVersion} vs {targetVersion}
+    <DragModal
+      open={visible}
+      onCancel={onClose}
+      width="90%"
+      style={{ maxWidth: '1200px' }}
+      title={
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Title level={4} style={{ margin: 0 }}>版本对比</Title>
         </div>
+      }
+      footer={null}
+    >
+      <div style={{ maxHeight: '70vh', overflow: 'auto' }}>
 
         {/* 版本选择 */}
         <Row gutter={16} style={{ marginBottom: 16 }}>
@@ -305,8 +281,8 @@ const VersionComparison: React.FC<VersionComparisonProps> = ({
             </div>
           )}
         </Spin>
-      </Card>
-    </div>
+      </div>
+    </DragModal>
   );
 };
 

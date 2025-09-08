@@ -1,15 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Modal,
-  Form,
-  Input,
-  Select,
-  Checkbox,
-  Button,
-  message,
-  Typography,
-} from 'antd';
-import { CloseOutlined } from '@ant-design/icons';
+import type React from 'react';
+import { useState, useEffect } from 'react';
+import { Modal, Form, Input, Select, Checkbox, Button, message, Typography } from 'antd';
 import { versionsService } from '@/services/integrated/version/api';
 import type { CreateVersionParams, VersionType, WorkflowVersion } from '@/services/integrated/version/model';
 
@@ -54,10 +45,10 @@ const CreateVersionModal: React.FC<CreateVersionModalProps> = ({
 
   const loadVersions = async () => {
     try {
-      const result = await versionsService.getVersionList({ 
-        workflowId, 
-        pageNum: 1, 
-        pageSize: 100 
+      const result = await versionsService.getVersionList({
+        workflowId,
+        pageNum: 1,
+        pageSize: 100,
       });
       setVersions(result.records || mockVersions);
     } catch (error) {
@@ -71,7 +62,7 @@ const CreateVersionModal: React.FC<CreateVersionModalProps> = ({
     try {
       const values = await form.validateFields();
       setLoading(true);
-      
+
       const params: CreateVersionParams = {
         workflowId,
         versionType: values.versionType,
@@ -84,7 +75,7 @@ const CreateVersionModal: React.FC<CreateVersionModalProps> = ({
       await versionsService.createVersion(params);
       message.success('版本创建成功');
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       if (error.errorFields) {
         // 表单验证错误
         return;
@@ -98,10 +89,10 @@ const CreateVersionModal: React.FC<CreateVersionModalProps> = ({
   const getVersionTypeOptions = () => {
     const versionType = form.getFieldValue('versionType');
     const basedOnVersion = form.getFieldValue('basedOnVersion');
-    
+
     // 根据基础版本自动建议版本类型
     if (basedOnVersion && !versionType) {
-      const baseVersion = versions.find(v => v.version === basedOnVersion);
+      const baseVersion = versions.find((v) => v.version === basedOnVersion);
       if (baseVersion) {
         // 这里可以根据版本号规则自动建议下一个版本类型
         // 简化处理，提供所有选项
@@ -135,42 +126,30 @@ const CreateVersionModal: React.FC<CreateVersionModalProps> = ({
     <Modal
       title={
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Title level={4} style={{ margin: 0 }}>创建版本弹窗</Title>
-          <Button
-            type="text"
-            icon={<CloseOutlined />}
-            onClick={onClose}
-          />
+          <Title level={4} style={{ margin: 0 }}>
+            创建版本
+          </Title>
         </div>
       }
       open={visible}
       onCancel={onClose}
       width={600}
       footer={null}
-      destroyOnClose
     >
       <div style={{ marginBottom: 16 }}>
-        <Title level={5} style={{ margin: 0 }}>创建新版本</Title>
+        <Title level={5} style={{ margin: 0 }}>
+          创建新版本
+        </Title>
       </div>
 
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-      >
-        <Form.Item
-          name="versionType"
-          label="版本类型"
-          rules={[{ required: true, message: '请选择版本类型' }]}
-        >
+      <Form form={form} layout="vertical" onFinish={handleSubmit}>
+        <Form.Item name="versionType" label="版本类型" rules={[{ required: true, message: '请选择版本类型' }]}>
           <Select placeholder="选择版本类型">
-            {getVersionTypeOptions().map(option => (
+            {getVersionTypeOptions().map((option) => (
               <Option key={option.value} value={option.value}>
                 <div>
                   <div>{option.label}</div>
-                  <div style={{ fontSize: '12px', color: '#666' }}>
-                    {option.description}
-                  </div>
+                  <div style={{ fontSize: '12px', color: '#666' }}>{option.description}</div>
                 </div>
               </Option>
             ))}
@@ -182,34 +161,19 @@ const CreateVersionModal: React.FC<CreateVersionModalProps> = ({
           label="版本名称"
           rules={[
             { required: true, message: '请输入版本名称' },
-            { max: 255, message: '版本名称不能超过255个字符' }
+            { max: 255, message: '版本名称不能超过255个字符' },
           ]}
         >
           <Input placeholder="输入版本名称..." />
         </Form.Item>
 
-        <Form.Item
-          name="description"
-          label="版本描述"
-          rules={[
-            { max: 1000, message: '版本描述不能超过1000个字符' }
-          ]}
-        >
-          <TextArea
-            placeholder="描述本次版本的主要变更..."
-            rows={4}
-            showCount
-            maxLength={1000}
-          />
+        <Form.Item name="description" label="版本描述" rules={[{ max: 1000, message: '版本描述不能超过1000个字符' }]}>
+          <TextArea placeholder="描述本次版本的主要变更..." rows={4} showCount maxLength={1000} />
         </Form.Item>
 
-        <Form.Item
-          name="basedOnVersion"
-          label="基于版本"
-          rules={[{ required: true, message: '请选择基于版本' }]}
-        >
+        <Form.Item name="basedOnVersion" label="基于版本" rules={[{ required: true, message: '请选择基于版本' }]}>
           <Select placeholder="选择基于版本">
-            {versions.map(version => (
+            {versions.map((version) => (
               <Option key={version.version} value={version.version}>
                 {version.version} {version.versionName && `(${version.versionName})`}
                 {version.version === currentVersion && ' (当前版本)'}
@@ -218,10 +182,7 @@ const CreateVersionModal: React.FC<CreateVersionModalProps> = ({
           </Select>
         </Form.Item>
 
-        <Form.Item
-          name="publishImmediately"
-          valuePropName="checked"
-        >
+        <Form.Item name="publishImmediately" valuePropName="checked">
           <Checkbox>创建后立即发布</Checkbox>
         </Form.Item>
 
