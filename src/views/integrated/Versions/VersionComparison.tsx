@@ -12,6 +12,7 @@ import {
 import DragModal from '@/components/modal/DragModal';
 import { versionsService } from '@/services/integrated/version/api';
 import type { WorkflowVersion, WorkflowVersionDelta } from '@/services/integrated/version/model';
+import { DiffEditor } from '@/components/DiffEditor';
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -36,7 +37,6 @@ const VersionComparison: React.FC<VersionComparisonProps> = ({
   const [targetVersion, setTargetVersion] = useState<string>(initialTargetVersion || '');
   const [versions, setVersions] = useState<WorkflowVersion[]>([]);
   const [deltas, setDeltas] = useState<WorkflowVersionDelta[]>([]);
-  const [diffContent, setDiffContent] = useState<string>('');
 
   // 模拟版本数据
   const mockVersions: WorkflowVersion[] = [
@@ -121,77 +121,56 @@ const VersionComparison: React.FC<VersionComparisonProps> = ({
       };
       const result = await versionsService.compareVersions(params);
       setDeltas(result.deltas);
-      setDiffContent(result.diffContent);
     } catch (error) {
       // 如果API调用失败，使用模拟数据
       setDeltas(mockDeltas);
-      setDiffContent(generateMockDiffContent());
       message.warning('使用模拟数据，API调用失败');
     } finally {
       setLoading(false);
     }
   };
 
-  const generateMockDiffContent = () => {
-    return `"nodes": [
-  { "id": "start_node",
--   "name": "开始节点",
-+   "name": "流程开始",
-    "type": "start"
-  },
-+ { "id": "validation_node",
-+   "name": "数据验证",
-+   "type": "validation"
-+ },
-  { "id": "process_node",
-    "timeout": 300,
--   "timeout": 300,
-+   "timeout": 600,
-  }`;
+
+  const generateOriginalContent = () => {
+    return JSON.stringify({
+      nodes: [
+        {
+          id: "start_node",
+          name: "开始节点",
+          type: "start"
+        },
+        {
+          id: "process_node",
+          name: "处理节点",
+          timeout: 300
+        }
+      ]
+    }, null, 2);
+  };
+
+  const generateModifiedContent = () => {
+    return JSON.stringify({
+      nodes: [
+        {
+          id: "start_node",
+          name: "流程开始",
+          type: "start"
+        },
+        {
+          id: "validation_node",
+          name: "数据验证",
+          type: "validation"
+        },
+        {
+          id: "process_node",
+          name: "处理节点",
+          timeout: 600
+        }
+      ]
+    }, null, 2);
   };
 
 
-  const renderDiffContent = () => {
-    if (!diffContent) return null;
-
-    const lines = diffContent.split('\n');
-    return (
-      <div style={{ 
-        fontFamily: 'Monaco, Consolas, "Courier New", monospace',
-        fontSize: '12px',
-        lineHeight: '1.5',
-        backgroundColor: '#f5f5f5',
-        padding: '16px',
-        borderRadius: '4px',
-        maxHeight: '400px',
-        overflow: 'auto'
-      }}>
-        {lines.map((line, lineIndex) => {
-          const isAddition = line.startsWith('+');
-          const isDeletion = line.startsWith('-');
-          
-          return (
-            <div
-              key={`line-${lineIndex}-${line.substring(0, 20)}`}
-              style={{
-                backgroundColor: isAddition ? '#f6ffed' : isDeletion ? '#fff2f0' : 'transparent',
-                borderLeft: isAddition ? '3px solid #52c41a' : isDeletion ? '3px solid #ff4d4f' : 'none',
-                padding: '2px 8px',
-                margin: '1px 0',
-              }}
-            >
-              <span style={{ 
-                color: isAddition ? '#52c41a' : isDeletion ? '#ff4d4f' : '#666',
-                fontWeight: isAddition || isDeletion ? 'bold' : 'normal'
-              }}>
-                {line}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
 
   const getChangeSummary = () => {
     const addCount = deltas.filter(d => d.deltaType === 'ADD').length;
@@ -273,7 +252,18 @@ const VersionComparison: React.FC<VersionComparisonProps> = ({
           {baseVersion && targetVersion && baseVersion !== targetVersion ? (
             <div>
               <Title level={5}>详细差异</Title>
-              {renderDiffContent()}
+              <DiffEditor
+                original={baseVersion ? generateOriginalContent() : ''}
+                modified={targetVersion ? generateModifiedContent() : ''}
+                language="json"
+                height="400px"
+                originalTitle={`${baseVersion} (原始版本)`}
+                modifiedTitle={`${targetVersion} (修改版本)`}
+                renderSideBySide={true}
+                enableSplitViewResizing={true}
+                showMinimap={false}
+                fontSize={12}
+              />
             </div>
           ) : (
             <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
