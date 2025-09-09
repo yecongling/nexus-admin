@@ -73,6 +73,10 @@ const RoleApi = {
  */
 export interface IRoleService {
   /**
+   * 获取不在该角色下的所有可用用户
+   */
+  getRoleDetail(roleId: string): Promise<RoleModel>;
+  /**
    * 获取角色列表（包含分页数据）
    * @param params 角色参数(包含分页信息)
    * @returns 角色列表
@@ -166,6 +170,23 @@ export interface IRoleService {
  * 角色管理服务实现
  */
 export const roleService: IRoleService = {
+  /**
+   * 获取角色详情
+   * @param roleId 角色ID
+   * @returns 角色详情
+   */
+  async getRoleDetail(roleId: string): Promise<RoleModel> {
+    return await HttpRequest.get(
+      {
+        url: RoleApi.getRoleDetail,
+        params: { roleId },
+      },
+      {
+        successMessageMode: 'none',
+        requestType: 'fetch'
+      },
+    );
+  },
   /**
    * 获取角色列表（包含分页数据）
    * @param params 角色参数(包含分页信息)
