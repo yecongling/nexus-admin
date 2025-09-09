@@ -4,7 +4,6 @@ import { message } from 'antd';
 import VersionList from './VersionList';
 import VersionComparison from './VersionComparison';
 import CreateVersionModal from './CreateVersionModal';
-import ReleaseConfirmation from './ReleaseConfirmation';
 import { useDeleteVersion } from '@/views/integrated/Versions/useVersionQueries';
 import type { WorkflowVersion } from '@/services/integrated/version/model';
 
@@ -14,8 +13,6 @@ import type { WorkflowVersion } from '@/services/integrated/version/model';
 const Versions: React.FC = () => {
   const [showComparison, setShowComparison] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showReleaseConfirmation, setShowReleaseConfirmation] = useState(false);
-  const [selectedVersion, setSelectedVersion] = useState<WorkflowVersion | null>(null);
   const [comparisonVersions, setComparisonVersions] = useState<{
     baseVersion?: string;
     targetVersion?: string;
@@ -65,12 +62,6 @@ const Versions: React.FC = () => {
     });
   };
 
-  // 发布版本
-  const handlePublishVersion = (version: WorkflowVersion) => {
-    setSelectedVersion(version);
-    setShowReleaseConfirmation(true);
-  };
-
   // 回滚版本
   const handleRollbackVersion = (version: WorkflowVersion) => {
     // TODO: 实现回滚版本逻辑
@@ -83,7 +74,6 @@ const Versions: React.FC = () => {
     setShowCreateModal(true);
   };
 
-
   // 关闭版本对比
   const handleCloseComparison = () => {
     setShowComparison(false);
@@ -95,12 +85,6 @@ const Versions: React.FC = () => {
     setShowCreateModal(false);
   };
 
-  // 关闭发布确认弹窗
-  const handleCloseReleaseConfirmation = () => {
-    setShowReleaseConfirmation(false);
-    setSelectedVersion(null);
-  };
-
   return (
     <>
       <VersionList
@@ -110,7 +94,6 @@ const Versions: React.FC = () => {
         onDownloadVersion={handleDownloadVersion}
         onEditVersion={handleEditVersion}
         onDeleteVersion={handleDeleteVersion}
-        onPublishVersion={handlePublishVersion}
         onRollbackVersion={handleRollbackVersion}
         onCreateVersion={handleCreateVersion}
       />
@@ -128,12 +111,6 @@ const Versions: React.FC = () => {
         onClose={handleCloseCreateModal}
         workflowId={workflowId}
         currentVersion="v2.1.0"
-      />
-
-      <ReleaseConfirmation
-        visible={showReleaseConfirmation}
-        onClose={handleCloseReleaseConfirmation}
-        version={selectedVersion}
       />
     </>
   );
