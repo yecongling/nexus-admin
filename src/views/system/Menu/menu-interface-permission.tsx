@@ -159,8 +159,32 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
 
   // 刷新数据
   const handleRefresh = useCallback(() => {
-    refetch();
-  }, [refetch]);
+    // 检查是否有未保存的编辑数据
+    if (state.editingId) {
+      modal.confirm({
+        title: '确认刷新',
+        content: '当前有未保存的编辑数据，刷新将清除这些数据。是否确认刷新？',
+        okText: '确认刷新',
+        cancelText: '取消',
+        centered: true,
+        onOk: () => {
+          // 清除编辑状态和未保存的数据
+          updateState({
+            editingId: null,
+            editForm: { id: '', code: '', remark: '', path: '', method: '', name: '' },
+            errors: {},
+            // 移除临时行（以temp_开头的行）
+            permissionList: state.permissionList.filter(item => !item.id.startsWith('temp_')),
+          });
+          // 执行刷新
+          refetch();
+        },
+      });
+    } else {
+      // 没有未保存数据，直接刷新
+      refetch();
+    }
+  }, [refetch, state.editingId, state.permissionList, updateState, modal]);
 
   // 处理分页变化
   const handleTableChange = useCallback(
@@ -256,11 +280,21 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
       // 清除之前的错误
       clearErrors();
 
-      const newErrors: { code?: string; remark?: string } = {};
+      const newErrors: { code?: string; remark?: string; name?: string; path?: string } = {};
 
       // 验证编码
       if (!state.editForm.code.trim()) {
         newErrors.code = '编码不能为空';
+      }
+
+      // 验证名称
+      if (!state.editForm.name.trim()) {
+        newErrors.name = '名称不能为空';
+      }
+
+      // 验证路径
+      if (!state.editForm.path.trim()) {
+        newErrors.path = '路径不能为空';
       }
 
       // 验证备注
