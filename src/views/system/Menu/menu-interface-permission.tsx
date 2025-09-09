@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ReloadOutlined, EditOutlined, DeleteOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import { Card, Table, Button, Space, Tag, Tooltip, type TableProps, Input, Form, App } from 'antd';
+import { Card, Table, Button, Space, Tag, Tooltip, type TableProps, Input, Form, App, Select } from 'antd';
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import type React from 'react';
 import type { MenuModel } from '@/services/system/menu/type';
@@ -14,11 +14,17 @@ interface ComponentState {
     id: string;
     code: string;
     remark: string;
+    path: string;
+    method: string;
+    name: string;
   };
   nextId: number;
   errors: {
     code?: string;
     remark?: string;
+    path?: string;
+    method?: string;
+    name?: string;
   };
   // 分页相关状态
   pagination: {
@@ -41,7 +47,7 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
   const [state, setState] = useState<ComponentState>({
     permissionList: [],
     editingId: null,
-    editForm: { id: '', code: '', remark: '' },
+    editForm: { id: '', code: '', remark: '', path: '', method: '', name: '' },
     nextId: 1,
     errors: {},
     pagination: {
@@ -84,12 +90,18 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
             menuId: menu?.id || '',
             code: data.permission.code,
             remark: data.permission.remark,
+            path: data.permission.path,
+            method: data.permission.method,
+            name: data.permission.name,
           });
         case 'update':
           return await menuService.updateInterfacePermission({
             id: data.permission.id,
             code: data.permission.code,
             remark: data.permission.remark,
+            path: data.permission.path,
+            method: data.permission.method,
+            name: data.permission.name,
           });
         case 'delete':
           return await menuService.deleteInterfacePermission(data.permission.id);
@@ -183,12 +195,15 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
       remark: '',
       createTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
       updateTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
+      path: '',
+      method: '',
+      name: '',
     };
 
     updateState({
       permissionList: [...state.permissionList, newRow],
       editingId: newRow.id,
-      editForm: { id: newRow.id, code: '', remark: '' },
+      editForm: { id: newRow.id, code: '', remark: '', path: '', method: '', name: '' },
       nextId: state.nextId + 1,
       errors: {},
     });
@@ -199,7 +214,14 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
     (record: InterfacePermission) => {
       updateState({
         editingId: record.id,
-        editForm: { id: record.id, code: record.code, remark: record.remark },
+        editForm: {
+          id: record.id,
+          code: record.code,
+          remark: record.remark,
+          path: record.path,
+          method: record.method,
+          name: record.name,
+        },
         errors: {},
       });
     },
@@ -214,13 +236,13 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
         updateState({
           permissionList: state.permissionList.filter((item) => item.id !== id),
           editingId: null,
-          editForm: { id: '', code: '', remark: '' },
+          editForm: { id: '', code: '', remark: '', path: '', method: '', name: '' },
           errors: {},
         });
       } else {
         updateState({
           editingId: null,
-          editForm: { id: '', code: '', remark: '' },
+          editForm: { id: '', code: '', remark: '', path: '', method: '', name: '' },
           errors: {},
         });
       }
@@ -276,7 +298,7 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
       updateState({
         permissionList: state.permissionList.map((item) => (item.id === id ? updatedItem : item)),
         editingId: null,
-        editForm: { id: '', code: '', remark: '' },
+        editForm: { id: '', code: '', remark: '', path: '', method: '', name: '' },
       });
     },
     [state.editForm, state.permissionList, state.nextId, updateState, clearErrors, savePermissionMutation],
@@ -318,7 +340,7 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
         render: (_text: string, _record: InterfacePermission, index: number) => index + 1,
       },
       {
-        title: '编码',
+        title: '权限标识',
         dataIndex: 'code',
         key: 'code',
         render: (text: string, record: InterfacePermission) => {
@@ -337,8 +359,98 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
                       editForm: { ...state.editForm, code: e.target.value },
                     })
                   }
-                  placeholder="请输入编码"
+                  placeholder="请输入权限标识"
                   status={state.errors.code ? 'error' : ''}
+                />
+              </Form.Item>
+            );
+          }
+          return <Tag color="blue">{text}</Tag>;
+        },
+      },
+      {
+        title: '名称',
+        dataIndex: 'name',
+        key: 'name',
+        render: (text: string, record: InterfacePermission) => {
+          if (state.editingId === record.id) {
+            return (
+              <Form.Item
+                validateStatus={state.errors.name ? 'error' : ''}
+                help={state.errors.name}
+                style={{ marginBottom: 0 }}
+              >
+                <Input
+                  value={state.editForm.name}
+                  onChange={(e) =>
+                    updateState({
+                      editForm: { ...state.editForm, name: e.target.value },
+                    })
+                  }
+                  placeholder="请输入名称"
+                  status={state.errors.name ? 'error' : ''}
+                />
+              </Form.Item>
+            );
+          }
+          return <Tag color="blue">{text}</Tag>;
+        },
+      },
+      {
+        title: '路径',
+        dataIndex: 'path',
+        key: 'path',
+        render: (text: string, record: InterfacePermission) => {
+          if (state.editingId === record.id) {
+            return (
+              <Form.Item
+                validateStatus={state.errors.path ? 'error' : ''}
+                help={state.errors.path}
+                style={{ marginBottom: 0 }}
+              >
+                <Input
+                  value={state.editForm.path}
+                  onChange={(e) =>
+                    updateState({
+                      editForm: { ...state.editForm, path: e.target.value },
+                    })
+                  }
+                  placeholder="请输入路径"
+                  status={state.errors.path ? 'error' : ''}
+                />
+              </Form.Item>
+            );
+          }
+          return <Tag color="blue">{text}</Tag>;
+        },
+      },
+      {
+        title: '方法',
+        dataIndex: 'method',
+        key: 'method',
+        render: (text: string, record: InterfacePermission) => {
+          if (state.editingId === record.id) {
+            return (
+              <Form.Item
+                validateStatus={state.errors.method ? 'error' : ''}
+                help={state.errors.method}
+                style={{ marginBottom: 0 }}
+              >
+                <Select
+                  value={state.editForm.method}
+                  onChange={(value) =>
+                    updateState({
+                      editForm: { ...state.editForm, method: value },
+                    })
+                  }
+                  placeholder="请输入方法"
+                  status={state.errors.method ? 'error' : ''}
+                  options={[
+                    { label: 'GET', value: 'GET' },
+                    { label: 'POST', value: 'POST' },
+                    { label: 'PUT', value: 'PUT' },
+                    { label: 'DELETE', value: 'DELETE' },
+                  ]}
                 />
               </Form.Item>
             );
