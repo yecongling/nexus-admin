@@ -5,42 +5,27 @@ import {
   Input,
   Select,
   Button,
-  Space,
-  Tag,
-  Typography,
   Row,
   Col,
-  Modal,
   Pagination,
-  theme,
   Spin,
   Empty,
+  App,
 } from 'antd';
 import {
   PlusOutlined,
-  EyeOutlined,
-  SwapOutlined,
-  DownloadOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  ExclamationCircleOutlined,
-  CloudUploadOutlined,
 } from '@ant-design/icons';
-import { type WorkflowVersion, VersionStatus, type VersionType } from '@/services/integrated/version/model';
+import { type WorkflowVersion, VersionStatus } from '@/services/integrated/version/model';
 import {
   useVersionList,
   useDeleteVersion,
   usePublishVersion,
   useRollbackVersion,
 } from '@/views/integrated/Versions/useVersionQueries';
+import VersionListItem from './VersionListItem';
 
 const { Search } = Input;
 const { Option } = Select;
-const { Title, Text } = Typography;
-
-const { useToken } = theme;
 
 interface VersionListProps {
   workflowId: string;
@@ -79,7 +64,7 @@ const VersionList: React.FC<VersionListProps> = ({
   onRollbackVersion,
   onCreateVersion,
 }) => {
-  const { token } = useToken();
+  const { modal } = App.useApp();
 
   // 搜索和筛选状态
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -124,50 +109,9 @@ const VersionList: React.FC<VersionListProps> = ({
   const publishVersionMutation = usePublishVersion();
   const rollbackVersionMutation = useRollbackVersion();
 
-  const getStatusInfo = (status: number) => {
-    switch (status) {
-      case VersionStatus.DRAFT:
-        return { text: '草稿', color: 'orange', icon: <ClockCircleOutlined /> };
-      case VersionStatus.PUBLISHED:
-        return { text: '已发布', color: 'green', icon: <CheckCircleOutlined /> };
-      case VersionStatus.DEPRECATED:
-        return { text: '已弃用', color: 'red', icon: <ExclamationCircleOutlined /> };
-      case VersionStatus.ARCHIVED:
-        return { text: '已归档', color: 'gray', icon: <ExclamationCircleOutlined /> };
-      default:
-        return { text: '未知', color: 'default', icon: null };
-    }
-  };
-
-  const getVersionTypeText = (type: VersionType) => {
-    switch (type) {
-      case 'MAJOR':
-        return '主版本';
-      case 'MINOR':
-        return '次版本';
-      case 'PATCH':
-        return '补丁版本';
-      case 'HOTFIX':
-        return '热修复';
-      default:
-        return type;
-    }
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('zh-CN');
-  };
 
   const handleDelete = (version: WorkflowVersion) => {
-    Modal.confirm({
+    modal.confirm({
       title: '确认删除',
       content: `确定要删除版本 ${version.version} 吗？此操作不可撤销。`,
       okText: '删除',
@@ -217,77 +161,6 @@ const VersionList: React.FC<VersionListProps> = ({
     }));
   };
 
-  const renderActionButtons = (version: WorkflowVersion) => {
-    const buttons = [];
-    const status = version.status;
-
-    // 查看按钮 - 所有版本都有
-    buttons.push(
-      <Button key="view" type="text" icon={<EyeOutlined />} onClick={() => onViewVersion?.(version)}>
-        查看
-      </Button>,
-    );
-
-    // 根据状态显示不同按钮
-    if (status === VersionStatus.DRAFT) {
-      // 草稿状态：编辑、发布、删除
-      buttons.push(
-        <Button key="edit" type="text" icon={<EditOutlined />} onClick={() => onEditVersion?.(version)}>
-          编辑
-        </Button>,
-        <Button
-          key="publish"
-          type="primary"
-          icon={<CloudUploadOutlined />}
-          loading={publishVersionMutation.isPending}
-          onClick={() => handlePublish(version)}
-        >
-          发布
-        </Button>,
-        <Button
-          key="delete"
-          type="text"
-          danger
-          icon={<DeleteOutlined />}
-          loading={deleteVersionMutation.isPending}
-          onClick={() => handleDelete(version)}
-        >
-          删除
-        </Button>,
-      );
-    } else if (status === VersionStatus.PUBLISHED) {
-      // 已发布状态：回滚、对比、下载
-      buttons.push(
-        <Button
-          key="rollback"
-          type="primary"
-          icon={<SwapOutlined />}
-          loading={rollbackVersionMutation.isPending}
-          onClick={() => handleRollback(version)}
-        >
-          回滚
-        </Button>,
-        <Button key="compare" type="text" icon={<SwapOutlined />} onClick={() => onCompareVersion?.(version)}>
-          对比
-        </Button>,
-        <Button key="download" type="text" icon={<DownloadOutlined />} onClick={() => onDownloadVersion?.(version)}>
-          下载
-        </Button>,
-      );
-    } else {
-      // 其他状态：对比、下载
-      buttons.push(
-        <Button key="compare" type="text" icon={<SwapOutlined />} onClick={() => onCompareVersion?.(version)}>
-          对比
-        </Button>,
-        <Button key="download" type="text" icon={<DownloadOutlined />} onClick={() => onDownloadVersion?.(version)}>
-          下载
-        </Button>,
-      );
-    }
-
-    return <Space>{buttons}</Space>;
-  };
 
   // 错误处理
   if (error) {
@@ -367,47 +240,24 @@ const VersionList: React.FC<VersionListProps> = ({
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {versions.length > 0 ? (
                 versions.map((version) => {
-                  const statusInfo = getStatusInfo(version.status);
                   const isCurrentVersion = version.status === VersionStatus.PUBLISHED && version.version === 'v2.1.0';
 
                   return (
-                    <Card
+                    <VersionListItem
                       key={version.id}
-                      hoverable
-                      style={{
-                        border: isCurrentVersion ? `2px solid ${token.colorPrimary}` : undefined,
-                        position: 'relative',
-                      }}
-                    >
-                      <Row gutter={16} align="middle">
-                        <Col flex="none">
-                          <Tag color={version.versionType === 'MAJOR' ? 'blue' : 'green'}>{version.version}</Tag>
-                        </Col>
-                        <Col flex="auto">
-                          <div>
-                            <Title level={5} style={{ margin: 0, marginBottom: 4 }}>
-                              {version.versionName}
-                              {isCurrentVersion && (
-                                <Tag color="green" style={{ marginLeft: 8 }}>
-                                  当前版本
-                                </Tag>
-                              )}
-                            </Title>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 8 }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                <span style={{ color: statusInfo.color }}>{statusInfo.icon}</span>
-                                <Text type="secondary">{statusInfo.text}</Text>
-                              </div>
-                              <Text type="secondary">{getVersionTypeText(version.versionType as any)}</Text>
-                              <Text type="secondary">创建人：张三</Text>
-                              <Text type="secondary">{formatDate(version.createTime)}</Text>
-                              <Text type="secondary">{formatFileSize(version.fileSize)}</Text>
-                            </div>
-                          </div>
-                        </Col>
-                        <Col flex="none">{renderActionButtons(version)}</Col>
-                      </Row>
-                    </Card>
+                      version={version}
+                      isCurrentVersion={isCurrentVersion}
+                      onViewVersion={onViewVersion}
+                      onEditVersion={onEditVersion}
+                      onPublishVersion={handlePublish}
+                      onDeleteVersion={handleDelete}
+                      onRollbackVersion={handleRollback}
+                      onCompareVersion={onCompareVersion}
+                      onDownloadVersion={onDownloadVersion}
+                      isPublishing={publishVersionMutation.isPending}
+                      isDeleting={deleteVersionMutation.isPending}
+                      isRollingBack={rollbackVersionMutation.isPending}
+                    />
                   );
                 })
               ) : (

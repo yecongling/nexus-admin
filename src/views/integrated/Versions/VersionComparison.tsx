@@ -1,10 +1,9 @@
 import type React from 'react';
-import { useState, useEffect } from 'react';
-import { Select, Typography, Row, Col, Alert, Spin, message } from 'antd';
+import { useState } from 'react';
+import { Select, Typography, Row, Col, Alert, Spin } from 'antd';
 import DragModal from '@/components/modal/DragModal';
-import { versionsService } from '@/services/integrated/version/api';
-import type { WorkflowVersion, WorkflowVersionDelta } from '@/services/integrated/version/model';
 import { DiffEditor } from '@/components/DiffEditor';
+import { useVersionList, useCompareVersions } from './useVersionQueries';
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -24,103 +23,28 @@ const VersionComparison: React.FC<VersionComparisonProps> = ({
   baseVersion: initialBaseVersion,
   targetVersion: initialTargetVersion,
 }) => {
-  const [loading, setLoading] = useState(false);
   const [baseVersion, setBaseVersion] = useState<string>(initialBaseVersion || '');
   const [targetVersion, setTargetVersion] = useState<string>(initialTargetVersion || '');
-  const [versions, setVersions] = useState<WorkflowVersion[]>([]);
-  const [deltas, setDeltas] = useState<WorkflowVersionDelta[]>([]);
+  // 使用 React Query 获取版本列表
+  const { data: versionResult } = useVersionList({
+    workflowId,
+    pageNum: 1,
+    pageSize: 100,
+  });
 
-  // 模拟版本数据
-  const mockVersions: WorkflowVersion[] = [
-    { id: '1', version: 'v2.0.0', versionName: '重大功能更新' } as WorkflowVersion,
-    { id: '2', version: 'v2.1.0', versionName: '优化用户体验版本' } as WorkflowVersion,
-    { id: '3', version: 'v1.5.2', versionName: 'bug修复版本' } as WorkflowVersion,
-  ];
+  const versions = versionResult?.records || [];
 
-  // 模拟差异数据
-  const mockDeltas: WorkflowVersionDelta[] = [
+  // 使用 React Query 获取版本对比数据
+  const { data: comparisonResult, isLoading: comparisonLoading } = useCompareVersions(
     {
-      id: '1',
-      workflowId: '1',
-      fromVersion: 'v2.0.0',
-      toVersion: 'v2.1.0',
-      deltaType: 'MODIFY',
-      objectPath: 'nodes[0].name',
-      oldValue: '"开始节点"',
-      newValue: '"流程开始"',
-      createdAt: '2024-03-15T14:30:00Z',
+      workflowId,
+      baseVersion,
+      targetVersion,
     },
-    {
-      id: '2',
-      workflowId: '1',
-      fromVersion: 'v2.0.0',
-      toVersion: 'v2.1.0',
-      deltaType: 'ADD',
-      objectPath: 'nodes[1]',
-      oldValue: '',
-      newValue: '{"id": "validation_node", "name": "数据验证", "type": "validation"}',
-      createdAt: '2024-03-15T14:30:00Z',
-    },
-    {
-      id: '3',
-      workflowId: '1',
-      fromVersion: 'v2.0.0',
-      toVersion: 'v2.1.0',
-      deltaType: 'MODIFY',
-      objectPath: 'nodes[2].timeout',
-      oldValue: '300',
-      newValue: '600',
-      createdAt: '2024-03-15T14:30:00Z',
-    },
-  ];
+    visible && !!baseVersion && !!targetVersion && baseVersion !== targetVersion,
+  );
 
-  useEffect(() => {
-    if (visible) {
-      loadVersions();
-    }
-  }, [visible]);
-
-  useEffect(() => {
-    if (baseVersion && targetVersion && baseVersion !== targetVersion) {
-      loadComparison();
-    }
-  }, [baseVersion, targetVersion]);
-
-  const loadVersions = async () => {
-    try {
-      const result = await versionsService.getVersionList({
-        workflowId,
-        pageNum: 1,
-        pageSize: 100,
-      });
-      setVersions(result.records || mockVersions);
-    } catch (error) {
-      // 如果API调用失败，使用模拟数据
-      setVersions(mockVersions);
-      message.warning('使用模拟数据，API调用失败');
-    }
-  };
-
-  const loadComparison = async () => {
-    if (!baseVersion || !targetVersion) return;
-
-    setLoading(true);
-    try {
-      const params = {
-        workflowId,
-        baseVersion,
-        targetVersion,
-      };
-      const result = await versionsService.compareVersions(params);
-      setDeltas(result.deltas);
-    } catch (error) {
-      // 如果API调用失败，使用模拟数据
-      setDeltas(mockDeltas);
-      message.warning('使用模拟数据，API调用失败');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const deltas = comparisonResult?.deltas || [];
 
   const generateOriginalContent = () => {
     return JSON.stringify(
@@ -246,7 +170,7 @@ const VersionComparison: React.FC<VersionComparisonProps> = ({
         )}
 
         {/* 差异内容 */}
-        <Spin spinning={loading}>
+        <Spin spinning={comparisonLoading}>
           {baseVersion && targetVersion && baseVersion !== targetVersion ? (
             <div>
               <Title level={5}>详细差异</Title>

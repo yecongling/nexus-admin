@@ -19,55 +19,55 @@ const VersionsApi: Record<string, string> = {
   /**
    * 获取版本列表
    */
-  getVersionList: '/api/workflows/{workflowId}/versions',
+  getVersionList: '/engine/workflows/{workflowId}/versions',
   /**
    * 获取版本详情
    */
-  getVersionDetail: '/api/workflows/{workflowId}/versions/{versionId}',
+  getVersionDetail: '/engine/workflows/{workflowId}/versions/{versionId}',
   /**
    * 创建版本
    */
-  createVersion: '/api/workflows/{workflowId}/createVersion',
+  createVersion: '/engine/workflows/{workflowId}/createVersion',
   /**
    * 发布版本
    */
-  publishVersion: '/api/workflows/{workflowId}/versions/{version}/publish',
+  publishVersion: '/engine/workflows/{workflowId}/versions/{version}/publish',
   /**
    * 删除版本
    */
-  deleteVersion: '/api/workflows/{workflowId}/versions/{versionId}',
+  deleteVersion: '/engine/workflows/{workflowId}/versions/{versionId}',
   /**
    * 版本对比
    */
-  compareVersions: '/api/workflows/{workflowId}/versions/compare',
+  compareVersions: '/engine/workflows/{workflowId}/versions/compare',
   /**
    * 回滚版本
    */
-  rollbackVersion: '/api/workflows/{workflowId}/versions/rollback',
+  rollbackVersion: '/engine/workflows/{workflowId}/versions/rollback',
   /**
    * 下载版本
    */
-  downloadVersion: '/api/workflows/{workflowId}/versions/{versionId}/download',
+  downloadVersion: '/engine/workflows/{workflowId}/versions/{versionId}/download',
   /**
    * 获取版本锁信息
    */
-  getVersionLocks: '/api/workflows/{workflowId}/versions/locks',
+  getVersionLocks: '/engine/workflows/{workflowId}/versions/locks',
   /**
    * 获取版本分支列表
    */
-  getVersionBranches: '/api/workflows/{workflowId}/branches',
+  getVersionBranches: '/engine/workflows/{workflowId}/branches',
   /**
    * 版本影响评估
    */
-  assessVersionImpact: '/api/workflows/{workflowId}/versions/{versionId}/impact',
+  assessVersionImpact: '/engine/workflows/{workflowId}/versions/{versionId}/impact',
   /**
    * 锁定版本进行编辑
    */
-  lockVersion: '/api/workflows/{workflowId}/versions/{version}/lock',
+  lockVersion: '/engine/workflows/{workflowId}/versions/{version}/lock',
   /**
    * 释放版本锁定
    */
-  unlockVersion: '/api/workflows/{workflowId}/versions/{version}/lock',
+  unlockVersion: '/engine/workflows/{workflowId}/versions/{version}/lock',
 };
 
 /**
@@ -188,14 +188,12 @@ export const versionsService: IVersionsService = {
     return response;
   },
 
-  /** 
+  /**
    * 发布版本
    */
   async publishVersion(params: PublishVersionParams): Promise<boolean> {
     const response = await HttpRequest.post({
-      url: VersionsApi.publishVersion
-        .replace('{workflowId}', params.workflowId)
-        .replace('{version}', params.version),
+      url: VersionsApi.publishVersion.replace('{workflowId}', params.workflowId).replace('{version}', params.version),
       data: params,
       requestType: 'fetch',
     });
