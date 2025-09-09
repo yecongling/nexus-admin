@@ -196,14 +196,14 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
       createTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
       updateTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
       path: '',
-      method: '',
+      method: 'GET',
       name: '',
     };
 
     updateState({
       permissionList: [...state.permissionList, newRow],
       editingId: newRow.id,
-      editForm: { id: newRow.id, code: '', remark: '', path: '', method: '', name: '' },
+      editForm: { id: newRow.id, code: '', remark: '', path: '', method: newRow.method, name: '' },
       nextId: state.nextId + 1,
       errors: {},
     });
@@ -342,6 +342,7 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
       {
         title: '权限标识',
         dataIndex: 'code',
+        width: 220,
         key: 'code',
         render: (text: string, record: InterfacePermission) => {
           if (state.editingId === record.id) {
@@ -427,6 +428,8 @@ const MenuInterfacePermission: React.FC<MenuInterfacePermissionProps> = ({ menu 
       {
         title: '方法',
         dataIndex: 'method',
+        width: 100,
+        align: 'center',
         key: 'method',
         render: (text: string, record: InterfacePermission) => {
           if (state.editingId === record.id) {
