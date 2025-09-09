@@ -24,11 +24,14 @@ const CreateVersionModal: React.FC<CreateVersionModalProps> = ({
   const [form] = Form.useForm();
 
   // 使用 React Query 获取版本列表
-  const { data: versionResult } = useVersionList({
-    workflowId,
-    pageNum: 1,
-    pageSize: 100,
-  });
+  const { data: versionResult } = useVersionList(
+    {
+      workflowId,
+      pageNum: 1,
+      pageSize: 100,
+    },
+    visible,
+  );
 
   // 版本数据
   const versions = versionResult?.records || [];
@@ -122,12 +125,13 @@ const CreateVersionModal: React.FC<CreateVersionModalProps> = ({
       width={600}
       footer={null}
     >
-
       <Form form={form} layout="vertical" onFinish={handleSubmit}>
         <Form.Item name="versionType" label="版本类型" rules={[{ required: true, message: '请选择版本类型' }]}>
           <Select placeholder="选择版本类型">
             {versionTypeOptions.map((option) => (
-              <Option key={option.value} value={option.value} >{option.label}</Option>
+              <Option key={option.value} value={option.value}>
+                {option.label}
+              </Option>
             ))}
           </Select>
         </Form.Item>

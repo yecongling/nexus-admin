@@ -8,6 +8,9 @@ import { useVersionList, useCompareVersions } from './useVersionQueries';
 const { Option } = Select;
 const { Title, Text } = Typography;
 
+/**
+ * 版本对比Props
+ */
 interface VersionComparisonProps {
   workflowId: string;
   visible: boolean;
@@ -16,6 +19,9 @@ interface VersionComparisonProps {
   targetVersion?: string;
 }
 
+/**
+ * 版本对比
+ */
 const VersionComparison: React.FC<VersionComparisonProps> = ({
   workflowId,
   visible,
@@ -26,11 +32,14 @@ const VersionComparison: React.FC<VersionComparisonProps> = ({
   const [baseVersion, setBaseVersion] = useState<string>(initialBaseVersion || '');
   const [targetVersion, setTargetVersion] = useState<string>(initialTargetVersion || '');
   // 使用 React Query 获取版本列表
-  const { data: versionResult } = useVersionList({
-    workflowId,
-    pageNum: 1,
-    pageSize: 100,
-  });
+  const { data: versionResult } = useVersionList(
+    {
+      workflowId,
+      pageNum: 1,
+      pageSize: 100,
+    },
+    visible,
+  );
 
   const versions = versionResult?.records || [];
 

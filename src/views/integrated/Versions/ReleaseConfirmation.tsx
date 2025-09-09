@@ -22,22 +22,25 @@ interface ReleaseConfirmationProps {
  */
 const ReleaseConfirmation: React.FC<ReleaseConfirmationProps> = ({ visible, onClose, version }) => {
   const { message } = App.useApp();
-  
+
   // 使用 React Query 获取版本影响评估
-  const { 
-    data: impactAssessment, 
-    isLoading: impactLoading, 
-  } = useVersionImpact(
-    version?.workflowId || '', 
-    version?.id || '', 
-    visible && !!version
-  );
+  const {
+    data: impactAssessment,
+    isLoading: impactLoading,
+    error: impactError,
+  } = useVersionImpact(version?.workflowId || '', version?.id || '', visible && !!version);
 
   // 使用 React Query 发布版本
   const publishVersionMutation = usePublishVersionWithParams();
 
   const handleConfirm = async () => {
     if (!version) return;
+
+    // 检查影响评估是否加载失败
+    if (impactError) {
+      message.error(`无法获取版本影响评估，发布被阻止。错误信息：${impactError.message || '未知错误'}`);
+      return;
+    }
 
     try {
       const params = {
@@ -49,8 +52,8 @@ const ReleaseConfirmation: React.FC<ReleaseConfirmationProps> = ({ visible, onCl
       await publishVersionMutation.mutateAsync(params);
       message.success('版本发布成功');
       onClose();
-    } catch (error) {
-      message.error('版本发布失败');
+    } catch (error: any) {
+      message.error(`版本发布失败，原因：${error.message}`);
     }
   };
 
@@ -119,11 +122,12 @@ const ReleaseConfirmation: React.FC<ReleaseConfirmationProps> = ({ visible, onCl
         <Button key="cancel" onClick={onClose}>
           取消
         </Button>,
-        <Button 
-          key="confirm" 
-          type="primary" 
-          onClick={handleConfirm} 
+        <Button
+          key="confirm"
+          type="primary"
+          onClick={handleConfirm}
           loading={publishVersionMutation.isPending}
+          disabled={!!impactError}
         >
           确认发布
         </Button>,
@@ -195,37 +199,47 @@ const ReleaseConfirmation: React.FC<ReleaseConfirmationProps> = ({ visible, onCl
         {/* 影响评估 */}
         <div style={{ marginBottom: 24 }}>
           <Title level={5}>影响评估：</Title>
-          <List
-            size="small"
-             dataSource={[
-               {
-                 key: 'backwardCompatible',
-                 label: '向下兼容',
-                 value: assessmentData.backwardCompatible,
-                 icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
-               },
-               {
-                 key: 'nonDestructive',
-                 label: '无破坏性变更',
-                 value: assessmentData.nonDestructive,
-                 icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
-               },
-               {
-                 key: 'requiresRedeployment',
-                 label: '需要重新部署',
-                 value: assessmentData.requiresRedeployment,
-                 icon: <ExclamationCircleOutlined style={{ color: '#faad14' }} />,
-               },
-             ]}
-            renderItem={(item) => (
-              <List.Item>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  {item.icon}
-                  <Text>{item.label}</Text>
-                </div>
-              </List.Item>
-            )}
-          />
+          {impactError ? (
+            <Alert
+              message="影响评估加载失败"
+              description={`无法获取版本影响评估数据，请检查网络连接或联系管理员。错误信息：${impactError.message || '未知错误'}`}
+              type="error"
+              showIcon
+              style={{ marginBottom: 16 }}
+            />
+          ) : (
+            <List
+              size="small"
+              dataSource={[
+                {
+                  key: 'backwardCompatible',
+                  label: '向下兼容',
+                  value: assessmentData.backwardCompatible,
+                  icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+                },
+                {
+                  key: 'nonDestructive',
+                  label: '无破坏性变更',
+                  value: assessmentData.nonDestructive,
+                  icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+                },
+                {
+                  key: 'requiresRedeployment',
+                  label: '需要重新部署',
+                  value: assessmentData.requiresRedeployment,
+                  icon: <ExclamationCircleOutlined style={{ color: '#faad14' }} />,
+                },
+              ]}
+              renderItem={(item) => (
+                <List.Item>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {item.icon}
+                    <Text>{item.label}</Text>
+                  </div>
+                </List.Item>
+              )}
+            />
+          )}
         </div>
       </Spin>
     </DragModal>

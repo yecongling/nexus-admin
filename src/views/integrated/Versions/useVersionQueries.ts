@@ -23,12 +23,13 @@ export const VERSION_QUERY_KEYS = {
 /**
  * 获取版本列表
  */
-export const useVersionList = (params: VersionListParams) => {
+export const useVersionList = (params: VersionListParams, enabled = true) => {
   return useQuery({
     queryKey: VERSION_QUERY_KEYS.list(params),
     queryFn: () => versionsService.getVersionList(params),
     staleTime: 5 * 60 * 1000, // 5分钟内数据被认为是新鲜的
     gcTime: 10 * 60 * 1000, // 10分钟后垃圾回收
+    enabled: enabled && !!params.workflowId,
   });
 };
 

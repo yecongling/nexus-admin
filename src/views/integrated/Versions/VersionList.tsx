@@ -23,6 +23,7 @@ import {
   useRollbackVersion,
 } from '@/views/integrated/Versions/useVersionQueries';
 import VersionListItem from './VersionListItem';
+import ReleaseConfirmation from './ReleaseConfirmation';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -34,7 +35,6 @@ interface VersionListProps {
   onDownloadVersion?: (version: WorkflowVersion) => void;
   onEditVersion?: (version: WorkflowVersion) => void;
   onDeleteVersion?: (version: WorkflowVersion) => void;
-  onPublishVersion?: (version: WorkflowVersion) => void;
   onRollbackVersion?: (version: WorkflowVersion) => void;
   onCreateVersion?: () => void;
 }
@@ -48,7 +48,6 @@ interface VersionListProps {
  * @param props.onDownloadVersion 下载版本
  * @param props.onEditVersion 编辑版本
  * @param props.onDeleteVersion 删除版本
- * @param props.onPublishVersion 发布版本
  * @param props.onRollbackVersion 回滚版本
  * @param props.onCreateVersion 创建版本
  * @returns 版本列表
@@ -60,7 +59,6 @@ const VersionList: React.FC<VersionListProps> = ({
   onDownloadVersion,
   onEditVersion,
   onDeleteVersion,
-  onPublishVersion,
   onRollbackVersion,
   onCreateVersion,
 }) => {
@@ -75,6 +73,10 @@ const VersionList: React.FC<VersionListProps> = ({
     pageSize: 20,
     total: 0,
   });
+  
+  // 弹窗状态管理
+  const [releaseModalVisible, setReleaseModalVisible] = useState(false);
+  const [selectedVersion, setSelectedVersion] = useState<WorkflowVersion | null>(null);
 
   // 构建查询参数
   const queryParams = useMemo(
@@ -110,6 +112,10 @@ const VersionList: React.FC<VersionListProps> = ({
   const rollbackVersionMutation = useRollbackVersion();
 
 
+  /**
+   * 删除版本
+   * @param version 版本
+   */
   const handleDelete = (version: WorkflowVersion) => {
     modal.confirm({
       title: '确认删除',
@@ -127,23 +133,49 @@ const VersionList: React.FC<VersionListProps> = ({
     });
   };
 
+  /**
+   * 发布版本
+   * @param version 版本
+   */
   const handlePublish = (version: WorkflowVersion) => {
-    publishVersionMutation.mutate({
-      workflowId,
-      versionId: version.id,
-    });
-    onPublishVersion?.(version);
+    setSelectedVersion(version);
+    setReleaseModalVisible(true);
   };
 
+  /**
+   * 回滚版本
+   * @param version 版本
+   */
   const handleRollback = (version: WorkflowVersion) => {
-    rollbackVersionMutation.mutate({
-      workflowId,
-      versionId: version.id,
+    modal.confirm({
+      title: '确认回滚',
+      content: `确定要回滚到版本 ${version.version} 吗？此操作将覆盖当前版本，且不可撤销。`,
+      okText: '确认回滚',
+      cancelText: '取消',
+      okType: 'danger',
+      onOk: () => {
+        rollbackVersionMutation.mutate({
+          workflowId,
+          versionId: version.id,
+        });
+        onRollbackVersion?.(version);
+      },
     });
-    onRollbackVersion?.(version);
   };
 
-  // 分页变化处理
+  /**
+   * 关闭发布确认弹窗
+   */
+  const handleCloseReleaseModal = () => {
+    setReleaseModalVisible(false);
+    setSelectedVersion(null);
+  };
+
+  /**
+   * 分页变化处理
+   * @param page 页码
+   * @param pageSize 页大小
+   */
   const handlePageChange = (page: number, pageSize?: number) => {
     setPagination((prev) => ({
       ...prev,
@@ -152,7 +184,10 @@ const VersionList: React.FC<VersionListProps> = ({
     }));
   };
 
-  // 搜索处理
+  /**
+   * 搜索处理
+   * @param value 搜索值
+   */
   const handleSearch = (value: string) => {
     setSearchKeyword(value);
     setPagination((prev) => ({
@@ -162,7 +197,9 @@ const VersionList: React.FC<VersionListProps> = ({
   };
 
 
-  // 错误处理
+  /**
+   * 错误处理
+   */
   if (error) {
     return (
       <div className="h-full flex flex-col box-border">
@@ -284,6 +321,13 @@ const VersionList: React.FC<VersionListProps> = ({
         showQuickJumper
         showTotal={(total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`}
         pageSizeOptions={['10', '20', '50', '100']}
+      />
+
+      {/* 发布确认弹窗 */}
+      <ReleaseConfirmation
+        visible={releaseModalVisible}
+        onClose={handleCloseReleaseModal}
+        version={selectedVersion}
       />
     </div>
   );

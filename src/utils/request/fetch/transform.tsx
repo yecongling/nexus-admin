@@ -55,7 +55,51 @@ export const createTransform = (requestInstance: any): FetchTransform => ({
     
     // 检查响应状态
     if (!res.ok) {
-      throw new Error(`HTTP Error: ${res.status}`);
+      // 对于 HTTP 错误状态码，尝试解析错误信息
+      let errorMessage = `HTTP Error: ${res.status}`;
+      let errorCode = res.status;
+      
+      try {
+        // 尝试解析错误响应体
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const errorData = await res.json();
+          if (errorData.message) {
+            errorMessage = errorData.message;
+          }
+          if (errorData.code) {
+            errorCode = errorData.code;
+          }
+        }
+      } catch (parseError) {
+        // 如果解析失败，使用默认错误信息
+        console.warn('Failed to parse error response:', parseError);
+      }
+      
+      // 获取请求URL信息
+      const requestUrl = (res as any).config?.url || '未知接口';
+      
+      // 根据状态码显示不同的错误信息
+      if (res.status === 404) {
+        errorMessage = `${t('common.errorMsg.notFound') || '请求的资源不存在'}\n\n请求路径：${requestUrl}`;
+      } else if (res.status === 403) {
+        errorMessage = `${t('common.errorMsg.forbidden') || '没有权限访问该资源'}\n\n请求路径：${requestUrl}`;
+      } else if (res.status === 500) {
+        errorMessage = `${t('common.errorMsg.serverException') || '服务器内部错误'}\n\n请求路径：${requestUrl}`;
+      } else if (res.status >= 400 && res.status < 500) {
+        errorMessage = `${t('common.errorMsg.clientError') || '客户端请求错误'}\n\n请求路径：${requestUrl}`;
+      } else if (res.status >= 500) {
+        errorMessage = `${t('common.errorMsg.serverError') || '服务器错误'}\n\n请求路径：${requestUrl}`;
+      }
+      
+      // 显示错误弹窗
+      antdUtils.modal?.error({
+        title: `${t('common.errorMsg.serverException')}（${t('common.errorMsg.statusCode')}：${errorCode}）`,
+        content: errorMessage,
+        okText: t('common.operation.confirm'),
+      });
+      
+      throw new Error(errorMessage);
     }
     
     // 根据 Content-Type 判断响应格式
