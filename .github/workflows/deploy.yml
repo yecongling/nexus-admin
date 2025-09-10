@@ -39,6 +39,9 @@ jobs:
           chmod 600 private_key.pem
           # 清空目标目录
           ssh -i private_key.pem $USERNAME@$HOST "rm -rf /work/nexus/*"
-          scp -i private_key.pem -C -r dist/* $USERNAME@$HOST:/work/nexus
+          tar -zcvf dist.tar.gz dist
+          scp -i private_key.pem -C -r dist.tar.gz $USERNAME@$HOST:/work/nexus
+          ssh -i private_key.pem $USERNAME@$HOST "tar -zxf dist.tar.gz -C /work/nexus"
+          ssh -i private_key.pem $USERNAME@$HOST "rm -rf dist.tar.gz"
           ssh -i private_key.pem $USERNAME@$HOST "sudo systemctl reload nginx"
           rm private_key.pem
