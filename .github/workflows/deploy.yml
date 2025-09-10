@@ -38,7 +38,8 @@ jobs:
           echo "${{ secrets.ALIYUN_PRIVATE_KEY }}" | tr -d '\r' > private_key.pem
           chmod 600 private_key.pem
           # 清空目标目录
-          ssh -i private_key.pem $USERNAME@$HOST "rm -rf /work/nexus/*"
-          scp -i private_key.pem -r dist/* $USERNAME@$HOST:/work/nexus
+          # ssh -i private_key.pem $USERNAME@$HOST "rm -rf /work/nexus/*"
+          # scp -i private_key.pem -C -r dist/* $USERNAME@$HOST:/work/nexus
+          rsync -avz --delete dist/ $USERNAME@$HOST:/work/nexus
           ssh -i private_key.pem $USERNAME@$HOST "sudo systemctl reload nginx"
           rm private_key.pem
