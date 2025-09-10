@@ -27,6 +27,8 @@ const GlobalConfigProvider: React.FC = () => {
         cssVar: true,
         token: {
           colorPrimary: colorPrimary,
+          controlHeight: 36,
+          borderRadius: 8
         },
         components: {
           Layout: {

@@ -182,6 +182,11 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
 
   // 处理路径变化时的tab激活逻辑
   React.useEffect(() => {
+    // 如果正在关闭tab，跳过执行
+    if (isClosingTabRef.current) {
+      return;
+    }
+    
     // 只有在初始化完成后才处理路径变化
     if (isInitializedRef.current && menus.length > 0 && homePath && tabs.length > 0) {
       // 确保当前路径对应的tab被激活
@@ -381,6 +386,13 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
         // 如果关闭的是当前激活的tab，需要跳转到新的激活tab
         if (e === activeKey && newActiveKey) {
           navigate(newActiveKey, { replace: true });
+          // 延迟重置标记，确保路径变化的useEffect不会在pathname还是旧值时执行
+          setTimeout(() => {
+            isClosingTabRef.current = false;
+          }, 0);
+        } else {
+          // 如果没有导航，立即重置标记
+          isClosingTabRef.current = false;
         }
       }
     },
@@ -407,6 +419,13 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
             // 如果关闭的是当前激活的tab，需要跳转到新的激活tab
             if (tabKey === activeKey && newActiveKey) {
               navigate(newActiveKey, { replace: true });
+              // 延迟重置标记，确保路径变化的useEffect不会在pathname还是旧值时执行
+              setTimeout(() => {
+                isClosingTabRef.current = false;
+              }, 0);
+            } else {
+              // 如果没有导航，立即重置标记
+              isClosingTabRef.current = false;
             }
           },
         },
@@ -448,6 +467,13 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
             // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
             if (newActiveKey && newActiveKey !== activeKey) {
               navigate(newActiveKey, { replace: true });
+              // 延迟重置标记，确保路径变化的useEffect不会在pathname还是旧值时执行
+              setTimeout(() => {
+                isClosingTabRef.current = false;
+              }, 0);
+            } else {
+              // 如果没有导航，立即重置标记
+              isClosingTabRef.current = false;
             }
           },
         },
@@ -462,6 +488,13 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
             // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
             if (newActiveKey && newActiveKey !== activeKey) {
               navigate(newActiveKey, { replace: true });
+              // 延迟重置标记，确保路径变化的useEffect不会在pathname还是旧值时执行
+              setTimeout(() => {
+                isClosingTabRef.current = false;
+              }, 0);
+            } else {
+              // 如果没有导航，立即重置标记
+              isClosingTabRef.current = false;
             }
           },
         },
@@ -476,6 +509,13 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
             // 如果当前激活的tab被关闭了，需要跳转到新的激活tab
             if (newActiveKey && newActiveKey !== activeKey) {
               navigate(newActiveKey, { replace: true });
+              // 延迟重置标记，确保路径变化的useEffect不会在pathname还是旧值时执行
+              setTimeout(() => {
+                isClosingTabRef.current = false;
+              }, 0);
+            } else {
+              // 如果没有导航，立即重置标记
+              isClosingTabRef.current = false;
             }
           },
         },
@@ -492,11 +532,26 @@ const TabBar: React.FC<TabBarProps> = ({ className }) => {
               // 如果当前不在homePath，需要跳转到homePath
               if (pathname !== homePath) {
                 navigate(newActiveKey, { replace: true });
+                // 延迟重置标记，确保路径变化的useEffect不会在pathname还是旧值时执行
+                setTimeout(() => {
+                  isClosingTabRef.current = false;
+                }, 0);
+              } else {
+                // 如果没有导航，立即重置标记
+                isClosingTabRef.current = false;
               }
             } else if (homePath) {
               navigate(homePath, { replace: true });
+              // 延迟重置标记，确保路径变化的useEffect不会在pathname还是旧值时执行
+              setTimeout(() => {
+                isClosingTabRef.current = false;
+              }, 0);
             } else {
               navigate('/', { replace: true });
+              // 延迟重置标记，确保路径变化的useEffect不会在pathname还是旧值时执行
+              setTimeout(() => {
+                isClosingTabRef.current = false;
+              }, 0);
             }
           },
         },

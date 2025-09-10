@@ -1,13 +1,47 @@
+import { Card, Tabs } from 'antd';
+import { useState } from 'react';
+import type React from 'react';
+import ButtonList from './ButtonList';
+import ButtonAssign from './ButtonAssign';
+
+/**
+ * 权限按钮管理主组件
+ * 提供权限按钮的维护和分配功能
+ */
 const PermissionButton: React.FC = () => {
+  const [activeTab, setActiveTab] = useState('list');
+
+  /**
+   * 处理Tab切换
+   * @param key 选中的Tab key
+   */
+  const handleTabChange = (key: string) => {
+    setActiveTab(key);
+  };
+
   return (
-    <>
-      <div>权限按钮维护模块</div>
-      <pre>
-        按钮权限列表 按钮权限展示（按钮名称、所属页面、权限标识） 按模块/页面分组展示 按钮权限搜索和筛选 按钮状态管理
-        按钮权限配置 新增按钮权限（按钮信息、权限标识） 编辑按钮权限 删除按钮权限 按钮权限与菜单关联 按钮权限分配
-        角色按钮权限分配 按钮权限批量操作 按钮权限预览功能
-      </pre>
-    </>
+    <div className="permission-button-container h-full">
+      <Card className="h-full" bodyStyle={{ padding: 0 }}>
+        <Tabs
+          activeKey={activeTab}
+          onChange={handleTabChange}
+          items={[
+            {
+              key: 'list',
+              label: '按钮列表',
+              children: <ButtonList />,
+            },
+            {
+              key: 'assign',
+              label: '权限分配',
+              children: <ButtonAssign />,
+            },
+          ]}
+          className="h-full"
+          tabBarStyle={{ marginBottom: 0, padding: '0 24px' }}
+        />
+      </Card>
+    </div>
   );
 };
 

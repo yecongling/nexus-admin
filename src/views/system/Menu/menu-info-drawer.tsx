@@ -259,7 +259,7 @@ const MenuInfoDrawer: React.FC<MenuInfoDrawerProps> = ({ open, operation, onClos
           </Form.Item>
         )}
         {menuType !== MenuType.TOP_LEVEL && (
-          <Form.Item name="parentId" label="上级菜单">
+          <Form.Item name="parentId" label="上级菜单" rules={[{ required: true, message: '请选择上级菜单!' }]}>
             <TreeSelect
               showSearch
               loading={isLoading}
