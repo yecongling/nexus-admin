@@ -159,6 +159,7 @@ const MenuInfoDrawer: React.FC<MenuInfoDrawerProps> = ({ open, operation, onClos
         ...values,
         status: Boolean(values.status),
         icon: values.originalIcon,
+        routeQuery: values.routeQuery ? values.routeQuery : {},
       };
       onOk(formData);
     } catch (errorInfo: any) {
