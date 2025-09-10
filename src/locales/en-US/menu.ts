@@ -42,6 +42,11 @@ const menu = {
     param: 'Parameters',
     announcement: 'Announcement',
   },
+  permission: {
+    button: 'Button',
+    assign: 'Assign',
+    audit: 'Audit',
+  },
   monitor: {
     main: 'Monitor',
     timer: 'Timer',
@@ -76,7 +81,7 @@ const menu = {
     docWriter: 'Doc Writer',
   },
   apps: {
-    add: "add app"
-  }
+    add: 'add app',
+  },
 };
 export default menu;
