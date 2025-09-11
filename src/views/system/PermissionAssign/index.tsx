@@ -21,33 +21,31 @@ const PermissionAssign: React.FC = () => {
   };
 
   return (
-    <div className="permission-assign-container h-full">
-      <Card className="h-full" bodyStyle={{ padding: 0 }}>
-        <Tabs
-          activeKey={activeTab}
-          onChange={handleTabChange}
-          items={[
-            {
-              key: 'role-assign',
-              label: '角色权限分配',
-              children: <RolePermissionAssign />,
-            },
-            {
-              key: 'permission-preview',
-              label: '权限预览',
-              children: <PermissionPreview />,
-            },
-            {
-              key: 'batch-operation',
-              label: '批量操作',
-              children: <BatchPermissionOperation />,
-            },
-          ]}
-          className="h-full"
-          tabBarStyle={{ marginBottom: 0, padding: '0 24px' }}
-        />
-      </Card>
-    </div>
+    <Card className="h-full" styles={{ body: { padding: 0 } }}>
+      <Tabs
+        activeKey={activeTab}
+        onChange={handleTabChange}
+        items={[
+          {
+            key: 'role-assign',
+            label: '角色权限分配',
+            children: <RolePermissionAssign />,
+          },
+          {
+            key: 'permission-preview',
+            label: '权限预览',
+            children: <PermissionPreview />,
+          },
+          {
+            key: 'batch-operation',
+            label: '批量操作',
+            children: <BatchPermissionOperation />,
+          },
+        ]}
+        className="h-full"
+        tabBarStyle={{ marginBottom: 0, padding: '0 24px' }}
+      />
+    </Card>
   );
 };
 

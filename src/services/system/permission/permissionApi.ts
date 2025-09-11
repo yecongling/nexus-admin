@@ -1,3 +1,4 @@
+import type { PageQueryParams, PageResult } from '@/types/global';
 import { HttpRequest } from '@/utils/request';
 
 /**
@@ -39,7 +40,7 @@ const PermissionApi = {
 /**
  * 权限按钮数据类型
  */
-export interface PermissionButton {
+export interface PermissionButtonModel {
   id: string;
   name: string;
   code: string;
@@ -59,24 +60,11 @@ export interface PermissionButton {
 /**
  * 权限按钮查询参数
  */
-export interface ButtonSearchParams {
+export interface ButtonSearchParams extends PageQueryParams {
   name?: string;
   code?: string;
   menuId?: string;
   status?: boolean;
-  pageNumber?: number;
-  pageSize?: number;
-}
-
-/**
- * 权限按钮查询响应
- */
-export interface ButtonListResponse {
-  records: PermissionButton[];
-  pageNumber: number;
-  pageSize: number;
-  totalPage: number;
-  totalRow: number;
 }
 
 /**
@@ -189,14 +177,14 @@ export interface IPermissionService {
    * @param params 查询参数
    * @returns 按钮列表
    */
-  getButtonList(params: ButtonSearchParams): Promise<ButtonListResponse>;
+  getButtonList(params: ButtonSearchParams): Promise<PageResult<PermissionButtonModel>>;
 
   /**
    * 获取权限按钮详情
    * @param buttonId 按钮ID
    * @returns 按钮详情
    */
-  getButtonDetail(buttonId: string): Promise<PermissionButton>;
+  getButtonDetail(buttonId: string): Promise<PermissionButtonModel>;
 
   /**
    * 新增权限按钮
@@ -263,7 +251,11 @@ export interface IPermissionService {
    * @param permissionIds 权限ID列表
    * @returns 分配结果
    */
-  assignRolePermission(roleId: string, permissionType: 'menu' | 'button' | 'interface', permissionIds: string[]): Promise<boolean>;
+  assignRolePermission(
+    roleId: string,
+    permissionType: 'menu' | 'button' | 'interface',
+    permissionIds: string[],
+  ): Promise<boolean>;
 
   /**
    * 获取角色权限详情
@@ -295,37 +287,25 @@ export interface IPermissionService {
     targetType?: string;
     startTime?: string;
     endTime?: string;
-  }): Promise<{
-    records: PermissionChangeLog[];
-    pageNumber: number;
-    pageSize: number;
-    totalPage: number;
-    totalRow: number;
-  }>;
+  }): Promise<PageResult<PermissionChangeLog[]>>;
 
   /**
    * 获取异常权限检测结果
    * @param params 查询参数
    * @returns 异常检测结果
    */
-  getAnomalyDetection(params: {
-    pageNumber?: number;
-    pageSize?: number;
-    anomalyType?: string;
-  }): Promise<{
-    records: Array<{
-      id: string;
-      anomalyType: string;
-      description: string;
-      severity: 'low' | 'medium' | 'high';
-      detectedTime: string;
-      status: 'pending' | 'resolved' | 'ignored';
-    }>;
-    pageNumber: number;
-    pageSize: number;
-    totalPage: number;
-    totalRow: number;
-  }>;
+  getAnomalyDetection(params: { pageNumber?: number; pageSize?: number; anomalyType?: string }): Promise<
+    PageResult<{
+      records: {
+        id: string;
+        anomalyType: string;
+        description: string;
+        severity: 'low' | 'medium' | 'high';
+        detectedTime: string;
+        status: 'pending' | 'resolved' | 'ignored';
+      }[];
+    }>
+  >;
 }
 
 /**
@@ -335,8 +315,8 @@ export const permissionService: IPermissionService = {
   /**
    * 获取权限按钮列表
    */
-  async getButtonList(params: ButtonSearchParams): Promise<ButtonListResponse> {
-    return HttpRequest.get<ButtonListResponse>({
+  async getButtonList(params: ButtonSearchParams): Promise<PageResult<PermissionButtonModel>> {
+    return HttpRequest.get<PageResult<PermissionButtonModel>>({
       url: PermissionApi.getButtonList,
       params,
     });
@@ -345,8 +325,8 @@ export const permissionService: IPermissionService = {
   /**
    * 获取权限按钮详情
    */
-  async getButtonDetail(buttonId: string): Promise<PermissionButton> {
-    return HttpRequest.get<PermissionButton>({
+  async getButtonDetail(buttonId: string): Promise<PermissionButtonModel> {
+    return HttpRequest.get<PermissionButtonModel>({
       url: PermissionApi.getButtonDetail,
       params: { buttonId },
     });
@@ -435,7 +415,11 @@ export const permissionService: IPermissionService = {
   /**
    * 分配角色权限
    */
-  async assignRolePermission(roleId: string, permissionType: 'menu' | 'button' | 'interface', permissionIds: string[]): Promise<boolean> {
+  async assignRolePermission(
+    roleId: string,
+    permissionType: 'menu' | 'button' | 'interface',
+    permissionIds: string[],
+  ): Promise<boolean> {
     return HttpRequest.post({
       url: PermissionApi.assignRolePermission,
       data: { roleId, permissionType, permissionIds },
@@ -476,13 +460,7 @@ export const permissionService: IPermissionService = {
     targetType?: string;
     startTime?: string;
     endTime?: string;
-  }): Promise<{
-    records: PermissionChangeLog[];
-    pageNumber: number;
-    pageSize: number;
-    totalPage: number;
-    totalRow: number;
-  }> {
+  }): Promise<PageResult<PermissionChangeLog[]>> {
     return HttpRequest.get({
       url: PermissionApi.getPermissionChangeLog,
       params,
@@ -492,24 +470,18 @@ export const permissionService: IPermissionService = {
   /**
    * 获取异常权限检测结果
    */
-  async getAnomalyDetection(params: {
-    pageNumber?: number;
-    pageSize?: number;
-    anomalyType?: string;
-  }): Promise<{
-    records: Array<{
-      id: string;
-      anomalyType: string;
-      description: string;
-      severity: 'low' | 'medium' | 'high';
-      detectedTime: string;
-      status: 'pending' | 'resolved' | 'ignored';
-    }>;
-    pageNumber: number;
-    pageSize: number;
-    totalPage: number;
-    totalRow: number;
-  }> {
+  async getAnomalyDetection(params: { pageNumber?: number; pageSize?: number; anomalyType?: string }): Promise<
+    PageResult<{
+      records: {
+        id: string;
+        anomalyType: string;
+        description: string;
+        severity: 'low' | 'medium' | 'high';
+        detectedTime: string;
+        status: 'pending' | 'resolved' | 'ignored';
+      }[];
+    }>
+  > {
     return HttpRequest.get({
       url: PermissionApi.getAnomalyDetection,
       params,

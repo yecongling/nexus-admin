@@ -43,7 +43,7 @@ const menu = {
     announcement: '系统公告',
   },
   permission: {
-    button: '按钮权限',
+    button: '按钮管理',
     assign: '权限分配',
     audit: '权限审计',
   },

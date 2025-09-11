@@ -5,7 +5,7 @@ import { useState, useCallback, useMemo } from 'react';
 import type React from 'react';
 import {
   permissionService,
-  type PermissionButton,
+  type PermissionButtonModel,
   type ButtonSearchParams,
 } from '@/services/system/permission/permissionApi';
 import { usePermission } from '@/hooks/usePermission';
@@ -27,10 +27,10 @@ const ButtonMaintenance: React.FC<ButtonMaintenanceProps> = ({ onRefresh }) => {
   const { modal } = App.useApp();
   const queryClient = useQueryClient();
   const [formVisible, setFormVisible] = useState(false);
-  const [editingButton, setEditingButton] = useState<PermissionButton | null>(null);
+  const [editingButton, setEditingButton] = useState<PermissionButtonModel | null>(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [searchParams, setSearchParams] = useState<ButtonSearchParams>({
-    pageNumber: 1,
+    pageNum: 1,
     pageSize: 10,
   });
 
@@ -111,7 +111,7 @@ const ButtonMaintenance: React.FC<ButtonMaintenanceProps> = ({ onRefresh }) => {
    * 处理编辑按钮
    * @param button 要编辑的按钮
    */
-  const handleEdit = useCallback((button: PermissionButton) => {
+  const handleEdit = useCallback((button: PermissionButtonModel) => {
     setEditingButton(button);
     setFormVisible(true);
   }, []);
@@ -121,7 +121,7 @@ const ButtonMaintenance: React.FC<ButtonMaintenanceProps> = ({ onRefresh }) => {
    * @param button 要删除的按钮
    */
   const handleDelete = useCallback(
-    (button: PermissionButton) => {
+    (button: PermissionButtonModel) => {
       modal.confirm({
         title: '确认删除',
         content: `确定要删除按钮 "${button.name}" 吗？`,
@@ -157,7 +157,7 @@ const ButtonMaintenance: React.FC<ButtonMaintenanceProps> = ({ onRefresh }) => {
    * @param status 新状态
    */
   const handleToggleStatus = useCallback(
-    (button: PermissionButton, status: boolean) => {
+    (button: PermissionButtonModel      , status: boolean) => {
       toggleStatusMutation.mutate({ buttonId: button.id, status });
     },
     [toggleStatusMutation],
@@ -213,14 +213,14 @@ const ButtonMaintenance: React.FC<ButtonMaintenanceProps> = ({ onRefresh }) => {
   /**
    * 表格列定义
    */
-  const columns: TableProps<PermissionButton>['columns'] = useMemo(
+  const columns: TableProps<PermissionButtonModel>['columns'] = useMemo(
     () => [
       {
         title: '序号',
         key: 'index',
         width: 80,
         align: 'center',
-        render: (_, __, index) => (searchParams.pageNumber! - 1) * searchParams.pageSize! + index + 1,
+        render: (_, __, index) => (searchParams.pageNum! - 1) * searchParams.pageSize! + index + 1,
       },
       {
         title: '按钮名称',
@@ -245,7 +245,7 @@ const ButtonMaintenance: React.FC<ButtonMaintenanceProps> = ({ onRefresh }) => {
         dataIndex: 'status',
         key: 'status',
         width: 100,
-        render: (status: boolean, record: PermissionButton) => (
+        render: (status: boolean, record: PermissionButtonModel) => (
           <Switch
             checked={status}
             onChange={(checked) => handleToggleStatus(record, checked)}
@@ -272,7 +272,7 @@ const ButtonMaintenance: React.FC<ButtonMaintenanceProps> = ({ onRefresh }) => {
         key: 'action',
         width: 150,
         align: 'center',
-        render: (_, record: PermissionButton) => (
+        render: (_, record: PermissionButtonModel) => (
           <Space size="small">
             {canEdit && (
               <Button type="link" size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)}>
@@ -303,7 +303,7 @@ const ButtonMaintenance: React.FC<ButtonMaintenanceProps> = ({ onRefresh }) => {
       },
     ],
     [
-      searchParams.pageNumber,
+      searchParams.pageNum,
       searchParams.pageSize,
       canEdit,
       canDelete,
@@ -357,7 +357,7 @@ const ButtonMaintenance: React.FC<ButtonMaintenanceProps> = ({ onRefresh }) => {
             }),
           }}
           pagination={{
-            current: searchParams.pageNumber,
+            current: searchParams.pageNum,
             pageSize: searchParams.pageSize,
             total: buttonListResponse?.totalRow || 0,
             showSizeChanger: true,

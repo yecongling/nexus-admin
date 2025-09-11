@@ -43,9 +43,9 @@ const menu = {
     announcement: 'Announcement',
   },
   permission: {
-    button: 'Button',
-    assign: 'Assign',
-    audit: 'Audit',
+    button: 'Button Management',
+    assign: 'Permission Assignment',
+    audit: 'Permission Audit',
   },
   monitor: {
     main: 'Monitor',

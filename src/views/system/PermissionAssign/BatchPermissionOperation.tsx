@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Card, Select, Button, Space, message, Table, Modal, Row, Col } from 'antd';
-import { ReloadOutlined, PlusOutlined } from '@ant-design/icons';
+import { Card, Select, Button, Space, message, Table, Modal, Row, Col, Spin, Tag } from 'antd';
+import { ReloadOutlined, PlusOutlined, UserOutlined } from '@ant-design/icons';
 import { useState, useCallback, useMemo, useId } from 'react';
 import type React from 'react';
 import { permissionService } from '@/services/system/permission/permissionApi';
@@ -26,7 +26,7 @@ const BatchPermissionOperation: React.FC = () => {
    */
   const { data: roleListResponse, isLoading: roleListLoading } = useQuery({
     queryKey: ['role-list'],
-    queryFn: () => roleService.getRoleList({ pageSize: 1000 }),
+    queryFn: () => roleService.getRoleListPage({ pageNum: 1, pageSize: 100 }),
   });
 
   /**
@@ -37,13 +37,13 @@ const BatchPermissionOperation: React.FC = () => {
     queryFn: () => {
       switch (permissionType) {
         case 'menu':
-          return permissionService.getButtonList({ pageSize: 1000 }); // 这里应该调用菜单API
+          return permissionService.getButtonList({ pageNum: 1, pageSize: 100 }); // 这里应该调用菜单API
         case 'button':
-          return permissionService.getButtonList({ pageSize: 1000 });
+          return permissionService.getButtonList({ pageNum: 1, pageSize: 100 });
         case 'interface':
-          return Promise.resolve({ records: [] }); // 接口权限API待实现
+          return Promise.resolve({ records: [], pageNumber: 1, pageSize: 100, totalRow: 0, totalPage: 1 }); // 接口权限API待实现
         default:
-          return Promise.resolve({ records: [] });
+          return Promise.resolve({ records: [], pageNumber: 1, pageSize: 100, totalRow: 0, totalPage: 1 });
       }
     },
   });
@@ -52,13 +52,16 @@ const BatchPermissionOperation: React.FC = () => {
    * 批量操作权限的mutation
    */
   const batchOperationMutation = useMutation({
-    mutationFn: async ({ roleIds, permissionIds }: {
+    mutationFn: async ({
+      roleIds,
+      permissionIds,
+    }: {
       roleIds: string[];
       permissionIds: string[];
       operation: 'assign' | 'revoke';
     }) => {
-      const promises = roleIds.map(roleId =>
-        permissionService.assignRolePermission(roleId, permissionType, permissionIds)
+      const promises = roleIds.map((roleId) =>
+        permissionService.assignRolePermission(roleId, permissionType, permissionIds),
       );
       return Promise.all(promises);
     },
@@ -184,19 +187,13 @@ const BatchPermissionOperation: React.FC = () => {
         title: '角色编码',
         dataIndex: 'code',
         key: 'code',
-        render: (code: string) => (
-          <Tag color="blue">{code}</Tag>
-        ),
+        render: (code: string) => <Tag color="blue">{code}</Tag>,
       },
       {
         title: '状态',
         dataIndex: 'status',
         key: 'status',
-        render: (status: boolean) => (
-          <Tag color={status ? 'green' : 'red'}>
-            {status ? '启用' : '禁用'}
-          </Tag>
-        ),
+        render: (status: boolean) => <Tag color={status ? 'green' : 'red'}>{status ? '启用' : '禁用'}</Tag>,
       },
       {
         title: '描述',
@@ -215,7 +212,9 @@ const BatchPermissionOperation: React.FC = () => {
         <Row gutter={16}>
           <Col span={6}>
             <div className="space-y-2">
-              <label htmlFor={permissionTypeId} className="text-sm font-medium">权限类型：</label>
+              <label htmlFor={permissionTypeId} className="text-sm font-medium">
+                权限类型：
+              </label>
               <Select
                 id={permissionTypeId}
                 value={permissionType}
@@ -231,7 +230,9 @@ const BatchPermissionOperation: React.FC = () => {
           </Col>
           <Col span={6}>
             <div className="space-y-2">
-              <label htmlFor={operationTypeId} className="text-sm font-medium">操作类型：</label>
+              <label htmlFor={operationTypeId} className="text-sm font-medium">
+                操作类型：
+              </label>
               <Select
                 id={operationTypeId}
                 value={operationType}
@@ -284,17 +285,13 @@ const BatchPermissionOperation: React.FC = () => {
                 options={roleOptions}
                 loading={roleListLoading}
                 showSearch
-                filterOption={(input, option) =>
-                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                }
+                filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
               />
             </div>
             <div className="flex-1 overflow-auto">
               <Table
                 columns={roleColumns}
-                dataSource={roleListResponse?.records?.filter((role: any) => 
-                  selectedRoles.includes(role.id)
-                ) || []}
+                dataSource={roleListResponse?.records?.filter((role: any) => selectedRoles.includes(role.id)) || []}
                 rowKey="id"
                 pagination={false}
                 size="small"
@@ -305,7 +302,11 @@ const BatchPermissionOperation: React.FC = () => {
         </Card>
 
         {/* 权限选择 */}
-        <Card title={`选择${permissionType === 'menu' ? '菜单' : permissionType === 'button' ? '按钮' : '接口'}权限`} size="small" className="h-full">
+        <Card
+          title={`选择${permissionType === 'menu' ? '菜单' : permissionType === 'button' ? '按钮' : '接口'}权限`}
+          size="small"
+          className="h-full"
+        >
           <div className="h-full flex flex-col">
             <div className="mb-4">
               <Select
@@ -317,9 +318,7 @@ const BatchPermissionOperation: React.FC = () => {
                 options={permissionOptions}
                 loading={permissionListLoading}
                 showSearch
-                filterOption={(input, option) =>
-                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                }
+                filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
               />
             </div>
             <div className="flex-1 overflow-auto">
@@ -329,21 +328,19 @@ const BatchPermissionOperation: React.FC = () => {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {permissionList?.records?.filter((permission: any) => 
-                    selectedPermissions.includes(permission.id)
-                  ).map((permission: any) => (
-                    <div
-                      key={permission.id}
-                      className="p-2 border border-gray-200 rounded cursor-pointer hover:bg-gray-50"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium">{permission.name || permission.code}</span>
-                        <Tag color="blue" size="small">
-                          {permission.code}
-                        </Tag>
+                  {permissionList?.records
+                    ?.filter((permission: any) => selectedPermissions.includes(permission.id))
+                    .map((permission: any) => (
+                      <div
+                        key={permission.id}
+                        className="p-2 border border-gray-200 rounded cursor-pointer hover:bg-gray-50"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium">{permission.name || permission.code}</span>
+                          <Tag color="blue">{permission.code}</Tag>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               )}
             </div>
@@ -361,18 +358,16 @@ const BatchPermissionOperation: React.FC = () => {
         width={600}
       >
         <div className="py-4">
-          <p className="mb-4">
-            确定要{operationType === 'assign' ? '分配' : '回收'}以下权限吗？
-          </p>
+          <p className="mb-4">确定要{operationType === 'assign' ? '分配' : '回收'}以下权限吗？</p>
           <div className="space-y-2">
             <div>
               <strong>操作角色：</strong>
               <div className="mt-1">
-                {selectedRoles.map(roleId => {
+                {selectedRoles.map((roleId) => {
                   const role = roleListResponse?.records?.find((r: any) => r.id === roleId);
                   return (
                     <Tag key={roleId} color="blue" className="mr-1">
-                      {role?.name}
+                      {role?.roleName}
                     </Tag>
                   );
                 })}
@@ -381,7 +376,7 @@ const BatchPermissionOperation: React.FC = () => {
             <div>
               <strong>操作权限：</strong>
               <div className="mt-1">
-                {selectedPermissions.map(permissionId => {
+                {selectedPermissions.map((permissionId) => {
                   const permission = permissionList?.records?.find((p: any) => p.id === permissionId);
                   return (
                     <Tag key={permissionId} color="green" className="mr-1">

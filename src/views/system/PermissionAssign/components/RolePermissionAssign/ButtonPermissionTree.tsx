@@ -13,15 +13,6 @@ interface ButtonPermissionTreeProps {
   onCheck: (checkedKeys: string[]) => void;
 }
 
-/**
- * 树节点数据类型
- */
-interface TreeNode {
-  key: string;
-  title: React.ReactNode;
-  children?: TreeNode[];
-  isLeaf?: boolean;
-}
 
 /**
  * 按钮权限树组件
@@ -38,7 +29,7 @@ const ButtonPermissionTree: React.FC<ButtonPermissionTreeProps> = ({
    */
   const { data: buttonListResponse, isLoading } = useQuery({
     queryKey: ['permission-buttons'],
-    queryFn: () => permissionService.getButtonList({ pageSize: 1000 }),
+    queryFn: () => permissionService.getButtonList({ pageNum: 1, pageSize: 1000 }),
   });
 
   /**
@@ -66,7 +57,7 @@ const ButtonPermissionTree: React.FC<ButtonPermissionTreeProps> = ({
       title: (
         <div className="flex items-center justify-between">
           <span className="font-medium">{group.menuName}</span>
-          <Tag color="blue" size="small">
+          <Tag color="blue">
             {group.buttons.length}
           </Tag>
         </div>
@@ -76,7 +67,7 @@ const ButtonPermissionTree: React.FC<ButtonPermissionTreeProps> = ({
         title: (
           <div className="flex items-center justify-between">
             <span className="text-sm">{button.name}</span>
-            <Tag color={button.status ? 'green' : 'red'} size="small">
+            <Tag color={button.status ? 'green' : 'red'}>
               {button.status ? '启用' : '禁用'}
             </Tag>
           </div>
