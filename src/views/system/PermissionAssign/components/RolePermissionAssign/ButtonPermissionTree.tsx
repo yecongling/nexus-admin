@@ -81,8 +81,8 @@ const ButtonPermissionTree: React.FC<ButtonPermissionTreeProps> = ({
    * 处理树节点选中
    * @param checkedKeysValue 选中的节点keys
    */
-  const handleCheck: TreeProps['onCheck'] = useCallback((checkedKeysValue) => {
-    const keys = checkedKeysValue as string[];
+  const handleCheck: TreeProps['onCheck'] = useCallback((checkedKeysValue: any) => {
+    const keys = checkedKeysValue.checked;
     onCheck(keys);
   }, [onCheck]);
 

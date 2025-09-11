@@ -8,6 +8,7 @@ import { roleService } from '@/services/system/role/roleApi';
 import MenuPermissionTree from './MenuPermissionTree';
 import ButtonPermissionTree from './ButtonPermissionTree';
 import InterfacePermissionGrid from './InterfacePermissionGrid';
+import type { RoleModel } from '@/services/system/role/type';
 
 /**
  * 角色权限分配组件Props
@@ -158,16 +159,17 @@ const RolePermissionAssign: React.FC<RolePermissionAssignProps> = ({
    */
   const roleOptions = useMemo(() => {
     if (!roleListResponse?.records) return [];
-    return roleListResponse.records.map((role: any) => ({
-      label: role.name,
+    return roleListResponse.records.map((role: RoleModel) => ({
+      label: role.roleName,
       value: role.id,
     }));
   }, [roleListResponse?.records]);
 
   /**
-   * 渲染权限分配内容
+   * 渲染权限内容
+   * @param permissionComponent 权限组件
    */
-  const renderPermissionContent = () => {
+  const renderPermissionContent = (permissionComponent: React.ReactNode) => {
     if (!currentRoleId) {
       return (
         <div className="flex items-center justify-center h-64">
@@ -187,23 +189,15 @@ const RolePermissionAssign: React.FC<RolePermissionAssignProps> = ({
       );
     }
 
-    switch (activeTab) {
-      case 'menu':
-        return <MenuPermissionTree checkedKeys={menuCheckedKeys} onCheck={handleMenuPermissionChange} />;
-      case 'button':
-        return <ButtonPermissionTree checkedKeys={buttonCheckedKeys} onCheck={handleButtonPermissionChange} />;
-      case 'interface':
-        return <InterfacePermissionGrid checkedKeys={interfaceCheckedKeys} onCheck={handleInterfacePermissionChange} />;
-      default:
-        return null;
-    }
+    return permissionComponent;
   };
 
+
   return (
-    <div className="h-full flex flex-col space-y-4">
+    <div className="h-full flex flex-col gap-4">
       {/* 角色选择栏 */}
       {showRoleSelector && (
-        <Card size="small">
+        <Card size="small" variant="borderless">
           <Row gutter={16} align="middle">
             <Col flex="auto">
               <Space>
@@ -224,7 +218,12 @@ const RolePermissionAssign: React.FC<RolePermissionAssignProps> = ({
             <Col>
               <Space>
                 {showRefreshButton && (
-                  <Button type="text" icon={<ReloadOutlined />} onClick={handleRefresh} loading={rolePermissionsLoading}>
+                  <Button
+                    type="text"
+                    icon={<ReloadOutlined />}
+                    onClick={handleRefresh}
+                    loading={rolePermissionsLoading}
+                  >
                     刷新
                   </Button>
                 )}
@@ -249,8 +248,8 @@ const RolePermissionAssign: React.FC<RolePermissionAssignProps> = ({
       <div className="flex-1">
         <Card
           title={`${activeTab === 'menu' ? '菜单' : activeTab === 'button' ? '按钮' : '接口'}权限分配`}
-          size="small"
-          className="h-full"
+          className="h-full flex flex-col"
+          styles={{ body: { flex: 1 } }}
         >
           <Tabs
             activeKey={activeTab}
@@ -259,19 +258,26 @@ const RolePermissionAssign: React.FC<RolePermissionAssignProps> = ({
               {
                 key: 'menu',
                 label: '菜单权限',
+                children: renderPermissionContent(
+                  <MenuPermissionTree checkedKeys={menuCheckedKeys} onCheck={handleMenuPermissionChange} />
+                ),
               },
               {
                 key: 'button',
                 label: '按钮权限',
+                children: renderPermissionContent(
+                  <ButtonPermissionTree checkedKeys={buttonCheckedKeys} onCheck={handleButtonPermissionChange} />
+                ),
               },
               {
                 key: 'interface',
                 label: '接口权限',
+                children: renderPermissionContent(
+                  <InterfacePermissionGrid checkedKeys={interfaceCheckedKeys} onCheck={handleInterfacePermissionChange} />
+                ),
               },
             ]}
-            className="h-full"
           />
-          <div className="mt-4 h-full">{renderPermissionContent()}</div>
         </Card>
       </div>
     </div>

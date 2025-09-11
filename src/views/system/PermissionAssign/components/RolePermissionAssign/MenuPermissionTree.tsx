@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
-import { Tree, Spin, Empty } from 'antd';
-import { useCallback, useMemo, useState } from 'react';
+import { Table, Checkbox, Space, Tag } from 'antd';
+import { useCallback, useMemo } from 'react';
 import type React from 'react';
 import { menuService } from '@/services/system/menu/menuApi';
-import type { TreeProps } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 
 /**
  * 菜单权限树组件Props
@@ -14,25 +14,27 @@ interface MenuPermissionTreeProps {
 }
 
 /**
- * 树节点数据类型
+ * 菜单数据类型
  */
-interface TreeNode {
-  key: string;
-  title: string;
-  children?: TreeNode[];
-  isLeaf?: boolean;
+interface MenuItem {
+  id: string;
+  name: string;
+  parentId?: string;
+  url?: string;
+  component?: string;
+  status: boolean;
+  sortNo: number;
+  createTime: string;
+  updateTime: string;
+  description?: string;
+  children?: MenuItem[];
 }
 
 /**
  * 菜单权限树组件
- * 以树形结构展示菜单权限分配
+ * 以树形表格结构展示菜单权限分配
  */
-const MenuPermissionTree: React.FC<MenuPermissionTreeProps> = ({
-  checkedKeys,
-  onCheck,
-}) => {
-  const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
-
+const MenuPermissionTree: React.FC<MenuPermissionTreeProps> = ({ checkedKeys, onCheck }) => {
   /**
    * 查询菜单树数据
    */
@@ -42,71 +44,159 @@ const MenuPermissionTree: React.FC<MenuPermissionTreeProps> = ({
   });
 
   /**
-   * 构建树形数据
+   * 构建树形表格数据
    */
-  const treeData = useMemo(() => {
+  const tableData = useMemo(() => {
     if (!menuList) return [];
 
-    const buildTree = (menus: any[], parentId?: string): TreeNode[] => {
+    const buildTreeData = (menus: MenuItem[], parentId?: string): MenuItem[] => {
       return menus
-        .filter(menu => menu.parentId === parentId)
-        .map(menu => ({
-          key: menu.id,
-          title: menu.name,
-          children: buildTree(menus, menu.id),
+        .filter((menu) => menu.parentId === parentId)
+        .map((menu) => ({
+          ...menu,
+          children: buildTreeData(menus, menu.id),
         }));
     };
 
-    return buildTree(menuList);
+    return buildTreeData(menuList);
   }, [menuList]);
 
   /**
-   * 处理树节点选中
-   * @param checkedKeysValue 选中的节点keys
+   * 处理单个菜单选中
+   * @param menuId 菜单ID
+   * @param checked 是否选中
    */
-  const handleCheck: TreeProps['onCheck'] = useCallback((checkedKeysValue) => {
-    const keys = checkedKeysValue as string[];
-    onCheck(keys);
-  }, [onCheck]);
+  const handleMenuCheck = useCallback(
+    (menuId: string, checked: boolean) => {
+      if (checked) {
+        onCheck([...checkedKeys, menuId]);
+      } else {
+        onCheck(checkedKeys.filter((key) => key !== menuId));
+      }
+    },
+    [checkedKeys, onCheck],
+  );
 
   /**
-   * 处理树节点展开
-   * @param keys 展开的节点keys
+   * 处理全选/取消全选
+   * @param checked 是否全选
    */
-  const handleExpand = useCallback((keys: React.Key[]) => {
-    setExpandedKeys(keys as string[]);
-  }, []);
+  const handleSelectAll = useCallback(
+    (checked: boolean) => {
+      if (checked) {
+        const allIds = getAllMenuIds(tableData);
+        onCheck(allIds);
+      } else {
+        onCheck([]);
+      }
+    },
+    [tableData, onCheck],
+  );
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Spin size="large" />
-      </div>
-    );
-  }
+  /**
+   * 获取所有菜单ID（包括子菜单）
+   * @param menus 菜单列表
+   */
+  const getAllMenuIds = (menus: MenuItem[]): string[] => {
+    const ids: string[] = [];
+    const traverse = (items: MenuItem[]) => {
+      items.forEach((item) => {
+        ids.push(item.id);
+        if (item.children && item.children.length > 0) {
+          traverse(item.children);
+        }
+      });
+    };
+    traverse(menus);
+    return ids;
+  };
 
-  if (!treeData.length) {
-    return (
-      <Empty
-        description="暂无菜单数据"
-        image={Empty.PRESENTED_IMAGE_SIMPLE}
-        className="mt-8"
-      />
-    );
-  }
+  /**
+   * 检查是否全选
+   */
+  const isAllSelected = useMemo(() => {
+    if (tableData.length === 0) return false;
+    const allIds = getAllMenuIds(tableData);
+    return allIds.every((id) => checkedKeys.includes(id));
+  }, [tableData, checkedKeys]);
+
+  /**
+   * 检查是否部分选中
+   */
+  const isIndeterminate = useMemo(() => {
+    const allIds = getAllMenuIds(tableData);
+    const selectedCount = allIds.filter((id) => checkedKeys.includes(id)).length;
+    return selectedCount > 0 && selectedCount < allIds.length;
+  }, [tableData, checkedKeys]);
+
+  /**
+   * 表格列定义
+   */
+  const columns: ColumnsType<MenuItem> = [
+    {
+      title: (
+        <Checkbox
+          checked={isAllSelected}
+          indeterminate={isIndeterminate}
+          onChange={(e) => handleSelectAll(e.target.checked)}
+        >
+          菜单名称
+        </Checkbox>
+      ),
+      dataIndex: 'name',
+      key: 'name',
+      render: (name: string, record: MenuItem) => (
+        <Space>
+          <Checkbox
+            checked={checkedKeys.includes(record.id)}
+            onChange={(e) => handleMenuCheck(record.id, e.target.checked)}
+          />
+          <span className="font-medium">{name}</span>
+        </Space>
+      ),
+    },
+    {
+      title: '菜单路径',
+      dataIndex: 'url',
+      key: 'url',
+      render: (url: string) => <Tag color="blue">{url || '-'}</Tag>,
+    },
+    {
+      title: '组件路径',
+      dataIndex: 'component',
+      key: 'component',
+      ellipsis: true,
+      render: (component: string) => component || '-',
+    },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status: boolean) => <Tag color={status ? 'green' : 'red'}>{status ? '启用' : '禁用'}</Tag>,
+    },
+    {
+      title: '排序',
+      dataIndex: 'sortNo',
+      key: 'sortNo',
+      width: 80,
+    },
+  ];
 
   return (
-    <div className="h-full overflow-auto">
-      <Tree
-        checkable
-        checkedKeys={checkedKeys}
-        onCheck={handleCheck}
-        onExpand={handleExpand}
-        expandedKeys={expandedKeys}
-        treeData={treeData}
-        showLine
-        showIcon={false}
-        className="menu-permission-tree"
+    <div className="h-full">
+      <Table
+        columns={columns}
+        dataSource={tableData}
+        loading={isLoading}
+        rowKey="id"
+        pagination={false}
+        size="small"
+        scroll={{ y: 400 }}
+        expandable={{
+          defaultExpandAllRows: true,
+          childrenColumnName: 'children',
+        }}
+        className="menu-permission-table"
       />
     </div>
   );

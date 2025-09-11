@@ -169,7 +169,7 @@ const InterfacePermissionGrid: React.FC<InterfacePermissionGridProps> = ({
                 />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center space-x-2 mb-2">
-                    <Tag color="purple" size="small">
+                    <Tag color="purple">
                       {interfaceItem.code}
                     </Tag>
                   </div>
