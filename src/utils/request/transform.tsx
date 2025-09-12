@@ -2,18 +2,23 @@
  * axios中对数据的中转处理
  */
 /* 数据处理 */
-import type { AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import type {
+  AxiosError,
+  AxiosRequestConfig,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+} from 'axios';
 import type { RequestOptions } from '@/types/axios';
 import type { Response } from '@/types/global';
-import { antdUtils } from '@/utils/antdUtil';
-import { joinTimestamp } from '@/utils/request/helper';
+import { antdUtils } from '../antdUtil';
+import { joinTimestamp } from './helper';
 import { HttpCodeEnum, RequestEnum } from '@/enums/httpEnum';
-import { setObjToUrlParams } from '@/utils/utils';
-import { isString } from '@/utils/is';
-import { encrypt } from '@/utils/encrypt';
+import { setObjToUrlParams } from '../utils';
+import { isString } from '../is';
+import { encrypt } from '../encrypt';
 import type React from 'react';
 import { useUserStore } from '@/stores/userStore';
-// 移除对HttpRequest的依赖，使用自身的请求实例
+import { HttpRequest } from '.';
 import { commonService } from '@/services/common';
 import { t } from 'i18next';
 
@@ -48,22 +53,34 @@ export abstract class AxiosTransform {
   /**
    * @description: Process configuration before request
    */
-  beforeRequestHook?: (config: AxiosRequestConfig, options: RequestOptions) => AxiosRequestConfig;
+  beforeRequestHook?: (
+    config: AxiosRequestConfig,
+    options: RequestOptions,
+  ) => AxiosRequestConfig;
 
   /**
    * 响应数据转换
    */
-  transformResponseHook?: (res: AxiosResponse<Response>, options: RequestOptions) => any;
+  transformResponseHook?: (
+    res: AxiosResponse<Response>,
+    options: RequestOptions,
+  ) => any;
 
   /**
    * @description: 请求失败处理
    */
-  requestCatchHook?: (e: Error | AxiosError, options: RequestOptions) => Promise<any>;
+  requestCatchHook?: (
+    e: Error | AxiosError,
+    options: RequestOptions,
+  ) => Promise<any>;
 
   /**
    * @description: 请求之前的拦截器
    */
-  requestInterceptors?: (config: InternalAxiosRequestConfig, options: CreateAxiosOptions) => InternalAxiosRequestConfig;
+  requestInterceptors?: (
+    config: InternalAxiosRequestConfig,
+    options: CreateAxiosOptions,
+  ) => InternalAxiosRequestConfig;
 
   /**
    * @description: 请求之后的拦截器
@@ -82,28 +99,23 @@ export abstract class AxiosTransform {
 }
 
 /**
- * 创建transform实例，接受请求实例作为参数
+ * 定义一些拦截器的具体实现
  */
-export const createTransform = (requestInstance: any): AxiosTransform => ({
+export const transform: AxiosTransform = {
   /**
    * 处理响应数据
    * @param res
    * @param options
    */
-  transformResponseHook: (res: AxiosResponse<Response>, options: RequestOptions) => {
+  transformResponseHook: (
+    res: AxiosResponse<Response>,
+    options: RequestOptions,
+  ) => {
     const { isTransformResponse, isReturnNativeResponse } = options;
     // 是否返回原生响应头
     if (isReturnNativeResponse) {
       return res;
     }
-
-    // 处理特殊响应类型（如 blob、arraybuffer 等）
-    const config = res.config as CreateAxiosOptions;
-    if (config.responseType && ['blob', 'arraybuffer', 'text'].includes(config.responseType)) {
-      // 对于 blob、arraybuffer、text 等特殊响应类型，直接返回原始数据
-      return res.data;
-    }
-
     // 不进行任何处理，直接返回响应数据
     if (!isTransformResponse) {
       return res.data;
@@ -115,7 +127,8 @@ export const createTransform = (requestInstance: any): AxiosTransform => ({
     }
     const { code, data: rtn, message: msg } = data;
     // 系统默认200状态码为正常成功请求，可在枚举中配置自己的
-    const hasSuccess = data && Reflect.has(data, 'code') && code === HttpCodeEnum.SUCCESS;
+    const hasSuccess =
+      data && Reflect.has(data, 'code') && code === HttpCodeEnum.SUCCESS;
     if (hasSuccess) {
       if (msg && options.successMessageMode === 'success') {
         // 信息成功提示
@@ -137,7 +150,13 @@ export const createTransform = (requestInstance: any): AxiosTransform => ({
 
   // 请求之前处理config
   beforeRequestHook: (config, options) => {
-    const { apiUrl, joinPrefix, joinParamsToUrl, joinTime = true, urlPrefix } = options;
+    const {
+      apiUrl,
+      joinPrefix,
+      joinParamsToUrl,
+      joinTime = true,
+      urlPrefix,
+    } = options;
     if (joinPrefix) {
       config.url = `${urlPrefix}${config.url}`;
     }
@@ -146,10 +165,16 @@ export const createTransform = (requestInstance: any): AxiosTransform => ({
     }
     const params = config.params || {};
     const data = config.data || false;
-    if (config.method?.toUpperCase() === RequestEnum.GET || config.method?.toUpperCase() === RequestEnum.DELETE) {
+    if (
+      config.method?.toUpperCase() === RequestEnum.GET ||
+      config.method?.toUpperCase() === RequestEnum.DELETE
+    ) {
       if (!isString(params)) {
         // 给get请求加上事件戳参数，避免从缓存中拿数据
-        config.params = Object.assign(params || {}, joinTimestamp(joinTime, false));
+        config.params = Object.assign(
+          params || {},
+          joinTimestamp(joinTime, false),
+        );
       } else {
         // 兼容restful风格
         config.url = `${config.url + params}${joinTimestamp(joinTime, true)}`;
@@ -157,7 +182,11 @@ export const createTransform = (requestInstance: any): AxiosTransform => ({
       }
     } else {
       if (!isString(params)) {
-        if (Reflect.has(config, 'data') && config.data && Object.keys(config.data).length > 0) {
+        if (
+          Reflect.has(config, 'data') &&
+          config.data &&
+          Object.keys(config.data).length > 0
+        ) {
           config.data = data;
           config.params = params;
         } else {
@@ -166,7 +195,10 @@ export const createTransform = (requestInstance: any): AxiosTransform => ({
           config.params = undefined;
         }
         if (joinParamsToUrl) {
-          config.url = setObjToUrlParams(config.url as string, Object.assign({}, config.params, config.data));
+          config.url = setObjToUrlParams(
+            config.url as string,
+            Object.assign({}, config.params, config.data),
+          );
         }
       } else {
         // 兼容restful风格
@@ -244,7 +276,10 @@ export const createTransform = (requestInstance: any): AxiosTransform => ({
     const result = res.data;
     const { code: responseCode } = result;
     // 判断是否跳过请求
-    if ((config as CreateAxiosOptions).requestOptions?.skipAuthInterceptor && responseCode === HttpCodeEnum.RC401) {
+    if (
+      (config as CreateAxiosOptions).requestOptions?.skipAuthInterceptor &&
+      responseCode === HttpCodeEnum.RC401
+    ) {
       antdUtils.modal?.confirm({
         title: t('login.loginValid'),
         content: t('login.retryLogin'),
@@ -257,14 +292,19 @@ export const createTransform = (requestInstance: any): AxiosTransform => ({
       return Promise.reject(t('login.loginValid'));
     }
     // 判断responseCode是否为401(即token失效),添加_retry属性防止重复刷新token
-    if (responseCode === HttpCodeEnum.RC401 && !(config as CreateAxiosOptions)._retry) {
+    if (
+      responseCode === HttpCodeEnum.RC401 &&
+      !(config as CreateAxiosOptions)._retry
+    ) {
       (config as CreateAxiosOptions)._retry = true;
       // 判断是否正在刷新token
       if (!isRefreshing) {
         isRefreshing = true;
         try {
           // 调用刷新token的接口
-          const newToken = await commonService.refreshToken(userStore.refreshToken);
+          const newToken = await commonService.refreshToken(
+            userStore.refreshToken,
+          );
           if (!newToken) {
             throw new Error('refresh token failed');
           }
@@ -276,7 +316,7 @@ export const createTransform = (requestInstance: any): AxiosTransform => ({
           if (config.url?.startsWith('/api')) {
             config.url = config.url.slice(4);
           }
-          const response = await requestInstance.request(
+          const response = await HttpRequest.request(
             { ...config },
             { token: newToken, isReturnNativeResponse: true },
           );
@@ -304,8 +344,10 @@ export const createTransform = (requestInstance: any): AxiosTransform => ({
             if (config.url?.startsWith('/api')) {
               config.url = config.url.slice(4);
             }
-            requestInstance
-              .request({ ...config }, { token: token, isReturnNativeResponse: true })
+            HttpRequest.request(
+              { ...config },
+              { token: token, isReturnNativeResponse: true },
+            )
               .then(resolve)
               .catch(reject);
           });
@@ -352,7 +394,4 @@ export const createTransform = (requestInstance: any): AxiosTransform => ({
 
     return Promise.reject(error);
   },
-});
-
-// 为了向后兼容，导出一个默认的transform实例（需要在使用时传入请求实例）
-export const transform: AxiosTransform = createTransform(null as any);
+};

@@ -181,10 +181,10 @@ export const roleService: IRoleService = {
       {
         url: RoleApi.getRoleDetail,
         params: { roleId },
+        adapter: 'fetch',
       },
       {
         successMessageMode: 'none',
-        requestType: 'fetch'
       },
     );
   },
