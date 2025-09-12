@@ -87,7 +87,7 @@ export interface IPermissionAuditService {
     targetType?: string;
     startTime?: string;
     endTime?: string;
-  }): Promise<PageResult<PermissionChangeLog[]>>;
+  }): Promise<PageResult<PermissionChangeLog>>;
 
   /**
    * 获取异常权限检测结果
@@ -125,7 +125,7 @@ export const permissionAuditService: IPermissionAuditService = {
     targetType?: string;
     startTime?: string;
     endTime?: string;
-  }): Promise<PageResult<PermissionChangeLog[]>> {
+  }): Promise<PageResult<PermissionChangeLog>> {
     return HttpRequest.get({
       url: PermissionAuditApi.getPermissionChangeLog,
       params,

@@ -3,7 +3,8 @@ import { Card, Select, Button, Space, message, Table, Modal, Row, Col, Spin, Tag
 import { ReloadOutlined, PlusOutlined, UserOutlined } from '@ant-design/icons';
 import { useState, useCallback, useMemo, useId } from 'react';
 import type React from 'react';
-import { permissionService } from '@/services/system/permission/permissionApi';
+import { permissionAssignService } from '@/services/system/permission/PermissionAssign/permissionAssignApi';
+import { permissionButtonService } from '@/services/system/permission/PermissionButton/permissionButtonApi';
 import { roleService } from '@/services/system/role/roleApi';
 import type { TableProps } from 'antd';
 
@@ -37,9 +38,9 @@ const BatchPermissionOperation: React.FC = () => {
     queryFn: () => {
       switch (permissionType) {
         case 'menu':
-          return permissionService.getButtonList({ pageNum: 1, pageSize: 100 }); // 这里应该调用菜单API
+          return permissionButtonService.getButtonList({ pageNum: 1, pageSize: 100 }); // 这里应该调用菜单API
         case 'button':
-          return permissionService.getButtonList({ pageNum: 1, pageSize: 100 });
+          return permissionButtonService.getButtonList({ pageNum: 1, pageSize: 100 });
         case 'interface':
           return Promise.resolve({ records: [], pageNumber: 1, pageSize: 100, totalRow: 0, totalPage: 1 }); // 接口权限API待实现
         default:
@@ -61,7 +62,7 @@ const BatchPermissionOperation: React.FC = () => {
       operation: 'assign' | 'revoke';
     }) => {
       const promises = roleIds.map((roleId) =>
-        permissionService.assignRolePermission(roleId, permissionType, permissionIds),
+        permissionAssignService.assignRolePermission(roleId, permissionType, permissionIds),
       );
       return Promise.all(promises);
     },

@@ -3,7 +3,8 @@ import { Card, Select, Button, Space, Spin, Tabs, Row, Col, Descriptions, Tag, T
 import { UserOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useState, useCallback, useMemo } from 'react';
 import type React from 'react';
-import { permissionService } from '@/services/system/permission/permissionApi';
+import { permissionAssignService } from '@/services/system/permission/PermissionAssign/permissionAssignApi';
+import { permissionButtonService } from '@/services/system/permission/PermissionButton/permissionButtonApi';
 import { roleService } from '@/services/system/role/roleApi';
 import type { TableProps } from 'antd';
 
@@ -56,7 +57,7 @@ const PermissionPreview: React.FC<PermissionPreviewProps> = ({
    */
   const { data: rolePermissions, isLoading: permissionsLoading } = useQuery({
     queryKey: ['role-permissions', currentRoleId],
-    queryFn: () => permissionService.getRolePermissionDetail(currentRoleId || ''),
+    queryFn: () => permissionAssignService.getRolePermissionDetail(currentRoleId || ''),
     enabled: !!currentRoleId,
   });
 
@@ -80,7 +81,7 @@ const PermissionPreview: React.FC<PermissionPreviewProps> = ({
     queryKey: ['button-details', rolePermissions?.buttonPermissions],
     queryFn: () => {
       if (!rolePermissions?.buttonPermissions?.length) return [];
-      return permissionService
+      return permissionButtonService
         .getButtonList({
           pageNum: 1,
           pageSize: 100,
