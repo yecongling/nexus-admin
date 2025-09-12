@@ -3,7 +3,7 @@ import { Card, Select, Button, Space, message, Spin, Tabs, Row, Col } from 'antd
 import { UserOutlined, SaveOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useState, useCallback, useMemo } from 'react';
 import type React from 'react';
-import { permissionService } from '@/services/system/permission/permissionApi';
+import { permissionAssignService } from '@/services/system/permission/PermissionAssign/permissionAssignApi';
 import { roleService } from '@/services/system/role/roleApi';
 import MenuPermissionTree from './MenuPermissionTree';
 import ButtonPermissionTree from './ButtonPermissionTree';
@@ -61,7 +61,7 @@ const RolePermissionAssign: React.FC<RolePermissionAssignProps> = ({
    */
   const { data: rolePermissions, isLoading: rolePermissionsLoading } = useQuery({
     queryKey: ['role-permissions', currentRoleId],
-    queryFn: () => permissionService.getRolePermissionDetail(currentRoleId || ''),
+    queryFn: () => permissionAssignService.getRolePermissionDetail(currentRoleId || ''),
     enabled: !!currentRoleId,
   });
 
@@ -75,7 +75,7 @@ const RolePermissionAssign: React.FC<RolePermissionAssignProps> = ({
     }: {
       permissionType: 'menu' | 'button' | 'interface';
       permissionIds: string[];
-    }) => permissionService.assignRolePermission(currentRoleId || '', permissionType, permissionIds),
+    }) => permissionAssignService.assignRolePermission(currentRoleId || '', permissionType, permissionIds),
     onSuccess: () => {
       message.success('权限分配成功');
       queryClient.invalidateQueries({ queryKey: ['role-permissions', currentRoleId] });
