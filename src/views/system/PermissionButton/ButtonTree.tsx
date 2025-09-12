@@ -3,14 +3,15 @@ import { Tree, Input, Spin, Empty, Tag, Space, Button } from 'antd';
 import { SearchOutlined, ReloadOutlined, PlusOutlined } from '@ant-design/icons';
 import { useState, useCallback, useMemo } from 'react';
 import type React from 'react';
-import { permissionService, type PermissionButton } from '@/services/system/permission/permissionApi';
+import type { PermissionButtonModel } from '@/services/system/permission/PermissionButton/permissionButtonApi';
+import { permissionButtonService } from '@/services/system/permission/PermissionButton/permissionButtonApi';
 import { usePermission } from '@/hooks/usePermission';
 
 /**
  * 按钮树组件Props
  */
 interface ButtonTreeProps {
-  onSelectButton: (button: PermissionButton | null) => void;
+  onSelectButton: (button: PermissionButtonModel | null) => void;
   selectedButtonId?: string;
   loading?: boolean;
 }
@@ -23,18 +24,14 @@ interface TreeNode {
   title: React.ReactNode;
   children?: TreeNode[];
   isLeaf?: boolean;
-  data: PermissionButton | null;
+  data: PermissionButtonModel | null;
 }
 
 /**
  * 按钮树组件
  * 以树形结构展示权限按钮，按菜单分组
  */
-const ButtonTree: React.FC<ButtonTreeProps> = ({
-  onSelectButton,
-  selectedButtonId,
-  loading = false,
-}) => {
+const ButtonTree: React.FC<ButtonTreeProps> = ({ onSelectButton, selectedButtonId, loading = false }) => {
   const [searchText, setSearchText] = useState('');
   const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
 
@@ -53,8 +50,9 @@ const ButtonTree: React.FC<ButtonTreeProps> = ({
   } = useQuery({
     queryKey: ['permission-buttons', searchText],
     queryFn: () =>
-      permissionService.getButtonList({
+      permissionButtonService.getButtonList({
         name: searchText || undefined,
+        pageNum: 1,
         pageSize: 1000, // 获取所有数据用于树形展示
       }),
   });
@@ -108,18 +106,21 @@ const ButtonTree: React.FC<ButtonTreeProps> = ({
     if (!buttonListResponse?.records) return [];
 
     // 按菜单分组
-    const menuGroups = buttonListResponse.records.reduce((acc, button) => {
-      const menuId = button.parentMenuId || 'root';
-      if (!acc[menuId]) {
-        acc[menuId] = {
-          menuId,
-          menuName: button.parentMenuName || '根菜单',
-          buttons: [],
-        };
-      }
-      acc[menuId].buttons.push(button);
-      return acc;
-    }, {} as Record<string, { menuId: string; menuName: string; buttons: PermissionButton[] }>);
+    const menuGroups = buttonListResponse.records.reduce(
+      (acc, button: PermissionButtonModel) => {
+        const menuId = button.parentMenuId || 'root';
+        if (!acc[menuId]) {
+          acc[menuId] = {
+            menuId,
+            menuName: button.parentMenuName || '根菜单',
+            buttons: [],
+          };
+        }
+        acc[menuId].buttons.push(button);
+        return acc;
+      },
+      {} as Record<string, { menuId: string; menuName: string; buttons: PermissionButtonModel[] }>,
+    );
 
     // 转换为树形结构
     const nodes: TreeNode[] = Object.values(menuGroups).map((group) => ({
@@ -127,21 +128,17 @@ const ButtonTree: React.FC<ButtonTreeProps> = ({
       title: (
         <div className="flex items-center justify-between">
           <span className="font-medium">{group.menuName}</span>
-          <Tag color="blue" size="small">
-            {group.buttons.length}
-          </Tag>
+          <Tag color="blue">{group.buttons.length}</Tag>
         </div>
       ),
       data: null,
-      children: group.buttons.map((button) => ({
+      children: group.buttons.map((button: PermissionButtonModel) => ({
         key: button.id,
         title: (
           <div className="flex items-center justify-between group">
             <div className="flex items-center space-x-2">
               <span className="text-sm">{button.name}</span>
-              <Tag color={button.status ? 'green' : 'red'} size="small">
-                {button.status ? '启用' : '禁用'}
-              </Tag>
+              <Tag color={button.status ? 'green' : 'red'}>{button.status ? '启用' : '禁用'}</Tag>
             </div>
             <div className="opacity-0 group-hover:opacity-100">
               <Space size="small">
@@ -192,13 +189,7 @@ const ButtonTree: React.FC<ButtonTreeProps> = ({
             enterButton={<SearchOutlined />}
           />
           <div className="flex justify-between">
-            <Button
-              type="text"
-              icon={<ReloadOutlined />}
-              onClick={handleRefresh}
-              loading={loading}
-              size="small"
-            >
+            <Button type="text" icon={<ReloadOutlined />} onClick={handleRefresh} loading={loading} size="small">
               刷新
             </Button>
             {canAdd && (
@@ -213,11 +204,7 @@ const ButtonTree: React.FC<ButtonTreeProps> = ({
       {/* 树形结构 */}
       <div className="flex-1 p-4 overflow-auto">
         {treeData.length === 0 ? (
-          <Empty
-            description="暂无权限按钮"
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            className="mt-8"
-          />
+          <Empty description="暂无权限按钮" image={Empty.PRESENTED_IMAGE_SIMPLE} className="mt-8" />
         ) : (
           <Tree
             treeData={treeData}

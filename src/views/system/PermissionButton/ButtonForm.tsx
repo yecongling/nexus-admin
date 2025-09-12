@@ -4,17 +4,17 @@ import { SaveOutlined } from '@ant-design/icons';
 import { useEffect } from 'react';
 import type React from 'react';
 import {
-  permissionService,
-  type PermissionButton,
+  permissionButtonService,
+  type PermissionButtonModel,
   type ButtonFormData,
-} from '@/services/system/permission/permissionApi';
+} from '@/services/system/permission/PermissionButton/permissionButtonApi';
 import { menuService } from '@/services/system/menu/menuApi';
 
 /**
  * 按钮表单组件Props
  */
 interface ButtonFormProps {
-  button?: PermissionButton;
+  button?: PermissionButtonModel;
   onSave: () => void;
   onCancel: () => void;
 }
@@ -47,9 +47,9 @@ const ButtonForm: React.FC<ButtonFormProps> = ({ button, onSave, onCancel }) => 
   const saveButtonMutation = useMutation({
     mutationFn: (data: ButtonFormData) => {
       if (button?.id) {
-        return permissionService.updateButton({ ...data, id: button.id });
+        return permissionButtonService.updateButton({ ...data, id: button.id });
       } else {
-        return permissionService.addButton(data);
+        return permissionButtonService.addButton(data);
       }
     },
     onSuccess: () => {

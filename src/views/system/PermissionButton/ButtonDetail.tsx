@@ -3,7 +3,10 @@ import { Card, Descriptions, Tag, Space, Button, Divider, Spin } from 'antd';
 import { EditOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useState, useCallback } from 'react';
 import type React from 'react';
-import { permissionService, type PermissionButton } from '@/services/system/permission/permissionApi';
+import {
+  permissionButtonService,
+  type PermissionButtonModel,
+} from '@/services/system/permission/PermissionButton/permissionButtonApi';
 import { usePermission } from '@/hooks/usePermission';
 import ButtonForm from './ButtonForm';
 import ButtonInterfacePermission from './ButtonInterfacePermission';
@@ -12,7 +15,7 @@ import ButtonInterfacePermission from './ButtonInterfacePermission';
  * 按钮详情组件Props
  */
 interface ButtonDetailProps {
-  button: PermissionButton;
+  button: PermissionButtonModel;
   onRefresh: () => void;
 }
 
@@ -36,7 +39,7 @@ const ButtonDetail: React.FC<ButtonDetailProps> = ({ button, onRefresh }) => {
     refetch: refetchInterfaces,
   } = useQuery({
     queryKey: ['button-interfaces', button.id],
-    queryFn: () => permissionService.getButtonInterfaces(button.id),
+    queryFn: () => permissionButtonService.getButtonInterfaces(button.id),
     enabled: !!button.id,
   });
 

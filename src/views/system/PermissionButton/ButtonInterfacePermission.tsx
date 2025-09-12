@@ -4,9 +4,9 @@ import { PlusOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons'
 import { useState, useCallback, useMemo } from 'react';
 import type React from 'react';
 import {
-  permissionService,
+  permissionButtonService,
   type ButtonInterfacePermission as ButtonInterfacePermissionType,
-} from '@/services/system/permission/permissionApi';
+} from '@/services/system/permission/PermissionButton/permissionButtonApi';
 import type { TableProps } from 'antd';
 import type { InterfacePermission } from '@/services/system/menu/menuApi';
 
@@ -38,7 +38,7 @@ const ButtonInterfacePermission: React.FC<ButtonInterfacePermissionProps> = ({
    * 分配接口权限的mutation
    */
   const assignInterfacesMutation = useMutation({
-    mutationFn: (interfaceIds: string[]) => permissionService.assignButtonInterfaces(buttonId, interfaceIds),
+    mutationFn: (interfaceIds: string[]) => permissionButtonService.assignButtonInterfaces(buttonId, interfaceIds),
     onSuccess: () => {
       message.success('接口权限分配成功');
       queryClient.invalidateQueries({ queryKey: ['button-interfaces', buttonId] });
@@ -57,7 +57,7 @@ const ButtonInterfacePermission: React.FC<ButtonInterfacePermissionProps> = ({
     mutationFn: (interfaceId: string) => {
       const currentIds = interfacePermissions.map((p) => p.interfaceId);
       const newIds = currentIds.filter((id) => id !== interfaceId);
-      return permissionService.assignButtonInterfaces(buttonId, newIds);
+      return permissionButtonService.assignButtonInterfaces(buttonId, newIds);
     },
     onSuccess: () => {
       message.success('接口权限移除成功');

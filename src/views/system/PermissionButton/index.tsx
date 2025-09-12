@@ -4,7 +4,7 @@ import type React from 'react';
 import ButtonTree from './ButtonTree';
 import ButtonDetail from './ButtonDetail';
 import ButtonMaintenance from './ButtonMaintenance';
-import type { PermissionButtonModel } from '@/services/system/permission/permissionApi';
+import type { PermissionButtonModel } from '@/services/system/permission/PermissionButton/permissionButtonApi';
 
 /**
  * 按钮列表主组件

@@ -4,10 +4,10 @@ import { EditOutlined, DeleteOutlined, PlusOutlined, ReloadOutlined } from '@ant
 import { useState, useCallback, useMemo } from 'react';
 import type React from 'react';
 import {
-  permissionService,
+  permissionButtonService,
   type PermissionButtonModel,
   type ButtonSearchParams,
-} from '@/services/system/permission/permissionApi';
+} from '@/services/system/permission/PermissionButton/permissionButtonApi';
 import { usePermission } from '@/hooks/usePermission';
 import ButtonForm from './ButtonForm';
 import type { TableProps } from 'antd';
@@ -49,14 +49,14 @@ const ButtonMaintenance: React.FC<ButtonMaintenanceProps> = ({ onRefresh }) => {
     refetch,
   } = useQuery({
     queryKey: ['permission-buttons', searchParams],
-    queryFn: () => permissionService.getButtonList(searchParams),
+    queryFn: () => permissionButtonService.getButtonList(searchParams),
   });
 
   /**
    * 删除按钮的mutation
    */
   const deleteButtonMutation = useMutation({
-    mutationFn: (buttonId: string) => permissionService.deleteButton(buttonId),
+    mutationFn: (buttonId: string) => permissionButtonService.deleteButton(buttonId),
     onSuccess: () => {
       message.success('按钮删除成功');
       queryClient.invalidateQueries({ queryKey: ['permission-buttons'] });
@@ -71,7 +71,7 @@ const ButtonMaintenance: React.FC<ButtonMaintenanceProps> = ({ onRefresh }) => {
    * 批量删除按钮的mutation
    */
   const batchDeleteMutation = useMutation({
-    mutationFn: (buttonIds: string[]) => permissionService.batchDeleteButtons(buttonIds),
+    mutationFn: (buttonIds: string[]) => permissionButtonService.batchDeleteButtons(buttonIds),
     onSuccess: () => {
       message.success('批量删除成功');
       queryClient.invalidateQueries({ queryKey: ['permission-buttons'] });
@@ -88,7 +88,7 @@ const ButtonMaintenance: React.FC<ButtonMaintenanceProps> = ({ onRefresh }) => {
    */
   const toggleStatusMutation = useMutation({
     mutationFn: ({ buttonId, status }: { buttonId: string; status: boolean }) =>
-      permissionService.toggleButtonStatus(buttonId, status),
+      permissionButtonService.toggleButtonStatus(buttonId, status),
     onSuccess: () => {
       message.success('状态切换成功');
       queryClient.invalidateQueries({ queryKey: ['permission-buttons'] });
@@ -157,7 +157,7 @@ const ButtonMaintenance: React.FC<ButtonMaintenanceProps> = ({ onRefresh }) => {
    * @param status 新状态
    */
   const handleToggleStatus = useCallback(
-    (button: PermissionButtonModel      , status: boolean) => {
+    (button: PermissionButtonModel, status: boolean) => {
       toggleStatusMutation.mutate({ buttonId: button.id, status });
     },
     [toggleStatusMutation],
@@ -220,7 +220,7 @@ const ButtonMaintenance: React.FC<ButtonMaintenanceProps> = ({ onRefresh }) => {
         key: 'index',
         width: 80,
         align: 'center',
-        render: (_, __, index) => (searchParams.pageNum! - 1) * searchParams.pageSize! + index + 1,
+        render: (_, __, index) => (searchParams.pageNum - 1) * searchParams.pageSize + index + 1,
       },
       {
         title: '按钮名称',
